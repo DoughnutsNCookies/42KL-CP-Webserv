@@ -1,29 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   WebServer.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/07 18:13:23 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/02 13:32:48 by schuah           ###   ########.fr       */
+/*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
+/*   Updated: 2023/03/02 13:33:06 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#ifndef WEBSERVER_HPP
+# define WEBSERVER_HPP
+
 #include "webserv.hpp"
 
-int	main(int ac, char **av)
+class WebServer
 {
-	std::string config_file = DEFAULT_CONFIG_PATH;
+	public:
+		WebServer(std::string configFilePath);
+		~WebServer();
+	private:
+		std::string configFilePath;
+};
 
-	if (ac > 2)
-	{
-		std::cout << "Usage: ./webserv <config_file>" << std::endl;
-		return (EXIT_FAILURE);
-	}
-	else if (ac == 2)
-		config_file = av[1];
-	std::cout << "Using config file: " << config_file << std::endl;
-	WebServer	webserver(config_file);
-	return (EXIT_SUCCESS);
-}
+#endif

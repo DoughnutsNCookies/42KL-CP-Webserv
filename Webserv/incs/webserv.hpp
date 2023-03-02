@@ -3,15 +3,26 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/07 18:13:39 by schuah            #+#    #+#             */
-/*   Updated: 2023/02/28 18:16:54 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/02 13:33:00 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef WEBSERV_HPP
 # define WEBSERV_HPP
+
+# include <iostream>
+# include <string>
+
+# include <sys/types.h>
+# include <sys/socket.h>
+# include <netdb.h>
+# include <arpa/inet.h>
+# include <netinet/in.h>
+
+# include "WebServer.hpp"
 
 # define RESET		"\033[0m"
 # define BLACK		"\033[30m"
@@ -23,6 +34,6 @@
 # define CYAN		"\033[36m"
 # define WHITE		"\033[37m"
 
-# include <iostream>
+# define DEFAULT_CONFIG_PATH "conf/default.conf"
 
 #endif

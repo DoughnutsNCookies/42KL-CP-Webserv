@@ -3,17 +3,17 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+         #
+#    By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/28 17:38:48 by jhii              #+#    #+#              #
-#    Updated: 2023/02/28 18:01:09 by jhii             ###   ########.fr        #
+#    Updated: 2023/03/02 13:44:31 by schuah           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		=	webserv
 CXX			=	c++
 CXXFLAGS	=	-Wall -Wextra -Werror -Wshadow -std=c++98 -pedantic
-CXXFLAGS	=	-fsanitize=address -g3
+# CXXFLAGS	=	-fsanitize=address -g3
 INCLUDES	=	-Iincs
 RM			=	rm -rf
 MKDIR		=	mkdir -p
@@ -22,13 +22,13 @@ SRC_PATH	=	srcs
 OBJ_PATH	=	objs
 ANNOYING	=	*.dSYM .vscode
 MAIN		=	srcs/main.cpp
-SRC			=	
+SRC			=	WebServer.cpp
 OBJ			=	${addprefix ${OBJ_PATH}/, ${SRC:.cpp=.o}}
 
 all: ${NAME}
 
 ${NAME}: ${OBJ} $(MAIN)
-	${CXX} ${CXXFLAGS} ${INCLUDES} -o ${NAME} ${MAIN} ${OBJ}
+	${CXX} ${CXXFLAGS} ${INCLUDES} ${MAIN} ${OBJ} -o ${NAME}
 
 ${OBJ_PATH}/%.o: ${SRC_PATH}/%.cpp
 	${MKDIR} ${@D}
