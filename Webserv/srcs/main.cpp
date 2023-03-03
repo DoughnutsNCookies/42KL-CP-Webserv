@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/07 18:13:23 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/02 13:32:48 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/02 19:46:53 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,13 @@ int	main(int ac, char **av)
 	else if (ac == 2)
 		config_file = av[1];
 	std::cout << "Using config file: " << config_file << std::endl;
-	WebServer	webserver(config_file);
+	try {
+		WebServer	webserver(config_file);
+		webserver.runServer();
+	}
+	catch (std::exception &e) {
+		std::cout << e.what() << std::endl;
+		return (EXIT_FAILURE);
+	}
 	return (EXIT_SUCCESS);
 }

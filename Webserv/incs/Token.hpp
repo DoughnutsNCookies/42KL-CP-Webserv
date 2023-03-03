@@ -1,31 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   WebServer.hpp                                      :+:      :+:    :+:   */
+/*   Token.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/02 19:38:05 by schuah           ###   ########.fr       */
+/*   Created: 2023/03/03 10:18:53 by schuah            #+#    #+#             */
+/*   Updated: 2023/03/03 10:49:52 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef WEBSERVER_HPP
-# define WEBSERVER_HPP
+#ifndef TOKEN_HPP
+# define TOKEN_HPP
 
 # include <string>
-# include "ConfigManager.hpp"
 
-class WebServer
+class Token
 {
 	public:
-		WebServer(std::string configFilePath);
-		~WebServer();
-		void	runServer();
-
+		enum Type
+		{
+			OPEN_BRACE,
+			CLOSE_BRACE,
+			SEMICOLON,
+			TEXT,
+			INVALID
+		};
+		Token(const std::string &context, Type type, int lineNum);
+		~Token();
+		std::string	getContext();
+		int			getLineNum();
+		Type		getType();
 	private:
-		std::string		_configFilePath;
-		ConfigManager	_configManager;
+		std::string	_context;
+		int			_lineNum;
+		Type		_type;
 };
 
 #endif

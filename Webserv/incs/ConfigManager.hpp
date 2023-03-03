@@ -1,31 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   WebServer.hpp                                      :+:      :+:    :+:   */
+/*   ConfigManager.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/02 19:38:05 by schuah           ###   ########.fr       */
+/*   Created: 2023/03/02 13:49:34 by schuah            #+#    #+#             */
+/*   Updated: 2023/03/03 10:42:08 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef WEBSERVER_HPP
-# define WEBSERVER_HPP
+#ifndef CONFIGMANAGER_HPP
+# define CONFIGMANAGER_HPP
 
 # include <string>
-# include "ConfigManager.hpp"
+# include <fstream>
 
-class WebServer
+# define ValidTokens "{};"
+# define ValidSpaces " \f\n\r\t\v"
+
+class ConfigManager
 {
 	public:
-		WebServer(std::string configFilePath);
-		~WebServer();
-		void	runServer();
+		ConfigManager();
+		ConfigManager(std::string configFilePath);
+		ConfigManager	&operator=(const ConfigManager &srcs);
+		~ConfigManager();
+		int	parseConfigFile();
 
 	private:
+		std::ifstream	_file;
 		std::string		_configFilePath;
-		ConfigManager	_configManager;
+		std::string		_fileBuffer;
 };
 
 #endif

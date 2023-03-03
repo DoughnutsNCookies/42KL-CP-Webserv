@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/07 18:13:39 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/02 13:33:00 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/02 19:38:49 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,8 @@
 # include <iostream>
 # include <string>
 
-# include <sys/types.h>
-# include <sys/socket.h>
-# include <netdb.h>
-# include <arpa/inet.h>
-# include <netinet/in.h>
-
 # include "WebServer.hpp"
+# include "ConfigManager.hpp"
 
 # define RESET		"\033[0m"
 # define BLACK		"\033[30m"
@@ -34,6 +29,6 @@
 # define CYAN		"\033[36m"
 # define WHITE		"\033[37m"
 
-# define DEFAULT_CONFIG_PATH "conf/default.conf"
+# define DEFAULT_CONFIG_PATH	"conf/default.conf"
 
 #endif
