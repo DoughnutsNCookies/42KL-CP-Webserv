@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/03 10:18:53 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/03 10:49:52 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/03 13:12:46 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,24 +15,26 @@
 
 # include <string>
 
+enum Type
+{
+    CONTEXT,
+    KEY,
+    VALUE,
+    SEMICOLON,
+    OPEN_BRACE,
+    CLOSE_BRACE
+};
+
 class Token
 {
 	public:
-		enum Type
-		{
-			OPEN_BRACE,
-			CLOSE_BRACE,
-			SEMICOLON,
-			TEXT,
-			INVALID
-		};
-		Token(const std::string &context, Type type, int lineNum);
+		Token(std::string context, Type type, int lineNum);
 		~Token();
-		std::string	getContext();
+		std::string	getToken();
 		int			getLineNum();
 		Type		getType();
 	private:
-		std::string	_context;
+		std::string	_token;
 		int			_lineNum;
 		Type		_type;
 };

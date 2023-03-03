@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:49:34 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/03 10:42:08 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/03 13:18:50 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,10 @@
 
 # include <string>
 # include <fstream>
+# include <vector>
+# include <iostream>
 
-# define ValidTokens "{};"
-# define ValidSpaces " \f\n\r\t\v"
+# include "Token.hpp"
 
 class ConfigManager
 {
@@ -26,12 +27,14 @@ class ConfigManager
 		ConfigManager(std::string configFilePath);
 		ConfigManager	&operator=(const ConfigManager &srcs);
 		~ConfigManager();
-		int	parseConfigFile();
+		void			parseConfigFile();
 
 	private:
-		std::ifstream	_file;
-		std::string		_configFilePath;
-		std::string		_fileBuffer;
+		void						_lexLine(std::string line, int lineNum);
+		void						_createToken(std::string *token, Type *currentType, Type type, std::string c, int lineNum);
+		std::ifstream				_file;
+		std::string					_configFilePath;
+		std::vector<Token>			_tokens;
 };
 
 #endif
