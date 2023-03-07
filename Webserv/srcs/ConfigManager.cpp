@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:55:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/03 14:38:36 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/07 17:57:57 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,6 @@ void	ConfigManager::parseConfigFile()
 		this->_lexLine(line, lineNum);
 	}
 	file.close();
-	std::cout << "Here\n" << std::endl;
 	// for (size_t i = 0; i < this->_tokens.size(); i++)
 	// {
 	// 	std::cout << "Token: " << this->_tokens[i].getToken() << ", Type: " << this->_tokens[i].getType() << ", Line: " << this->_tokens[i].getLineNum() <<std::endl;
