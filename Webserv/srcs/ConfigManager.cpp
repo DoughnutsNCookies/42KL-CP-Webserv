@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:55:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/03 14:21:03 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/03 14:38:36 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,20 +77,21 @@ void	ConfigManager::parseConfigFile()
 {
 	if (this->_configFilePath.empty())
 		throw std::runtime_error("Failed to open config file");
-	this->_file.open(this->_configFilePath.c_str(), std::ios::binary);
-	if (this->_file.is_open() == false)
+	std::ifstream	file(this->_configFilePath.c_str(), std::ios::binary);
+	if (file.is_open() == false)
 		throw std::runtime_error("Failed to open config file");
 	std::string	line;
 	int			lineNum = 0;
 	// this->_fileBuffer = "{" + this->_fileBuffer + "}";
-	while (std::getline(this->_file, line))
+	while (std::getline(file, line))
 	{
 		lineNum++;
 		this->_lexLine(line, lineNum);
 	}
-	this->_file.close();
-	for (size_t i = 0; i < this->_tokens.size(); i++)
-	{
-		std::cout << "Token: " << this->_tokens[i].getToken() << ", Type: " << this->_tokens[i].getType() << ", Line: " << this->_tokens[i].getLineNum() <<std::endl;
-	}
+	file.close();
+	std::cout << "Here\n" << std::endl;
+	// for (size_t i = 0; i < this->_tokens.size(); i++)
+	// {
+	// 	std::cout << "Token: " << this->_tokens[i].getToken() << ", Type: " << this->_tokens[i].getType() << ", Line: " << this->_tokens[i].getLineNum() <<std::endl;
+	// }
 }

@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:49:34 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/03 13:18:50 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/03 14:36:12 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ class ConfigManager
 	private:
 		void						_lexLine(std::string line, int lineNum);
 		void						_createToken(std::string *token, Type *currentType, Type type, std::string c, int lineNum);
-		std::ifstream				_file;
 		std::string					_configFilePath;
 		std::vector<Token>			_tokens;
 };

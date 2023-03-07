@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/03 11:01:37 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/03 16:06:06 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,5 +23,5 @@ WebServer::~WebServer() {}
 void	WebServer::runServer()
 {
 	this->_configManager.parseConfigFile();
-	std::cout << "Server running" << std::endl;
+	std::cout << "Config File Parsing Done..." << std::endl;
 }
