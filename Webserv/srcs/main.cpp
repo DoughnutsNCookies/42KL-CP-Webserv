@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/07 18:13:23 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/02 19:46:53 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/07 16:30:33 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,12 @@ int	main(int ac, char **av)
 
 	if (ac > 2)
 	{
-		std::cout << "Usage: ./webserv <config_file>" << std::endl;
+		std::cout << YELLOW "Usage: ./webserv <config_file>" RESET << std::endl;
 		return (EXIT_FAILURE);
 	}
 	else if (ac == 2)
 		config_file = av[1];
-	std::cout << "Using config file: " << config_file << std::endl;
+	std::cout << GREEN "Reading config file : " CYAN << config_file << RESET << std::endl;
 	try {
 		WebServer	webserver(config_file);
 		webserver.runServer();

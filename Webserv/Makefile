@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+         #
+#    By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/28 17:38:48 by jhii              #+#    #+#              #
-#    Updated: 2023/03/03 10:49:40 by schuah           ###   ########.fr        #
+#    Updated: 2023/03/07 16:52:50 by jhii             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,10 @@ SRC_PATH	=	srcs
 OBJ_PATH	=	objs
 ANNOYING	=	*.dSYM .vscode
 MAIN		=	srcs/main.cpp
-SRC			=	WebServer.cpp ConfigManager.cpp Token.cpp
+SRC			=	WebServer.cpp \
+				ConfigManager.cpp \
+				Token.cpp \
+				EuleePocket.cpp
 OBJ			=	${addprefix ${OBJ_PATH}/, ${SRC:.cpp=.o}}
 
 all: ${NAME}

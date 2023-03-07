@@ -3,29 +3,28 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/02 19:38:05 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/07 16:46:10 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef WEBSERVER_HPP
 # define WEBSERVER_HPP
 
-# include <string>
-# include "ConfigManager.hpp"
+# include "EuleePocket.hpp"
 
 class WebServer
 {
 	public:
 		WebServer(std::string configFilePath);
-		~WebServer();
-		void	runServer();
+		~WebServer(void);
+
+		void	runServer(void);
 
 	private:
-		std::string		_configFilePath;
-		ConfigManager	_configManager;
+		EuleePocket		_database;
 };
 
 #endif

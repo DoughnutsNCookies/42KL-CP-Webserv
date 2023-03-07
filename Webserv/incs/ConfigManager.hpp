@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigManager.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:49:34 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/03 14:36:12 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/07 16:34:15 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,17 +23,21 @@
 class ConfigManager
 {
 	public:
-		ConfigManager();
+		ConfigManager(void);
 		ConfigManager(std::string configFilePath);
-		ConfigManager	&operator=(const ConfigManager &srcs);
-		~ConfigManager();
-		void			parseConfigFile();
+		~ConfigManager(void);
+
+		ConfigManager	&operator=(const ConfigManager &ref);
+
+		void			parseConfigFile(void);
+		void			printTokens(void);
 
 	private:
-		void						_lexLine(std::string line, int lineNum);
-		void						_createToken(std::string *token, Type *currentType, Type type, std::string c, int lineNum);
-		std::string					_configFilePath;
-		std::vector<Token>			_tokens;
+		std::vector<Token>	_tokens;
+		std::string			_configFilePath;
+
+		void				_lexLine(std::string line, int lineNum);
+		void				_createToken(std::string *token, Type *currentType, Type type, std::string c, int lineNum);
 };
 
 #endif
