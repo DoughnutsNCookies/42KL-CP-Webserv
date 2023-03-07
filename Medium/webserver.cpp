@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserver.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 08:38:06 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/07 14:07:40 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/07 14:21:02 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,7 +201,7 @@ int	server(int port)
 			file.close();
 
 			// Send file
-			std::string	http_response = "HTTP/1.1 200 OK\r\nContent-Type: video/mp4\r\nContent-Length: " + std::to_string(file_size) + "\r\n\r\n" + file_contents;
+			std::string	http_response = "HTTP/1.1 200 OK\r\nContent-Type: */*\r\nContent-Length: " + std::to_string(file_size) + "\r\n\r\n" + file_contents;
 			printf("Sending file...\n");
 			// printf("Response: %s\n", http_response.c_str());
 			printf("File content: %s\n", file_contents.c_str());

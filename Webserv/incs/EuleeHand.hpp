@@ -1,32 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   EuleePocket.hpp                                    :+:      :+:    :+:   */
+/*   EuleeHand.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/07 16:46:54 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/07 17:21:22 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef EULEEPOCKET_HPP
-# define EULEEPOCKET_HPP
+#ifndef EULEEHAND_HPP
+# define EULEEHAND_HPP
 
-# include <iostream>
 # include "ConfigManager.hpp"
 
-class EuleePocket
+class EuleeHand
 {
 	public:
-		EuleePocket(void);
-		EuleePocket(std::string configFilePath, const ConfigManager &configManager);
-		EuleePocket(const EuleePocket &ref);
-		~EuleePocket(void);
+		EuleeHand(void);
+		EuleeHand(std::string configFilePath, const ConfigManager &configManager);
+		EuleeHand(const EuleeHand &ref);
+		~EuleeHand(void);
 
-		EuleePocket	&operator=(const EuleePocket &ref);
+		EuleeHand	&operator=(const EuleeHand &ref);
 
-		void	printData(void);
+		void	printTokens(void);
 		void	parseConfigFile(void);
 
 	private:

@@ -1,38 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   EuleePocket.cpp                                    :+:      :+:    :+:   */
+/*   EuleeHand.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/07 16:49:42 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/07 17:21:28 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "EuleePocket.hpp"
+#include "EuleeHand.hpp"
 
-EuleePocket::EuleePocket(void) : _configFilePath(), _configManager() {}
+EuleeHand::EuleeHand(void) : _configFilePath(), _configManager() {}
 
-EuleePocket::EuleePocket(std::string configFilePath, ConfigManager const &configManager) : _configFilePath(configFilePath), _configManager(configManager) {}
+EuleeHand::EuleeHand(std::string configFilePath, ConfigManager const &configManager) : _configFilePath(configFilePath), _configManager(configManager) {}
 
-EuleePocket::EuleePocket(const EuleePocket &ref) : _configFilePath(ref._configFilePath), _configManager(ref._configManager) {}
+EuleeHand::EuleeHand(const EuleeHand &ref) : _configFilePath(ref._configFilePath), _configManager(ref._configManager) {}
 
-EuleePocket::~EuleePocket(void) {}
+EuleeHand::~EuleeHand(void) {}
 
-EuleePocket	&EuleePocket::operator=(const EuleePocket &ref)
+EuleeHand	&EuleeHand::operator=(const EuleeHand &ref)
 {
 	this->_configFilePath = ref._configFilePath;
 	this->_configManager = ref._configManager;
 	return (*this);
 }
 
-void	EuleePocket::printData(void)
+void	EuleeHand::printTokens(void)
 {
 	this->_configManager.printTokens();
 }
 
-void	EuleePocket::parseConfigFile(void)
+void	EuleeHand::parseConfigFile(void)
 {
 	this->_configManager.parseConfigFile();
 }
