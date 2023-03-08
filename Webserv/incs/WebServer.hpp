@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/08 15:04:37 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/08 15:34:54 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@
 # include <netdb.h>
 # include <poll.h>
 
-# include "ConfigManager.hpp"
+# include "../incs/ConfigManager.hpp"
+# include "../incs/HttpPostResponse.hpp"
 # include "webserv.hpp"
 
 # define WS_DOMAIN		AF_INET

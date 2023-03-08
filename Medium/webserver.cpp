@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 08:38:06 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/07 14:07:40 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/07 16:36:52 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,6 @@ void	handle_cgi(int new_socket, std::string method, std::string path, int conten
 int	server(int port)
 {
 	int					server_fd, new_socket, addrlen;;
-	long				valread;
 	struct sockaddr_in	address;
 	struct addrinfo		hints, *res;
 
@@ -126,6 +125,7 @@ int	server(int port)
 	if (listen(server_fd, 10) < 0)
 		perror_and_exit("listen failed");
 
+	long				valread;
 	while (1)
 	{
 		printf("Port: %d\nWaiting for new connection...\n", port);
