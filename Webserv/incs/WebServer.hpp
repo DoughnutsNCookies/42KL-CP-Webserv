@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/08 15:34:54 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/08 15:47:12 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 
 # include "../incs/ConfigManager.hpp"
 # include "../incs/HttpPostResponse.hpp"
+# include "../incs/HttpDefaultResponse.hpp"
 # include "webserv.hpp"
 
 # define WS_DOMAIN		AF_INET
@@ -46,7 +47,6 @@ class WebServer
 		void				_setupServer();
 		void				_handleCgi(std::string method, int contentLength);
 		int					_handleGet();
-		void				_handlePost(std::string buffer, int content_length, int valread);
 		void				_serverLoop();
 
 		std::string			_configFilePath, _path;

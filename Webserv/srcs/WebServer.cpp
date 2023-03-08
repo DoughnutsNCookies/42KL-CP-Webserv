@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/08 15:36:11 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/08 15:53:20 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,24 +54,6 @@ void	WebServer::_setupServer()
 	this->_fds[0].fd = this->_serverFd;
 	this->_fds[0].events = POLLIN;
 	this->_ret = poll(this->_fds, 1, WS_TIMEOUT);
-}
-
-void	WebServer::_handlePost(std::string buffer, int content_length, int valread)
-{
-	size_t	content_length_pos = buffer.find("Content-Length: ");
-	if (content_length_pos != std::string::npos)
-	{
-		content_length_pos += std::strlen("Content-Length: ");
-		content_length = std::stoi(buffer.substr(content_length_pos));
-	}
-
-	std::string	message_body;
-	message_body.resize(content_length);
-	valread = read(this->_newSocket, &message_body[0], content_length);
-
-	std::string response_body = "Server has received your POST request!";
-	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + std::to_string(response_body.length()) + "\r\n\r\n" + response_body;
-	send(this->_newSocket, response.c_str(), response.length(), 0);
 }
 
 static std::string	get_content_type(std::string file)
@@ -127,7 +109,6 @@ int	WebServer::_handleGet()
 	return (0);
 }
 
-// void	WebServer::_handleCgi(std::string method, int contentLength, const char *path)
 void	WebServer::_handleCgi(std::string method, int contentLength)
 {
 	int		cgi_input[2], cgi_output[2], status;
@@ -216,9 +197,6 @@ void	WebServer::_serverLoop()
 			continue;
 		}
 		std::cout << buffer;
-		// std::cout << "Method: " << method << std::endl;
-		// std::cout << "Path: " << this->_path << std::endl;
-		
 		if (method == "POST")
 		{
 			HttpPostResponse	postResponse(this->_newSocket, contentLength, valread, buffer);
@@ -233,10 +211,8 @@ void	WebServer::_serverLoop()
 			this->_handleCgi(method, contentLength);
 		else
 		{
-			std::string hello = "HTTP/1.1 200 OK\nContent-Length: 12\n\nHello World!";
-			write(this->_newSocket, hello.c_str(), hello.length());
-			printf("Hello message sent\n\n");
-			close(this->_newSocket);
+			HttpDefaultResponse	defaultResponse(this->_newSocket);
+			defaultResponse.handleDefault();
 		}
 	}
 }
