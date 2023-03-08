@@ -6,11 +6,11 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:55:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/07 17:57:57 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/08 14:24:01 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ConfigManager.hpp"
+#include "../incs/ConfigManager.hpp"
 #include <unistd.h>
 
 ConfigManager::ConfigManager(): _configFilePath() {}

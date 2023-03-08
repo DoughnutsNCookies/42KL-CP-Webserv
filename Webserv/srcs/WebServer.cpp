@@ -6,11 +6,11 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/07 20:59:50 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/08 15:04:57 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "WebServer.hpp"
+#include "../incs/WebServer.hpp"
 
 WebServer::WebServer(std::string configFilePath): _configFilePath(configFilePath)
 {
@@ -21,7 +21,7 @@ WebServer::~WebServer() {}
 
 void	WebServer::_perrorExit(std::string msg)
 {
-	std::cerr << RED + msg + ": ";
+	std::cerr << RED << msg << ": ";
 	perror("");
 	std::cerr << RESET;
 	exit(EXIT_FAILURE);
@@ -50,6 +50,10 @@ void	WebServer::_setupServer()
 		this->_perrorExit("Bind Error");
 	if (listen(this->_serverFd, WS_BACKLOG) < 0)
 		this->_perrorExit("Listen Error");
+
+	this->_fds[0].fd = this->_serverFd;
+	this->_fds[0].events = POLLIN;
+	this->_ret = poll(this->_fds, 1, WS_TIMEOUT);
 }
 
 void	WebServer::_handlePost(std::string buffer, int content_length, int valread)
@@ -65,10 +69,26 @@ void	WebServer::_handlePost(std::string buffer, int content_length, int valread)
 	message_body.resize(content_length);
 	valread = read(this->_newSocket, &message_body[0], content_length);
 
-	std::string response_body = "This is the response to your POST request.";
+	std::string response_body = "Server has received your POST request!";
 	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + std::to_string(response_body.length()) + "\r\n\r\n" + response_body;
-	printf("Response: %s\n", response.c_str());
 	send(this->_newSocket, response.c_str(), response.length(), 0);
+}
+
+static std::string	get_content_type(std::string file)
+{
+	std::string	extension = file.substr(file.find_last_of(".") + 1);
+
+	if (extension == "jpg" || extension == "jpeg" || extension == "png")
+		return ("Content-Type: image/" + extension + "\r\n");
+	if (extension == "html" || extension == "css" || extension == "js")
+		return ("Content-Type: text/" + ((extension == "js") ? "javascript" : extension) + "\r\n");
+	if (extension == "mp3")
+		return ("Content-Type: audio/mpeg\r\n");
+	if (extension == "mp4")
+		return ("Content-Type: video/mp4\r\n");
+	if (extension == "json" || extension == "pdf" || extension == "xml" || extension == "zip")
+		return ("Content-Type: application/" + extension + "\r\n");
+	return ("Content-Type: text/plain\r\n");
 }
 
 int	WebServer::_handleGet()
@@ -76,7 +96,7 @@ int	WebServer::_handleGet()
 	std::ifstream	file(this->_path.c_str() + 1);
 	if (file.fail())
 	{
-		std::cerr << "Error opening file!" << std::endl;
+		std::cerr << RED << "Error opening " << this->_path << "!\n" << RESET << std::endl;
 		std::string response_body = "404 Not Found";
 		std::string response = "HTTP/1.1 404 Not Found\r\nContent-Length: " + std::to_string(response_body.length()) + "\r\n\r\n" + response_body;
 		send(this->_newSocket, response.c_str(), response.length(), 0);
@@ -92,16 +112,16 @@ int	WebServer::_handleGet()
 	file_contents.resize(file_size + 1);
 	if (file.read(&file_contents[0], file_size).fail())
 	{
-		std::cerr << "Error reading file!" << std::endl;
+		std::cerr << RED << "Error reading " << this->_path << "!\n" << RESET << std::endl;
 		file.close();
 		close(this->_newSocket);
 		return (1);
 	}
 	file.close();
 
-	std::string	http_response = "HTTP/1.1 200 OK\r\nContent-Type: video/mp4\r\nContent-Length: " + std::to_string(file_size) + "\r\n\r\n" + file_contents;
-	// printf("Response: %s\n", http_response.c_str());
-	printf("File content: %s\n", file_contents.c_str());
+	std::string	content_type = get_content_type(this->_path);
+	std::string	http_response = "HTTP/1.1 200 OK\r\n" + get_content_type(this->_path) + "Content-Length: " + std::to_string(file_size) + "\r\n\r\n" + file_contents;
+	std::cout << GREEN << get_content_type(this->_path) << RESET << std::endl;
 	write(this->_newSocket, &http_response[0], http_response.size());
 	close(this->_newSocket);
 	return (0);
@@ -131,11 +151,11 @@ void	WebServer::_handleCgi(std::string method, int contentLength)
         // setenv("SCRIPT_NAME", path, 1);
         // setenv("QUERY_STRING", query_string, 1);
         // setenv("CONTENT_TYPE", content_type, 1);
-        setenv("CONTENT_LENGTH", "69", 1);
+        // setenv("CONTENT_LENGTH", "69", 1);
 
 		char	*cmds[2] = {(char *)(this->_path.c_str() + 1), NULL};
 		execve(cmds[0], cmds, NULL);
-		std::cerr << "Failed..." << std::endl; 
+		std::cerr << RED << "Failed to execve CGI" << RESET << std::endl; 
         exit(EXIT_FAILURE);
     }
 	else	// parent process
@@ -176,7 +196,7 @@ void	WebServer::_serverLoop()
 
 	while(1)
 	{
-		std::cout << "Port: " << WS_PORT << "\nWaiting for new connection..." << std::endl;
+		std::cout << CYAN << "Port: " << WS_PORT << "\nWaiting for new connection..." << RESET << std::endl;
 		this->_newSocket = accept(this->_serverFd, NULL, NULL);
 		if (this->_newSocket < 0)
 			this->_perrorExit("Accept Error");
@@ -191,13 +211,13 @@ void	WebServer::_serverLoop()
 		request >> method >> this->_path;
 		if (this->_path == "/favicon.ico") // Ignore favicon
 		{
-			std::cout << "Fuck you favicon" << std::endl;
+			std::cout << RED << "Go away favicon" << RESET << std::endl;
 			close(this->_newSocket);
 			continue;
 		}
-		std::cout << buffer << std::endl;
-		std::cout << "Method: " << method << std::endl;
-		std::cout << "Path: " << this->_path << std::endl;
+		std::cout << buffer;
+		// std::cout << "Method: " << method << std::endl;
+		// std::cout << "Path: " << this->_path << std::endl;
 		
 		if (method == "POST")
 			this->_handlePost(buffer, contentLength, valread);
