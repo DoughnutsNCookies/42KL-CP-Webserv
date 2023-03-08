@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/08 15:53:20 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/08 18:22:18 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void	WebServer::_perrorExit(std::string msg)
 
 void	WebServer::_setupServer()
 {
-	struct addrinfo	hints, *res;
+	addrinfo	hints, *res;
 
 	if ((this->_serverFd = socket(WS_DOMAIN, WS_TYPE, WS_PROTOCOL)) < 0)
 		this->_perrorExit("Socket Error");
@@ -46,14 +46,10 @@ void	WebServer::_setupServer()
 	freeaddrinfo(res);
 	this->_serverAddr.sin_port = htons(WS_PORT);
 
-	if (bind(this->_serverFd, (struct sockaddr *)&this->_serverAddr, sizeof(this->_serverAddr)) < 0)
+	if (bind(this->_serverFd, (sockaddr *)&this->_serverAddr, sizeof(this->_serverAddr)) < 0)
 		this->_perrorExit("Bind Error");
 	if (listen(this->_serverFd, WS_BACKLOG) < 0)
 		this->_perrorExit("Listen Error");
-
-	this->_fds[0].fd = this->_serverFd;
-	this->_fds[0].events = POLLIN;
-	this->_ret = poll(this->_fds, 1, WS_TIMEOUT);
 }
 
 static std::string	get_content_type(std::string file)
@@ -181,9 +177,23 @@ void	WebServer::_serverLoop()
 		this->_newSocket = accept(this->_serverFd, NULL, NULL);
 		if (this->_newSocket < 0)
 			this->_perrorExit("Accept Error");
-		std::string	buffer(WS_BUFFER_SIZE, '\0');
-		valread = read(this->_newSocket, &buffer[0], WS_BUFFER_SIZE);
-		buffer.resize(valread);
+
+		this->_fds[0].fd = this->_newSocket;
+		this->_fds[0].events = POLLIN;
+		fcntl(this->_fds[0].fd, F_SETFL, O_NONBLOCK);
+
+		int	ret = poll(this->_fds, 1, WS_TIMEOUT);
+		std::string	buffer;
+		if (ret == -1)
+			std::cout << RED << "Poll error" << RESET << std::endl;
+		else if (ret == 0)
+			std::cout << RED << "Poll timeout" << RESET << std::endl;
+		else if (this->_fds[0].revents & POLLIN)
+		{
+			buffer.resize(WS_BUFFER_SIZE, '\0');
+			valread = read(this->_newSocket, &buffer[0], WS_BUFFER_SIZE);
+			buffer.resize(valread);
+		}
 
 		std::string	method, query, contentType;
 		int		contentLength = 0;
@@ -197,6 +207,7 @@ void	WebServer::_serverLoop()
 			continue;
 		}
 		std::cout << buffer;
+
 		if (method == "POST")
 		{
 			HttpPostResponse	postResponse(this->_newSocket, contentLength, valread, buffer);
@@ -211,7 +222,7 @@ void	WebServer::_serverLoop()
 			this->_handleCgi(method, contentLength);
 		else
 		{
-			HttpDefaultResponse	defaultResponse(this->_newSocket);
+			HttpDefaultResponse	defaultResponse(this->_fds, this->_newSocket);
 			defaultResponse.handleDefault();
 		}
 	}

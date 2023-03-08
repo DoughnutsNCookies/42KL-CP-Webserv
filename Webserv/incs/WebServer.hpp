@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/08 15:47:12 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/08 18:25:47 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,12 @@
 # include <string>
 # include <sstream>
 # include <fstream>
+# include <vector>
 # include <unistd.h>
 # include <netdb.h>
 # include <poll.h>
+# include <fcntl.h>
+
 
 # include "../incs/ConfigManager.hpp"
 # include "../incs/HttpPostResponse.hpp"
@@ -33,7 +36,7 @@
 # define WS_BACKLOG		10
 # define WS_PORT		8080
 # define WS_BUFFER_SIZE	30000
-# define WS_TIMEOUT		3000
+# define WS_TIMEOUT		10000
 
 class WebServer
 {
@@ -50,9 +53,9 @@ class WebServer
 		void				_serverLoop();
 
 		std::string			_configFilePath, _path;
-		int					_serverFd, _newSocket, _ret;
-		struct sockaddr_in	_serverAddr;
-		struct pollfd		_fds[1];
+		int					_serverFd, _newSocket;
+		sockaddr_in			_serverAddr;
+		pollfd				_fds[1];
 		ConfigManager		_configManager;
 };
 

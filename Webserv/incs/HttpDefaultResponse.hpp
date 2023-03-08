@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:38:49 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/08 15:42:12 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/08 16:55:27 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,21 @@
 # include <string>
 # include <iostream>
 # include <unistd.h>
+# include <poll.h>
+
+# include "webserv.hpp"
 
 class HttpDefaultResponse
 {
 	public:
-		HttpDefaultResponse(int socket);
+		HttpDefaultResponse(pollfd (&fds)[1], int socket);
 		~HttpDefaultResponse();
 		void	handleDefault();
 
 	private:
-		int	_socket;
+		pollfd	(&_fds)[1];
+		int		_socket;
+		
 };
 
 #endif
