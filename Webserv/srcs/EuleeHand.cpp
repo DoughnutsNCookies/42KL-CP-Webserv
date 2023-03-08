@@ -36,3 +36,14 @@ void	EuleeHand::parseConfigFile(void)
 {
 	this->_configManager.parseConfigFile();
 }
+
+void	EuleeHand::errorHandleShit(void)
+{
+	this->_configManager.errorHandleShit();
+}
+
+void	EuleeHand::configLibrary(void)
+{
+	this->_configManager.configLibrary();
+}
+
