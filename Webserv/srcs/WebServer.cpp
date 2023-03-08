@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/08 18:22:18 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/08 21:49:25 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,10 @@
 WebServer::WebServer(std::string configFilePath): _configFilePath(configFilePath)
 {
 	this->_configManager = ConfigManager(configFilePath);
+	
+	//Temporary to host 2 ports
+	this->_serverAddr.resize(2);
+	this->_serverFd.resize(2); 
 }
 
 WebServer::~WebServer() {}
@@ -31,24 +35,42 @@ void	WebServer::_setupServer()
 {
 	addrinfo	hints, *res;
 
-	if ((this->_serverFd = socket(WS_DOMAIN, WS_TYPE, WS_PROTOCOL)) < 0)
-		this->_perrorExit("Socket Error");
-	
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = WS_DOMAIN;
 	hints.ai_socktype = WS_TYPE;
 	hints.ai_flags = WS_FLAGS;
 
+	// Default port
+	if ((this->_serverFd[0] = socket(WS_DOMAIN, WS_TYPE, WS_PROTOCOL)) < 0)
+		this->_perrorExit("Socket Error");
+
 	if (getaddrinfo(WS_SERVER_NAME, std::to_string(WS_PORT).c_str(), &hints, &res) != 0)
 		this->_perrorExit("Getaddrinfo Error");
 	
-	memcpy(&this->_serverAddr, res->ai_addr, res->ai_addrlen);
+	memcpy(&this->_serverAddr[0], res->ai_addr, res->ai_addrlen);
 	freeaddrinfo(res);
-	this->_serverAddr.sin_port = htons(WS_PORT);
+	this->_serverAddr[0].sin_port = htons(WS_PORT);
 
-	if (bind(this->_serverFd, (sockaddr *)&this->_serverAddr, sizeof(this->_serverAddr)) < 0)
-		this->_perrorExit("Bind Error");
-	if (listen(this->_serverFd, WS_BACKLOG) < 0)
+	if (bind(this->_serverFd[0], (sockaddr *)&this->_serverAddr[0], sizeof(this->_serverAddr[0])) < 0)
+		this->_perrorExit("Bind Error 1");
+	if (listen(this->_serverFd[0], WS_BACKLOG) < 0)
+		this->_perrorExit("Listen Error");
+
+	// Trying port 9090
+	int	port = 9090;
+	if ((this->_serverFd[1] = socket(WS_DOMAIN, WS_TYPE, WS_PROTOCOL)) < 0)
+		this->_perrorExit("Socket Error");
+
+	if (getaddrinfo(WS_SERVER_NAME, std::to_string(port).c_str(), &hints, &res) != 0)
+		this->_perrorExit("Getaddrinfo Error");
+	
+	memcpy(&this->_serverAddr[1], res->ai_addr, res->ai_addrlen);
+	freeaddrinfo(res);
+	this->_serverAddr[1].sin_port = htons(port);
+
+	if (bind(this->_serverFd[1], (sockaddr *)&this->_serverAddr[1], sizeof(this->_serverAddr[1])) < 0)
+		this->_perrorExit("Bind Error 2");
+	if (listen(this->_serverFd[1], WS_BACKLOG) < 0)
 		this->_perrorExit("Listen Error");
 }
 
@@ -174,13 +196,25 @@ void	WebServer::_serverLoop()
 	while(1)
 	{
 		std::cout << CYAN << "Port: " << WS_PORT << "\nWaiting for new connection..." << RESET << std::endl;
-		this->_newSocket = accept(this->_serverFd, NULL, NULL);
+		this->_newSocket = 0;
+		fcntl(this->_serverFd[0], F_SETFL, O_NONBLOCK);
+		fcntl(this->_serverFd[1], F_SETFL, O_NONBLOCK);
+		int i = 0;
+		while (this->_newSocket <= 0)
+		{
+			for (i = 0; i < 2; i++)
+			{
+				this->_newSocket = accept(this->_serverFd[i], NULL, NULL);
+				if (this->_newSocket != -1)
+					break ;
+			}
+		}
+		std::cout << "Accepted! i: " << i << std::endl;
 		if (this->_newSocket < 0)
 			this->_perrorExit("Accept Error");
 
 		this->_fds[0].fd = this->_newSocket;
-		this->_fds[0].events = POLLIN;
-		fcntl(this->_fds[0].fd, F_SETFL, O_NONBLOCK);
+		this->_fds[0].events = POLLIN | POLLOUT;
 
 		int	ret = poll(this->_fds, 1, WS_TIMEOUT);
 		std::string	buffer;

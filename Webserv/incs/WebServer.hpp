@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/08 18:25:47 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/08 21:47:53 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@
 # define WS_FLAGS		AI_PASSIVE
 # define WS_SERVER_NAME	"localhost"
 # define WS_BACKLOG		10
-# define WS_PORT		8080
+# define WS_PORT		8082
 # define WS_BUFFER_SIZE	30000
 # define WS_TIMEOUT		10000
 
@@ -52,11 +52,12 @@ class WebServer
 		int					_handleGet();
 		void				_serverLoop();
 
-		std::string			_configFilePath, _path;
-		int					_serverFd, _newSocket;
-		sockaddr_in			_serverAddr;
-		pollfd				_fds[1];
-		ConfigManager		_configManager;
+		std::string					_configFilePath, _path;
+		std::vector<int>			_serverFd;
+		int							_newSocket;
+		std::vector<sockaddr_in>	_serverAddr;
+		pollfd						_fds[1];
+		ConfigManager				_configManager;
 };
 
 #endif
