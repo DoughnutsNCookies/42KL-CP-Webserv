@@ -6,7 +6,7 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:49:34 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/07 16:34:15 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/09 14:12:10 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,12 @@ class ConfigManager
 		void			printError(std::string str, int i);
 
 	private:
-		std::vector<Token>			_tokens;
 		std::string					_configFilePath;
+		std::vector<Token>			_tokens;
 		std::vector<std::string>	_validStr;
 
-		void				_lexLine(std::string line, int lineNum);
-		void				_createToken(std::string *token, Type *currentType, Type type, std::string c, int lineNum);
+		void						_lexLine(std::string line, int lineNum);
+		void						_createToken(std::string *token, Type *currentType, Type type, std::string c, int lineNum);
 };
 
 #endif
