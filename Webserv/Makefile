@@ -6,7 +6,7 @@
 #    By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/28 17:38:48 by jhii              #+#    #+#              #
-#    Updated: 2023/03/07 17:17:19 by jhii             ###   ########.fr        #
+#    Updated: 2023/03/09 12:25:55 by jhii             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,8 @@ MAIN		=	srcs/main.cpp
 SRC			=	WebServer.cpp \
 				ConfigManager.cpp \
 				Token.cpp \
-				EuleeHand.cpp
+				EuleeHand.cpp \
+				EuleePocket.cpp
 OBJ			=	${addprefix ${OBJ_PATH}/, ${SRC:.cpp=.o}}
 
 all: ${NAME}
