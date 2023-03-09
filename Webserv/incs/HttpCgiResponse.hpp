@@ -1,35 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HttpDefaultResponse.hpp                            :+:      :+:    :+:   */
+/*   HttpCgiResponse.hpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/03/08 15:38:49 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/09 10:57:51 by schuah           ###   ########.fr       */
+/*   Created: 2023/03/09 10:54:29 by schuah            #+#    #+#             */
+/*   Updated: 2023/03/09 11:32:28 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HTTPDEFAULTRESPONSE_HPP
-# define HTTPDEFAULTRESPONSE_HPP
+#ifndef HTTPCGIRESPONSE_HPP
+# define HTTPCGIRESPONSE_HPP
 
 # include <string>
 # include <iostream>
 # include <unistd.h>
 # include <poll.h>
 
-# include "webserv.hpp"
+# define RED			"\033[1;31m"
+# define RESET			"\033[0m"
+# define WS_BUFFER_SIZE	30000
+# define WS_TIMEOUT		3000
 
-class HttpDefaultResponse
+class HttpCgiResponse
 {
 	public:
-		HttpDefaultResponse(pollfd (&fds)[1], int socket);
-		~HttpDefaultResponse();
-		void	handleDefault();
+		HttpCgiResponse(pollfd (&fds)[1], std::string path, std::string method, int socket, int contentLength);
+		~HttpCgiResponse();
+		void	handleCgi();
 
 	private:
-		pollfd	(&_fds)[1];
-		int		_socket;
+		void		_perrorExit(std::string msg);
+		std::string	_path, _method;
+		int			_socket, _contentLength;
+		pollfd		(&_fds)[1];
 };
 
 #endif

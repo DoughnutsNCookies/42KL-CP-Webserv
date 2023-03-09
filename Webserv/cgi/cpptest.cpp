@@ -16,10 +16,10 @@ int main () {
 	cout << "Hello World 2 \n";
 	cout << "	<img src=\"2mb.jpg\" alt=\"Image\" height=\"500px\">\n";
 	// cout << "	<video src=\"test.mp4\" controls></video>\n";
-	cout << "	<video src=\"rickroll.mp4\" controls></video>\n";
+	// cout << "	<video src=\"rickroll.mp4\" controls></video>\n";
 	// cout << "	<iframe src=\"https://www.youtube.com/embed/AbIU2g50cqc\"></iframe>";
 	// cout << " <video width=\"500px\" height=\"500px\" controls=\"controls\"> <source src=\"test.mp4\" type=\"video/mp4\"></video>";
-	cout << "	<script src=\"./javascript.js\"></script>\n";
+	// cout << "	<script src=\"./javascript.js\"></script>\n";
 	cout << "</body>\n";
 	cout << "</html>\n";
    

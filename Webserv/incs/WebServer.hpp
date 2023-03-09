@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/08 21:47:53 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/09 12:24:50 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 # include "../incs/ConfigManager.hpp"
 # include "../incs/HttpPostResponse.hpp"
 # include "../incs/HttpDefaultResponse.hpp"
+# include "../incs/HttpCgiResponse.hpp"
 # include "webserv.hpp"
 
 # define WS_DOMAIN		AF_INET
@@ -36,7 +37,7 @@
 # define WS_BACKLOG		10
 # define WS_PORT		8082
 # define WS_BUFFER_SIZE	30000
-# define WS_TIMEOUT		10000
+# define WS_TIMEOUT		3000
 
 class WebServer
 {
@@ -48,13 +49,12 @@ class WebServer
 	private:
 		void				_perrorExit(std::string msg);
 		void				_setupServer();
-		void				_handleCgi(std::string method, int contentLength);
 		int					_handleGet();
 		void				_serverLoop();
 
 		std::string					_configFilePath, _path;
 		std::vector<int>			_serverFd;
-		int							_newSocket;
+		int							_socket;
 		std::vector<sockaddr_in>	_serverAddr;
 		pollfd						_fds[1];
 		ConfigManager				_configManager;
