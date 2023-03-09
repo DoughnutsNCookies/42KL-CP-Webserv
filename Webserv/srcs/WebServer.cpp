@@ -25,4 +25,8 @@ void	WebServer::runServer(void)
 	this->_database.parseConfigFile();
 	this->_database.printTokens();
 	std::cout << GREEN "Config File Parsing Done..." RESET << std::endl;
+	this->_database.configLibrary();
+	this->_database.errorHandleShit();
+	std::cout << GREEN "Error Handling File Done..." RESET << std::endl;
+
 }
