@@ -6,7 +6,7 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/07 17:21:28 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/10 16:23:41 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,13 +37,16 @@ void	EuleeHand::parseConfigFile(void)
 	this->_configManager.parseConfigFile();
 }
 
-void	EuleeHand::errorHandleShit(void)
-{
-	this->_configManager.errorHandleShit();
-}
-
 void	EuleeHand::configLibrary(void)
 {
 	this->_configManager.configLibrary();
 }
 
+void	EuleeHand::errorHandleShit(void)
+{
+	this->_configManager.errorHandleShit();
+}
+
+void	EuleeHand::parseConfigServer(void)
+{
+}
