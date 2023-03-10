@@ -6,13 +6,13 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:27:42 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/10 14:38:02 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/10 22:02:47 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/HttpPostResponse.hpp"
 
-HttpPostResponse::HttpPostResponse(int socket, int content_length, int valread, std::string buffer) : _socket(socket), _content_length(content_length), _valread(valread), _buffer(buffer) {}
+HttpPostResponse::HttpPostResponse(int socket, int content_length, int valread, std::string buffer) : _socket(socket), _contentLength(content_length), _valread(valread), _buffer(buffer) {}
 
 HttpPostResponse::~HttpPostResponse() {}
 
@@ -26,25 +26,25 @@ enum	Mode
 /* TO BE REMOVED */
 int	ft_select1(int fd, void *buffer, size_t size, Mode mode)
 {
-	fd_set read_fds, write_fds;
-    FD_ZERO(&read_fds);
-    FD_ZERO(&write_fds);
+	fd_set readFds, writeFds;
+    FD_ZERO(&readFds);
+    FD_ZERO(&writeFds);
     if (mode == READ)
-        FD_SET(fd, &read_fds);
+        FD_SET(fd, &readFds);
     else if (mode == WRITE)
-        FD_SET(fd, &write_fds);
+        FD_SET(fd, &writeFds);
 
     timeval	timeout;
     timeout.tv_sec = WS_TIMEOUT;
     timeout.tv_usec = 0;
 
-    int num_ready = select(FD_SETSIZE, &read_fds, &write_fds, NULL, &timeout);
-    if (num_ready == -1)
+    int ret = select(FD_SETSIZE, &readFds, &writeFds, NULL, &timeout);
+    if (ret == -1)
 	{
         std::cerr << "Error: select() failed.\n";
         return (-1);
     }
-    else if (num_ready == 0)
+    else if (ret == 0)
 	{
         std::cout << "Select timeout.\n";
         return (0);
@@ -52,28 +52,56 @@ int	ft_select1(int fd, void *buffer, size_t size, Mode mode)
 
 	for (int i = 0; i < FD_SETSIZE; i++)
 	{
-		if (FD_ISSET(fd, &read_fds) && mode == READ && i == fd)
+		if (FD_ISSET(fd, &readFds) && mode == READ && i == fd)
 			return (read(fd, buffer, size));
-		else if (FD_ISSET(fd, &write_fds) && mode == WRITE && i == fd)
+		else if (FD_ISSET(fd, &writeFds) && mode == WRITE && i == fd)
 			return (write(fd, buffer, size));
 	}
     return (0);
 }
 
-void	HttpPostResponse::handlePost()
+void	HttpPostResponse::_saveFile()
 {
-	size_t	content_length_pos = this->_buffer.find("Content-Length: ");
-	if (content_length_pos != std::string::npos)
+	size_t	namePos = this->_messageBody.find("filename=\"");
+	std::string	fileName, contentType;
+	if (namePos != std::string::npos)
 	{
-		content_length_pos += std::strlen("Content-Length: ");
-		this->_content_length = std::stoi(this->_buffer.substr(content_length_pos));
+		namePos += std::strlen("filename=\"");
+		fileName = this->_messageBody.substr(namePos, this->_messageBody.find("\"", namePos) - namePos);
 	}
 
-	std::string	message_body;
-	message_body.resize(this->_content_length);
-	this->_valread = ft_select1(this->_socket, &message_body[0], this->_content_length, READ);
+	size_t		boundaryPos = this->_messageBody.find("------WebKitFormBoundary");
+	std::string	boundary = this->_messageBody.substr(boundaryPos, this->_messageBody.find("\r\n", boundaryPos) - boundaryPos);
+	size_t		boundaryEndPos = this->_messageBody.find("\r\n" + boundary + "--");
+	size_t		dataLength = boundaryEndPos - (boundaryPos + boundary.length());
+	std::string	fileData = this->_messageBody.substr(boundaryPos + boundary.length(), dataLength);
 
-	std::string response_body = "Server has received your POST request!";
-	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + std::to_string(response_body.length()) + "\r\n\r\n" + response_body;
+	std::ofstream	newFile(fileName, std::ios::binary);
+	if (newFile.is_open() == false)
+	{
+		std::cerr << RED << "Error: Failed to create new file." << RESET << std::endl;
+		return ;
+	}
+	std::string	toWrite = fileData.substr(fileData.find("\r\n\r\n") + 4);
+	newFile.write(toWrite.c_str(), toWrite.length());
+	newFile.close();
+}
+
+void	HttpPostResponse::handlePost()
+{
+	size_t	contentLengthPos = this->_buffer.find("Content-Length: ");
+	if (contentLengthPos != std::string::npos)
+	{
+		contentLengthPos += std::strlen("Content-Length: ");
+		this->_contentLength = std::stoi(this->_buffer.substr(contentLengthPos));
+	}
+
+	this->_messageBody.resize(this->_contentLength);
+	this->_valread = ft_select1(this->_socket, &this->_messageBody[0], this->_contentLength, READ);
+
+	this->_saveFile();
+
+	std::string responseBody = "Server has received your POST request!";
+	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + std::to_string(responseBody.length()) + "\r\n\r\n" + responseBody;
 	send(this->_socket, response.c_str(), response.length(), 0);
 }

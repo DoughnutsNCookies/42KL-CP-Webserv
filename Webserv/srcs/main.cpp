@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/07 18:13:23 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/08 14:23:54 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/10 19:36:11 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,18 @@
 
 int	main(int ac, char **av)
 {
-	std::string config_file = DEFAULT_CONFIG_PATH;
+	std::string configFile = DEFAULT_CONFIG_PATH;
 
 	if (ac > 2)
 	{
-		std::cout << "Usage: ./webserv <config_file>" << std::endl;
+		std::cout << "Usage: ./webserv <configFile>" << std::endl;
 		return (EXIT_FAILURE);
 	}
 	else if (ac == 2)
-		config_file = av[1];
-	std::cout << "Using config file: " << config_file << std::endl;
+		configFile = av[1];
+	std::cout << "Using config file: " << configFile << std::endl;
 	try {
-		WebServer	webserver(config_file);
+		WebServer	webserver(configFile);
 		webserver.runServer();
 	}
 	catch (std::exception &e) {

@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:22:30 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/10 14:31:25 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/10 20:45:24 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define HTTPPOSTRESPONSE_HPP
 
 # include <iostream>
+# include <fstream>
 # include <string>
 # include <unistd.h>
 # include <sys/socket.h>
@@ -31,8 +32,9 @@ class HttpPostResponse
 		void	handlePost();
 
 	private:
-		int			_socket, _content_length, _valread;
-		std::string	_buffer;
+		void		_saveFile();
+		int			_socket, _contentLength, _valread;
+		std::string	_buffer, _messageBody;
 };
 
 #endif

@@ -6,50 +6,36 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 13:18:38 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/07 13:32:09 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/10 19:31:13 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 #include <string>
 
-int main() {
-    std::string content_length_str = std::getenv("CONTENT_LENGTH");
-    int content_length = std::stoi(content_length_str);
+using namespace std;
 
-    // Read the message body from the client
-    std::string message_body;
-    message_body.resize(content_length);
-    std::cin.read(&message_body[0], content_length);
-
-    // Process the message body according to your application's requirements
-    // For example, parse the message body to extract form data
-    std::string name;
-    std::string email;
-    std::string message;
-
-    size_t name_start_pos = message_body.find("name=") + std::strlen("name=");
-    size_t name_end_pos = message_body.find("&", name_start_pos);
-    name = message_body.substr(name_start_pos, name_end_pos - name_start_pos);
-
-    size_t email_start_pos = message_body.find("email=") + std::strlen("email=");
-    size_t email_end_pos = message_body.find("&", email_start_pos);
-    email = message_body.substr(email_start_pos, email_end_pos - email_start_pos);
-
-    size_t message_start_pos = message_body.find("message=") + std::strlen("message=");
-    message = message_body.substr(message_start_pos);
-
-    // Generate a response
-    std::string response_body = "<html><body><h1>Form Submission Received</h1>"
-                                "<p>Name: " + name + "</p>"
-                                "<p>Email: " + email + "</p>"
-                                "<p>Message: " + message + "</p>"
-                                "</body></html>";
-    std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + std::to_string(response_body.length()) +
-                           "\r\nContent-Type: text/html\r\n\r\n" + response_body;
-
-    // Send the response to the client
-    std::cout << response;
+int main()
+{
+	cout << "HTTP/1.1 200 OK\n";
+	cout << "Content-type:text/html\r\n\r\n";
+	cout << "<!DOCTYPE html>\n";
+	cout << "<html lang=\"en\">\n";
+	cout << "<head>\n";
+	cout << "	<meta charset=\"UTF-8\">\n";
+	cout << "	<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n";
+	cout << "	<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n";
+	cout << "	<title>Document</title>\n";
+	cout << "</head>\n";
+	cout << "<body>\n";
+	cout << "Testing CGI POST \n";
+    cout << "   <form method=\"post\" enctype=\"multipart/form-data\">\n";
+    cout << "   <label for=\"outfile\">Select a file:</label>\n";
+    cout << "   <input type=\"file\" name=\"outfile\" id=\"outfile\">\n";
+    cout << "   <input type=\"submit\" value=\"Submit\">\n";
+    cout << "   </form>\n";
+	cout << "</body>\n";
+	cout << "</html>\n";
 
     return 0;
 }
