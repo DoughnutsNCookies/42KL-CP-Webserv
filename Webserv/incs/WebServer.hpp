@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/10 15:28:15 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/10 17:53:15 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
 # include "../incs/HttpPostResponse.hpp"
 # include "../incs/HttpDefaultResponse.hpp"
 # include "../incs/HttpCgiResponse.hpp"
+# include "../incs/HttpGetResponse.hpp"
 # include "webserv.hpp"
 
 # define WS_DOMAIN		AF_INET
@@ -54,7 +55,6 @@ class WebServer
 	private:
 		void				_perrorExit(std::string msg, int exitTrue = 1);
 		void				_setupServer();
-		void				_handleGet();
 		void				_serverLoop();
 		long				ft_select2(int fd, void *buffer, size_t size, Mode mode);
 
@@ -63,7 +63,6 @@ class WebServer
 		int							_socket;
 		std::vector<sockaddr_in>	_serverAddr;
 		ConfigManager				_configManager;
-		// fd_set 						read_fds, write_fds;
 };
 
 #endif
