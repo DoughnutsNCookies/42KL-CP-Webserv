@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:54:29 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/09 11:32:28 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/10 13:58:34 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 # define RED			"\033[1;31m"
 # define RESET			"\033[0m"
 # define WS_BUFFER_SIZE	30000
-# define WS_TIMEOUT		3000
+# define WS_TIMEOUT		3
 
 class HttpCgiResponse
 {

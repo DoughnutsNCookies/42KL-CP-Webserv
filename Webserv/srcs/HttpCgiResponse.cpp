@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:55:14 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/09 12:28:44 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/10 13:58:47 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,40 @@ int	ft_poll(pollfd (&fds)[1], int fd, void *buffer, size_t size, Mode mode)
 	return (0);
 }
 
+/* TO BE REMOVED */
+int	ft_select3(int fd, void *buffer, size_t size, Mode mode)
+{
+	fd_set read_fds, write_fds;
+    FD_ZERO(&read_fds);
+    FD_ZERO(&write_fds);
+    if (mode == READ)
+        FD_SET(fd, &read_fds);
+    else if (mode == WRITE)
+        FD_SET(fd, &write_fds);
+
+    timeval	timeout;
+    timeout.tv_sec = WS_TIMEOUT;
+    timeout.tv_usec = 0;
+
+    int num_ready = select(fd + 1, &read_fds, &write_fds, nullptr, &timeout);
+    if (num_ready == -1)
+	{
+        std::cerr << "Error: select() failed.\n";
+        return (-1);
+    }
+    else if (num_ready == 0)
+	{
+        std::cout << "Select timeout.\n";
+        return (0);
+    }
+
+    if (FD_ISSET(fd, &read_fds) && mode == READ)
+        return (read(fd, buffer, size));
+    else if (FD_ISSET(fd, &write_fds) && mode == WRITE)
+        return (write(fd, buffer, size));
+    return (0);
+}
+
 void	HttpCgiResponse::handleCgi()
 {
 	int		cgi_input[2], cgi_output[2], status;
@@ -75,7 +109,8 @@ void	HttpCgiResponse::handleCgi()
         // setenv("SCRIPT_NAME", path, 1);
         // setenv("QUERY_STRING", query_string, 1);
         // setenv("CONTENT_TYPE", content_type, 1);
-        setenv("CONTENT_LENGTH", std::to_string(this->_contentLength).c_str(), 1);
+        // setenv("CONTENT_LENGTH", std::to_string(this->_contentLength).c_str(), 1);
+		setenv("CONTENT_LENGTH", "69", 1);
 
 		char	*cmds[2] = {(char *)(this->_path.c_str() + 1), NULL};
 		execve(cmds[0], cmds, NULL);
@@ -89,11 +124,14 @@ void	HttpCgiResponse::handleCgi()
 
         if (this->_method == "POST")
 		{
-			int	n = ft_poll(this->_fds, this->_socket, &c, 1, READ);
+			// int	n = ft_poll(this->_fds, this->_socket, &c, 1, READ);
+			int	n = read(this->_socket, &c, 1);
             int i = 0;
             while (n > 0 && i < this->_contentLength) {
                 write(cgi_input[1], &c, 1);
-                n = ft_poll(this->_fds, this->_socket, &c, 1, READ);
+                // n = ft_poll(this->_fds, this->_socket, &c, 1, READ);
+				n = ft_select3(this->_socket, &c, 1, READ);
+				// n = read(this->_socket, &c, 1);
                 i++;
             }
         }
@@ -102,7 +140,9 @@ void	HttpCgiResponse::handleCgi()
         int n = read(cgi_output[0], &buffer[0], WS_BUFFER_SIZE);
         while (n > 0)
 		{
-			ft_poll(this->_fds, this->_socket, &buffer[0], n, WRITE);
+			// ft_poll(this->_fds, this->_socket, &buffer[0], n, WRITE);
+			ft_select3(this->_socket, &buffer[0], n, WRITE);
+			// write(this->_socket, &buffer[0], n);
 			n = read(cgi_output[0], &buffer[0], WS_BUFFER_SIZE);
         }
 
@@ -111,4 +151,6 @@ void	HttpCgiResponse::handleCgi()
         waitpid(pid, &status, 0);
 		close(this->_socket);
     }
+	return ;
+	(void)this->_fds;
 }

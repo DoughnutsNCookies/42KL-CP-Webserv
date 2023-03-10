@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/09 12:24:50 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/10 14:06:32 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@
 # include <poll.h>
 # include <fcntl.h>
 
-
 # include "../incs/ConfigManager.hpp"
 # include "../incs/HttpPostResponse.hpp"
 # include "../incs/HttpDefaultResponse.hpp"
@@ -35,9 +34,16 @@
 # define WS_FLAGS		AI_PASSIVE
 # define WS_SERVER_NAME	"localhost"
 # define WS_BACKLOG		10
-# define WS_PORT		8082
+# define WS_PORT		8081
 # define WS_BUFFER_SIZE	30000
-# define WS_TIMEOUT		3000
+# define WS_TIMEOUT		3
+
+/* TO BE REMOVED */
+enum	Mode
+{
+	READ,
+	WRITE
+};
 
 class WebServer
 {
@@ -51,6 +57,7 @@ class WebServer
 		void				_setupServer();
 		int					_handleGet();
 		void				_serverLoop();
+		int					ft_select2(int fd, void *buffer, size_t size, Mode mode);
 
 		std::string					_configFilePath, _path;
 		std::vector<int>			_serverFd;
@@ -58,6 +65,7 @@ class WebServer
 		std::vector<sockaddr_in>	_serverAddr;
 		pollfd						_fds[1];
 		ConfigManager				_configManager;
+		fd_set 						read_fds, write_fds;
 };
 
 #endif

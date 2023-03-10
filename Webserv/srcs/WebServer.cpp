@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/09 12:21:01 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/10 14:01:06 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,13 +33,6 @@ void	WebServer::_perrorExit(std::string msg)
 }
 
 /* TO BE REMOVED */
-enum	Mode
-{
-	READ,
-	WRITE
-};
-
-/* TO BE REMOVED */
 int	ft_poll2(pollfd (&fds)[1], int fd, void *buffer, size_t size, Mode mode)
 {
 	int	ret;
@@ -60,6 +53,37 @@ int	ft_poll2(pollfd (&fds)[1], int fd, void *buffer, size_t size, Mode mode)
 	else if (fds[0].revents & POLLOUT && mode == WRITE)
 		return (write(fd, buffer, size));
 	return (0);
+}
+
+/* TO BE REMOVED */
+int	WebServer::ft_select2(int fd, void *buffer, size_t size, Mode mode)
+{
+    if (mode == READ)
+        FD_SET(fd, &this->read_fds);
+    else if (mode == WRITE)
+        FD_SET(fd, &this->write_fds);
+
+    timeval	timeout;
+    timeout.tv_sec = WS_TIMEOUT;
+    timeout.tv_usec = 0;
+
+    int num_ready = select(fd + 1, &this->read_fds, &this->write_fds, nullptr, &timeout);
+    if (num_ready == -1)
+	{
+        std::cerr << RED << "Error: select() failed." << RESET << std::endl;
+        return (-1);
+    }
+    else if (num_ready == 0)
+	{
+        std::cout << RED << "Select timeout." << RESET << std::endl;
+        return (0);
+    }
+
+    if (FD_ISSET(fd, &read_fds) && mode == READ)
+        return (read(fd, buffer, size));
+    else if (FD_ISSET(fd, &write_fds) && mode == WRITE)
+        return (write(fd, buffer, size));
+    return (0);
 }
 
 void	WebServer::_setupServer()
@@ -103,25 +127,9 @@ void	WebServer::_setupServer()
 		this->_perrorExit("Bind Error 2");
 	if (listen(this->_serverFd[1], WS_BACKLOG) < 0)
 		this->_perrorExit("Listen Error");
-}
 
-static std::string	get_content_type(std::string file)
-{
-	std::string	extension = file.substr(file.find_last_of(".") + 1);
-
-	if (extension == "jpg")
-		return ("Content-Type: image/jpeg\r\n");
-	if (extension == "jpg" || extension == "jpeg" || extension == "png")
-		return ("Content-Type: image/" + extension + "\r\n");
-	if (extension == "html" || extension == "css" || extension == "js")
-		return ("Content-Type: text/" + ((extension == "js") ? "javascript" : extension) + "\r\n");
-	if (extension == "mp3")
-		return ("Content-Type: audio/mpeg\r\n");
-	if (extension == "mp4")
-		return ("Content-Type: video/mp4\r\n");
-	if (extension == "json" || extension == "pdf" || extension == "xml" || extension == "zip")
-		return ("Content-Type: application/" + extension + "\r\n");
-	return ("Content-Type: text/plain\r\n");
+	FD_ZERO(&read_fds);
+    FD_ZERO(&write_fds);
 }
 
 int	WebServer::_handleGet()
@@ -152,11 +160,23 @@ int	WebServer::_handleGet()
 	}
 	file.close();
 
-	std::string	content_type = get_content_type(this->_path);
-	std::string	http_response = "HTTP/1.1 200 OK\r\n" + get_content_type(this->_path) + "Content-Length: " + std::to_string(file_size) + "\r\n\r\n" + file_contents;
-	std::cout << GREEN << get_content_type(this->_path) << RESET << std::endl;
-	ft_poll2(this->_fds, this->_socket, &http_response[0], http_response.size(), WRITE);
-	// write(this->_socket, &http_response[0], http_response.size());
+	std::string	http_response = "HTTP/1.1 200 OK\r\nContent-Type: */*\r\nContent-Length: " + std::to_string(file_size) + "\r\n\r\n" + file_contents;
+	size_t	sent = 0;
+	while (sent < http_response.size())
+	{
+		size_t actually_sent = ft_select2(this->_socket, &http_response[sent], http_response.size() - sent, WRITE);
+		if (actually_sent < 0)
+			std::cerr << RED << "WRITE FAILED" << RESET << std::endl;
+		if (actually_sent == 0)
+		{
+			close(this->_socket);
+			return (0);
+		}
+		std::cout << "Actually sent: " << actually_sent << "\tSent: " << sent << " / " << http_response.size() << std::endl;
+		sent += actually_sent;
+	}
+	
+	std::cout << "Stopped\n";
 	close(this->_socket);
 	return (0);
 }
@@ -184,12 +204,9 @@ void	WebServer::_serverLoop()
 		if (this->_socket < 0)
 			this->_perrorExit("Accept Error");
 
-		this->_fds[0].fd = this->_socket;
-		this->_fds[0].events = POLLIN | POLLOUT;
-
 		std::string	buffer;
 		buffer.resize(WS_BUFFER_SIZE, '\0');
-		valread = ft_poll2(this->_fds, this->_socket, &buffer[0], WS_BUFFER_SIZE, READ);
+		valread = ft_select2(this->_socket, &buffer[0], WS_BUFFER_SIZE, READ);
 		buffer.resize(valread);
 
 		std::string	method, query, contentType;
@@ -207,7 +224,7 @@ void	WebServer::_serverLoop()
 
 		if (method == "POST")
 		{
-			HttpPostResponse	postResponse(this->_socket, contentLength, valread, buffer);
+			HttpPostResponse	postResponse(this->_fds, this->_socket, contentLength, valread, buffer);
 			postResponse.handlePost();
 		}
 		else if (method == "GET" && this->_path != "/" && this->_path.find(".php") == std::string::npos && this->_path.find(".py") == std::string::npos && this->_path.find(".cgi") == std::string::npos) // Will be determined by the config
