@@ -6,13 +6,13 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:55:14 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/10 13:58:47 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/10 15:17:17 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/HttpCgiResponse.hpp"
 
-HttpCgiResponse::HttpCgiResponse(pollfd (&fds)[1], std::string path, std::string method, int socket, int contentLength) : _path(path), _method(method), _socket(socket), _contentLength(contentLength), _fds(fds) {}
+HttpCgiResponse::HttpCgiResponse(std::string path, std::string method, int socket, int contentLength) : _path(path), _method(method), _socket(socket), _contentLength(contentLength) {}
 
 HttpCgiResponse::~HttpCgiResponse() {}
 
@@ -31,26 +31,6 @@ enum	Mode
 	READ,
 	WRITE
 };
-
-/* TO BE REMOVED */
-int	ft_poll(pollfd (&fds)[1], int fd, void *buffer, size_t size, Mode mode)
-{
-	int	ret;
-
-	ret = poll(fds, 1, WS_TIMEOUT);
-	if (ret == -1)
-		std::cout << RED << "Poll error" << RESET << std::endl;
-	else if (ret == 0)
-		std::cout << RED << "Poll timeout" << RESET << std::endl;
-	if (ret <= 0)
-		return (-1);
-
-	if (fds[0].revents & POLLIN && mode == READ)
-		return (read(fd, buffer, size));
-	else if (fds[0].revents & POLLOUT && mode == WRITE)
-		return (write(fd, buffer, size));
-	return (0);
-}
 
 /* TO BE REMOVED */
 int	ft_select3(int fd, void *buffer, size_t size, Mode mode)
@@ -93,9 +73,9 @@ void	HttpCgiResponse::handleCgi()
 	char	c;
 
     if (pipe(cgi_input) < 0 || pipe(cgi_output) < 0)
-		this->_perrorExit("pipe failed");
+		this->_perrorExit("Pipe Error");
     if ((pid = fork()) < 0)
-		this->_perrorExit("fork failed");
+		this->_perrorExit("Fork Error");
 
     if (pid == 0)	// child process
 	{
@@ -124,14 +104,11 @@ void	HttpCgiResponse::handleCgi()
 
         if (this->_method == "POST")
 		{
-			// int	n = ft_poll(this->_fds, this->_socket, &c, 1, READ);
 			int	n = read(this->_socket, &c, 1);
             int i = 0;
             while (n > 0 && i < this->_contentLength) {
                 write(cgi_input[1], &c, 1);
-                // n = ft_poll(this->_fds, this->_socket, &c, 1, READ);
 				n = ft_select3(this->_socket, &c, 1, READ);
-				// n = read(this->_socket, &c, 1);
                 i++;
             }
         }
@@ -140,9 +117,7 @@ void	HttpCgiResponse::handleCgi()
         int n = read(cgi_output[0], &buffer[0], WS_BUFFER_SIZE);
         while (n > 0)
 		{
-			// ft_poll(this->_fds, this->_socket, &buffer[0], n, WRITE);
 			ft_select3(this->_socket, &buffer[0], n, WRITE);
-			// write(this->_socket, &buffer[0], n);
 			n = read(cgi_output[0], &buffer[0], WS_BUFFER_SIZE);
         }
 
@@ -151,6 +126,4 @@ void	HttpCgiResponse::handleCgi()
         waitpid(pid, &status, 0);
 		close(this->_socket);
     }
-	return ;
-	(void)this->_fds;
 }

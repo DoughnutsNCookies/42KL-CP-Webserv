@@ -6,36 +6,17 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:39:08 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/10 13:58:52 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/10 14:33:27 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/HttpDefaultResponse.hpp"
 
-HttpDefaultResponse::HttpDefaultResponse(pollfd (&fds)[1], int socket) : _fds(fds), _socket(socket) {}
+HttpDefaultResponse::HttpDefaultResponse(int socket) : _socket(socket) {}
 
 HttpDefaultResponse::~HttpDefaultResponse() {}
 
 /* TO BE REMOVED */
-int	ft_poll3(pollfd (&fds)[1], int fd, void *buffer, size_t size, Mode mode)
-{
-	int	ret;
-
-	ret = poll(fds, 1, WS_TIMEOUT);
-	if (ret == -1)
-		std::cout << RED << "Poll error" << RESET << std::endl;
-	else if (ret == 0)
-		std::cout << RED << "Poll timeout" << RESET << std::endl;
-	if (ret <= 0)
-		return (-1);
-
-	if (fds[0].revents & POLLIN && mode == READ)
-		return (read(fd, buffer, size));
-	else if (fds[0].revents & POLLOUT && mode == WRITE)
-		return (write(fd, buffer, size));
-	return (0);
-}
-
 int	ft_select(int fd, void *buffer, size_t size, Mode mode)
 {
 	fd_set read_fds, write_fds;
@@ -81,6 +62,4 @@ void	HttpDefaultResponse::handleDefault()
 
 	ft_select(this->_socket, (void *)output.c_str(), output.length(), WRITE);
 	close(this->_socket);
-	return ;
-	(void)this->_fds;
 }

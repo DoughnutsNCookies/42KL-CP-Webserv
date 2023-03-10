@@ -6,11 +6,13 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/10 14:01:06 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/10 15:58:15 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/WebServer.hpp"
+
+#include <signal.h>
 
 WebServer::WebServer(std::string configFilePath): _configFilePath(configFilePath)
 {
@@ -24,66 +26,54 @@ WebServer::WebServer(std::string configFilePath): _configFilePath(configFilePath
 WebServer::~WebServer() {}
 
 /* TO BE REMOVED */
-void	WebServer::_perrorExit(std::string msg)
+void	WebServer::_perrorExit(std::string msg, int exitTrue)
 {
 	std::cerr << RED << msg << ": ";
 	perror("");
 	std::cerr << RESET;
-	exit(EXIT_FAILURE);
+	if (exitTrue)
+		exit(EXIT_FAILURE);
 }
 
 /* TO BE REMOVED */
-int	ft_poll2(pollfd (&fds)[1], int fd, void *buffer, size_t size, Mode mode)
+long	WebServer::ft_select2(int fd, void *buffer, size_t size, Mode mode)
 {
-	int	ret;
+	fd_set read_fds, write_fds;
+    FD_ZERO(&read_fds);
+    FD_ZERO(&write_fds);
 
-	ret = poll(fds, 1, WS_TIMEOUT);
-	if (ret == -1)
-	{
-		std::cout << RED << "Poll error" << RESET << std::endl;
-		return (-1);
-	}
-	else if (ret == 0)
-	{
-		std::cout << RED << "Poll timeout" << RESET << std::endl;
-		return (-1);
-	}
-	else if (fds[0].revents & POLLIN && mode == READ)
-		return (read(fd, buffer, size));
-	else if (fds[0].revents & POLLOUT && mode == WRITE)
-		return (write(fd, buffer, size));
-	return (0);
-}
-
-/* TO BE REMOVED */
-int	WebServer::ft_select2(int fd, void *buffer, size_t size, Mode mode)
-{
-    if (mode == READ)
-        FD_SET(fd, &this->read_fds);
-    else if (mode == WRITE)
-        FD_SET(fd, &this->write_fds);
+	FD_SET(fd, (mode == READ) ? &read_fds : &write_fds);
 
     timeval	timeout;
     timeout.tv_sec = WS_TIMEOUT;
     timeout.tv_usec = 0;
 
-    int num_ready = select(fd + 1, &this->read_fds, &this->write_fds, nullptr, &timeout);
+    int num_ready = select(fd + 1, &read_fds, &write_fds, NULL, &timeout);
     if (num_ready == -1)
 	{
-        std::cerr << RED << "Error: select() failed." << RESET << std::endl;
+		this->_perrorExit("Select Error", 0);
         return (-1);
     }
     else if (num_ready == 0)
 	{
-        std::cout << RED << "Select timeout." << RESET << std::endl;
+        std::cout << RED << "Select timeout!" << RESET << std::endl;
         return (0);
     }
 
+	long	val = 0;
     if (FD_ISSET(fd, &read_fds) && mode == READ)
-        return (read(fd, buffer, size));
+	{
+		val = read(fd, buffer, size);
+		if (val == -1)
+			this->_perrorExit("Read Error", 0);
+	}
     else if (FD_ISSET(fd, &write_fds) && mode == WRITE)
-        return (write(fd, buffer, size));
-    return (0);
+	{
+		val = write(fd, buffer, size);
+		if (val == -1)
+			this->_perrorExit("Write Error", 0);
+	}
+	return (val);
 }
 
 void	WebServer::_setupServer()
@@ -99,6 +89,10 @@ void	WebServer::_setupServer()
 	if ((this->_serverFd[0] = socket(WS_DOMAIN, WS_TYPE, WS_PROTOCOL)) < 0)
 		this->_perrorExit("Socket Error");
 
+	int	optval = 1;
+	if (setsockopt(this->_serverFd[0], SOL_SOCKET, SO_NOSIGPIPE, &optval, sizeof(optval)) == -1) //Done to keep socket alive even after Broken Pipe
+		this->_perrorExit("Setsockopt Error");
+
 	if (getaddrinfo(WS_SERVER_NAME, std::to_string(WS_PORT).c_str(), &hints, &res) != 0)
 		this->_perrorExit("Getaddrinfo Error");
 	
@@ -107,7 +101,7 @@ void	WebServer::_setupServer()
 	this->_serverAddr[0].sin_port = htons(WS_PORT);
 
 	if (bind(this->_serverFd[0], (sockaddr *)&this->_serverAddr[0], sizeof(this->_serverAddr[0])) < 0)
-		this->_perrorExit("Bind Error 1");
+		this->_perrorExit("Bind Error");
 	if (listen(this->_serverFd[0], WS_BACKLOG) < 0)
 		this->_perrorExit("Listen Error");
 
@@ -115,6 +109,10 @@ void	WebServer::_setupServer()
 	int	port = 9090;
 	if ((this->_serverFd[1] = socket(WS_DOMAIN, WS_TYPE, WS_PROTOCOL)) < 0)
 		this->_perrorExit("Socket Error");
+
+	int	optval2 = 1;
+	if (setsockopt(this->_serverFd[1], SOL_SOCKET, SO_NOSIGPIPE, &optval2, sizeof(optval)) == -1)
+		this->_perrorExit("Setsockopt Error");
 
 	if (getaddrinfo(WS_SERVER_NAME, std::to_string(port).c_str(), &hints, &res) != 0)
 		this->_perrorExit("Getaddrinfo Error");
@@ -124,15 +122,12 @@ void	WebServer::_setupServer()
 	this->_serverAddr[1].sin_port = htons(port);
 
 	if (bind(this->_serverFd[1], (sockaddr *)&this->_serverAddr[1], sizeof(this->_serverAddr[1])) < 0)
-		this->_perrorExit("Bind Error 2");
+		this->_perrorExit("Bind Error");
 	if (listen(this->_serverFd[1], WS_BACKLOG) < 0)
 		this->_perrorExit("Listen Error");
-
-	FD_ZERO(&read_fds);
-    FD_ZERO(&write_fds);
 }
 
-int	WebServer::_handleGet()
+void	WebServer::_handleGet()
 {
 	std::ifstream	file(this->_path.c_str() + 1);
 	if (file.fail())
@@ -142,7 +137,7 @@ int	WebServer::_handleGet()
 		std::string response = "HTTP/1.1 404 Not Found\r\nContent-Length: " + std::to_string(response_body.length()) + "\r\n\r\n" + response_body;
 		send(this->_socket, response.c_str(), response.length(), 0);
 		close(this->_socket);
-		return (1);
+		return ;
 	}
 
 	file.seekg(0, std::ios::end);
@@ -156,29 +151,26 @@ int	WebServer::_handleGet()
 		std::cerr << RED << "Error reading " << this->_path << "!\n" << RESET << std::endl;
 		file.close();
 		close(this->_socket);
-		return (1);
+		return ;
 	}
 	file.close();
 
 	std::string	http_response = "HTTP/1.1 200 OK\r\nContent-Type: */*\r\nContent-Length: " + std::to_string(file_size) + "\r\n\r\n" + file_contents;
-	size_t	sent = 0;
-	while (sent < http_response.size())
+	int	sent = 0;
+	while (sent < (int)http_response.size())
 	{
-		size_t actually_sent = ft_select2(this->_socket, &http_response[sent], http_response.size() - sent, WRITE);
-		if (actually_sent < 0)
-			std::cerr << RED << "WRITE FAILED" << RESET << std::endl;
-		if (actually_sent == 0)
+		int actually_sent = ft_select2(this->_socket, &http_response[sent], http_response.size() - sent, WRITE);
+		if (actually_sent <= 0)
 		{
 			close(this->_socket);
-			return (0);
+			return ;
 		}
-		std::cout << "Actually sent: " << actually_sent << "\tSent: " << sent << " / " << http_response.size() << std::endl;
 		sent += actually_sent;
+		std::cout << "Actually sent: " << actually_sent << "\tSent: " << sent << " / " << http_response.size() << std::endl;
 	}
 	
-	std::cout << "Stopped\n";
 	close(this->_socket);
-	return (0);
+	return ;
 }
 
 void	WebServer::_serverLoop()
@@ -224,22 +216,21 @@ void	WebServer::_serverLoop()
 
 		if (method == "POST")
 		{
-			HttpPostResponse	postResponse(this->_fds, this->_socket, contentLength, valread, buffer);
+			HttpPostResponse	postResponse(this->_socket, contentLength, valread, buffer);
 			postResponse.handlePost();
 		}
 		else if (method == "GET" && this->_path != "/" && this->_path.find(".php") == std::string::npos && this->_path.find(".py") == std::string::npos && this->_path.find(".cgi") == std::string::npos) // Will be determined by the config
 		{
-			if (this->_handleGet())
-				continue ;
+			this->_handleGet();
 		}
 		else if (this->_path.find('.') != std::string::npos)
 		{
-			HttpCgiResponse	cgiResponse(this->_fds, this->_path, method, this->_socket, contentLength);
+			HttpCgiResponse	cgiResponse(this->_path, method, this->_socket, contentLength);
 			cgiResponse.handleCgi();
 		}
 		else
 		{
-			HttpDefaultResponse	defaultResponse(this->_fds, this->_socket);
+			HttpDefaultResponse	defaultResponse(this->_socket);
 			defaultResponse.handleDefault();
 		}
 	}

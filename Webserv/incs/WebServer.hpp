@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/10 14:06:32 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/10 15:28:15 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@
 # include <vector>
 # include <unistd.h>
 # include <netdb.h>
-# include <poll.h>
 # include <fcntl.h>
 
 # include "../incs/ConfigManager.hpp"
@@ -53,19 +52,18 @@ class WebServer
 		void	runServer();
 
 	private:
-		void				_perrorExit(std::string msg);
+		void				_perrorExit(std::string msg, int exitTrue = 1);
 		void				_setupServer();
-		int					_handleGet();
+		void				_handleGet();
 		void				_serverLoop();
-		int					ft_select2(int fd, void *buffer, size_t size, Mode mode);
+		long				ft_select2(int fd, void *buffer, size_t size, Mode mode);
 
 		std::string					_configFilePath, _path;
 		std::vector<int>			_serverFd;
 		int							_socket;
 		std::vector<sockaddr_in>	_serverAddr;
-		pollfd						_fds[1];
 		ConfigManager				_configManager;
-		fd_set 						read_fds, write_fds;
+		// fd_set 						read_fds, write_fds;
 };
 
 #endif

@@ -6,13 +6,13 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:27:42 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/09 13:16:38 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/10 14:38:02 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/HttpPostResponse.hpp"
 
-HttpPostResponse::HttpPostResponse(pollfd (&fds)[1], int socket, int content_length, int valread, std::string buffer) : _socket(socket), _content_length(content_length), _valread(valread), _buffer(buffer), _fds(fds) {}
+HttpPostResponse::HttpPostResponse(int socket, int content_length, int valread, std::string buffer) : _socket(socket), _content_length(content_length), _valread(valread), _buffer(buffer) {}
 
 HttpPostResponse::~HttpPostResponse() {}
 
@@ -24,23 +24,40 @@ enum	Mode
 };
 
 /* TO BE REMOVED */
-int	ft_poll4(pollfd (&fds)[1], int fd, void *buffer, size_t size, Mode mode)
+int	ft_select1(int fd, void *buffer, size_t size, Mode mode)
 {
-	int	ret;
+	fd_set read_fds, write_fds;
+    FD_ZERO(&read_fds);
+    FD_ZERO(&write_fds);
+    if (mode == READ)
+        FD_SET(fd, &read_fds);
+    else if (mode == WRITE)
+        FD_SET(fd, &write_fds);
 
-	ret = poll(fds, 1, WS_TIMEOUT);
-	if (ret == -1)
-		std::cout << RED << "Poll error" << RESET << std::endl;
-	else if (ret == 0)
-		std::cout << RED << "Poll timeout" << RESET << std::endl;
-	if (ret <= 0)
-		return (-1);
+    timeval	timeout;
+    timeout.tv_sec = WS_TIMEOUT;
+    timeout.tv_usec = 0;
 
-	if (fds[0].revents & POLLIN && mode == READ)
-		return (read(fd, buffer, size));
-	else if (fds[0].revents & POLLOUT && mode == WRITE)
-		return (write(fd, buffer, size));
-	return (0);
+    int num_ready = select(FD_SETSIZE, &read_fds, &write_fds, NULL, &timeout);
+    if (num_ready == -1)
+	{
+        std::cerr << "Error: select() failed.\n";
+        return (-1);
+    }
+    else if (num_ready == 0)
+	{
+        std::cout << "Select timeout.\n";
+        return (0);
+    }
+
+	for (int i = 0; i < FD_SETSIZE; i++)
+	{
+		if (FD_ISSET(fd, &read_fds) && mode == READ && i == fd)
+			return (read(fd, buffer, size));
+		else if (FD_ISSET(fd, &write_fds) && mode == WRITE && i == fd)
+			return (write(fd, buffer, size));
+	}
+    return (0);
 }
 
 void	HttpPostResponse::handlePost()
@@ -54,12 +71,9 @@ void	HttpPostResponse::handlePost()
 
 	std::string	message_body;
 	message_body.resize(this->_content_length);
-	// this->_valread = read(this->_socket, &message_body[0], this->_content_length);
-	this->_valread = ft_poll4(this->_fds, this->_socket, &message_body[0], this->_content_length, READ);
+	this->_valread = ft_select1(this->_socket, &message_body[0], this->_content_length, READ);
 
 	std::string response_body = "Server has received your POST request!";
 	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + std::to_string(response_body.length()) + "\r\n\r\n" + response_body;
 	send(this->_socket, response.c_str(), response.length(), 0);
-	return ;
-	(void)this->_fds;
 }
