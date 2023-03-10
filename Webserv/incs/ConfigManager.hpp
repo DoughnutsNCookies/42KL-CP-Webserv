@@ -32,6 +32,15 @@ class ConfigManager
 		void			parseConfigFile(void);
 		void			printTokens(void);
 		void			configLibrary(void);
+
+		int				checkKey(int i, int previous, int *braces, int *main_block);
+		int				checkValue(int i, int previous);
+		int				checkSemicolon(int i, int previous);
+		int				checkOpenBrace(int i, int previous, int *braces, int main_block);
+		int				checkCloseBrace(int i, int previous, int *braces, int *main_block);
+		
+	
+		int				locationBlock(int *i, int previous);
 		void			errorHandleShit(void);
 
 		// Utils
@@ -40,7 +49,8 @@ class ConfigManager
 	private:
 		std::vector<Token>			_tokens;
 		std::string					_configFilePath;
-		std::vector<std::string>	_validStr;
+		std::vector<std::string>	_serverVar;
+		std::vector<std::string>	_locationVar;
 
 		void				_lexLine(std::string line, int lineNum);
 		void				_createToken(std::string *token, Type *currentType, Type type, std::string c, int lineNum);

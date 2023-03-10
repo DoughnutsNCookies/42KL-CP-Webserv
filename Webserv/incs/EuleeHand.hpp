@@ -29,8 +29,6 @@ class EuleeHand
 		void	parseConfigFile(void);
 		void	errorHandleShit(void);
 		void	configLibrary(void);
-		
-
 
 	private:
 		std::string		_configFilePath;
