@@ -6,7 +6,7 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:49:34 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/09 14:12:10 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/10 17:22:07 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,15 +27,16 @@ class ConfigManager
 		ConfigManager(std::string configFilePath);
 		~ConfigManager(void);
 
-		ConfigManager	&operator=(const ConfigManager &ref);
+		ConfigManager		&operator=(const ConfigManager &ref);
 
-		void			parseConfigFile(void);
-		void			printTokens(void);
-		void			configLibrary(void);
-		void			errorHandleShit(void);
+		void				parseConfigFile(void);
+		void				printTokens(void);
+		void				configLibrary(void);
+		void				errorHandleShit(void);
 
 		// Utils
-		void			printError(std::string str, int i);
+		void				printError(std::string str, int i);
+		std::vector<Token>	&getToken(void);
 
 	private:
 		std::string					_configFilePath;

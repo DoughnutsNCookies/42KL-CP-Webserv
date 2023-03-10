@@ -6,7 +6,7 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:55:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/07 16:34:28 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/10 17:21:40 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,4 +168,9 @@ void	ConfigManager::errorHandleShit(void)
 		}
 	}
 	return ;
+}
+
+std::vector<Token>	&ConfigManager::getToken(void)
+{
+	return (this->_tokens);
 }
