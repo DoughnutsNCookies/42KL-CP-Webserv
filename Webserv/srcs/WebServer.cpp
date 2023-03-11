@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/11 13:02:39 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/11 14:58:36 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,7 +181,7 @@ void	WebServer::_serverLoop()
 
 		if (method == "POST")
 		{
-			HttpPostResponse	postResponse(this->_socket, valread, buffer);
+			HttpPostResponse	postResponse(this->_socket, buffer);
 			postResponse.handlePost();
 		}
 		else if (method == "GET" && this->_path != "/" && this->_path.find(".php") == std::string::npos && this->_path.find(".py") == std::string::npos && this->_path.find(".cgi") == std::string::npos) // Will be determined by the config
