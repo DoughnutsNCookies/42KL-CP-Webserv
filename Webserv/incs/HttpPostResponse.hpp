@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:22:30 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/11 15:13:23 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/11 18:19:27 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ class HttpPostResponse
 	public:
 		HttpPostResponse(int socket, std::string buffer);
 		~HttpPostResponse();
-		void	handlePost();
+		void		handlePost();
 
 	private:
 		void		_saveFile(size_t contentLength, int contentLengthSpecified);

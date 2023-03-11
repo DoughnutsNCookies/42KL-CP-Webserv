@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:20:41 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/11 13:03:15 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/11 18:19:25 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ class HttpGetResponse
 	public:
 		HttpGetResponse(std::string path, int socket);
 		~HttpGetResponse();
-		void	handleGet();
+		void		handleGet();
 
 	private:
 		int			_socket;

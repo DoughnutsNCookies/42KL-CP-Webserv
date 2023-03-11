@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/11 18:15:17 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/11 18:20:04 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,14 +50,14 @@ class WebServer
 	public:
 		WebServer(std::string configFilePath);
 		~WebServer();
-		void	runServer();
+		void						runServer();
 
 	private:
-		void				_perrorExit(std::string msg, int exitTrue = 1);
-		void				_setupServer();
-		int					_unchunkResponse();
-		void				_serverLoop();
-		long				ft_select2(int fd, void *buffer, size_t size, Mode mode);
+		void						_perrorExit(std::string msg, int exitTrue = 1);
+		void						_setupServer();
+		int							_unchunkResponse();
+		void						_serverLoop();
+		long						ft_select2(int fd, void *buffer, size_t size, Mode mode);
 
 		std::string					_configFilePath, _path, _buffer;
 		std::vector<int>			_serverFd;

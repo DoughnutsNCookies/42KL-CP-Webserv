@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:54:29 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/11 12:07:12 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/11 18:19:21 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ class HttpCgiResponse
 	public:
 		HttpCgiResponse(std::string path, std::string method, int socket);
 		~HttpCgiResponse();
-		void	handleCgi();
+		void		handleCgi();
 
 	private:
 		void		_perrorExit(std::string msg);
