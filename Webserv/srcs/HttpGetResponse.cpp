@@ -6,11 +6,11 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:20:26 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/10 19:40:29 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/11 13:07:40 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "HttpGetResponse.hpp"
+#include "../incs/HttpGetResponse.hpp"
 
 HttpGetResponse::HttpGetResponse(std::string path, int socket) : _socket(socket), _path(path) {}
 
@@ -96,7 +96,7 @@ void	HttpGetResponse::handleGet()
 			return ;
 		}
 		total += sent;
-		std::cout << "Sent: " << sent << "\tTotal: " << total << " / " << httpResponse.size() << std::endl;
+		std::cout << GREEN << "Sent: " << sent << "\tTotal: " << total << " / " << httpResponse.size() << RESET << std::endl;
 	}
 	close(this->_socket);
 }

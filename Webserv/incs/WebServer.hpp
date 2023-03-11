@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/11 11:42:27 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/11 12:57:46 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@
 # define WS_FLAGS		AI_PASSIVE
 # define WS_SERVER_NAME	"localhost"
 # define WS_BACKLOG		10
-# define WS_PORT		8081
+# define WS_PORT		8080
 # define WS_BUFFER_SIZE	30000
 # define WS_TIMEOUT		3
 

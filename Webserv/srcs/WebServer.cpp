@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/10 17:53:05 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/11 13:02:39 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,13 +150,24 @@ void	WebServer::_serverLoop()
 		if (this->_socket < 0)
 			this->_perrorExit("Accept Error");
 
+		size_t		total = 0;
+		char		readBuffer[WS_BUFFER_SIZE];
 		std::string	buffer;
-		buffer.resize(WS_BUFFER_SIZE, '\0');
-		valread = ft_select2(this->_socket, &buffer[0], WS_BUFFER_SIZE, READ);
-		buffer.resize(valread);
+		valread = ft_select2(this->_socket, readBuffer, WS_BUFFER_SIZE, READ);
+		while (valread > 0)
+		{
+			total += valread;
+			std::cout << GREEN << "Received: " << valread << "\tTotal: " << total << RESET << std::endl;
+			if (valread < 0)
+			{
+				close(this->_socket);
+				return ;
+			}
+			buffer.append(readBuffer, valread);
+			valread = ft_select2(this->_socket, readBuffer, WS_BUFFER_SIZE, READ);
+		}
 
 		std::string	method, query, contentType;
-		int		contentLength = 0;
 		std::istringstream	request(buffer);
 		
 		request >> method >> this->_path;
@@ -166,11 +177,11 @@ void	WebServer::_serverLoop()
 			close(this->_socket);
 			continue;
 		}
-		std::cout << buffer;
+		std::cout << BLUE << buffer.substr(0, buffer.find("\r\n\r\n")) << RESET << std::endl;
 
 		if (method == "POST")
 		{
-			HttpPostResponse	postResponse(this->_socket, contentLength, valread, buffer);
+			HttpPostResponse	postResponse(this->_socket, valread, buffer);
 			postResponse.handlePost();
 		}
 		else if (method == "GET" && this->_path != "/" && this->_path.find(".php") == std::string::npos && this->_path.find(".py") == std::string::npos && this->_path.find(".cgi") == std::string::npos) // Will be determined by the config
@@ -180,7 +191,7 @@ void	WebServer::_serverLoop()
 		}
 		else if (this->_path.find('.') != std::string::npos)
 		{
-			HttpCgiResponse	cgiResponse(this->_path, method, this->_socket, contentLength);
+			HttpCgiResponse	cgiResponse(this->_path, method, this->_socket);
 			cgiResponse.handleCgi();
 		}
 		else

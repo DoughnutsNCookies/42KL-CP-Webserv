@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:20:41 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/10 17:50:23 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/11 13:03:15 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <sys/socket.h>
 
 # define RED		"\033[1;31m"
+# define GREEN		"\033[1;32m"
 # define RESET		"\033[0m"
 # define WS_TIMEOUT	3
 

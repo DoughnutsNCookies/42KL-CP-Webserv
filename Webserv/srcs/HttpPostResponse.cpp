@@ -6,13 +6,13 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:27:42 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/11 11:52:12 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/11 13:05:52 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/HttpPostResponse.hpp"
 
-HttpPostResponse::HttpPostResponse(int socket, int content_length, int valread, std::string buffer) : _socket(socket), _contentLength(content_length), _valread(valread), _buffer(buffer) {}
+HttpPostResponse::HttpPostResponse(int socket, int valread, std::string buffer) : _socket(socket), _valread(valread), _buffer(buffer) {}
 
 HttpPostResponse::~HttpPostResponse() {}
 
@@ -60,28 +60,28 @@ int	ft_select1(int fd, void *buffer, size_t size, Mode mode)
     return (0);
 }
 
+// CHANGE BOUNDARY FINDER TO FIND FROM HEADER INSTEAD OF FINDING FROM BODY
 void	HttpPostResponse::_saveFile()
 {
-	size_t	namePos = this->_messageBody.find("filename=\"");
-	std::string	fileName, contentType;
-	if (namePos != std::string::npos)
+	size_t	namePos = this->_buffer.find("filename=\"");
+	if (namePos == std::string::npos)
 	{
-		namePos += std::strlen("filename=\"");
-		fileName = this->_messageBody.substr(namePos, this->_messageBody.find("\"", namePos) - namePos);
+		std::cerr << RED << "No file name found - Not saving" << RESET << std::endl;
+		return ;
 	}
+	namePos += std::strlen("filename=\"");
+	std::string	fileName = this->_buffer.substr(namePos, this->_buffer.find("\"", namePos) - namePos);
 
-	size_t		boundaryPos = this->_messageBody.find("------WebKitFormBoundary");
-	std::string	boundary = this->_messageBody.substr(boundaryPos, this->_messageBody.find("\r\n", boundaryPos) - boundaryPos);
-
-	size_t		boundaryEndPos = this->_messageBody.find("\r\n" + boundary + "--");
-
+	size_t		boundaryPos = this->_buffer.find("------WebKitFormBoundary");
+	std::string	boundary = this->_buffer.substr(boundaryPos, this->_buffer.find("\r\n", boundaryPos) - boundaryPos);
+	size_t		boundaryEndPos = this->_buffer.find("\r\n" + boundary + "--");
 	size_t		dataLength = boundaryEndPos - (boundaryPos + boundary.length());
-	std::string	fileData = this->_messageBody.substr(boundaryPos + boundary.length(), dataLength);
+	std::string	fileData = this->_buffer.substr(boundaryPos + boundary.length(), dataLength);
 
 	std::ofstream	newFile(fileName, std::ios::binary);
 	if (newFile.is_open() == false)
 	{
-		std::cerr << RED << "Error: Failed to create new file." << RESET << std::endl;
+		std::cerr << RED << "Error: Failed to create new file!" << RESET << std::endl;
 		return ;
 	}
 	std::string	toWrite = fileData.substr(fileData.find("\r\n\r\n") + 4);
@@ -92,29 +92,18 @@ void	HttpPostResponse::_saveFile()
 
 void	HttpPostResponse::handlePost()
 {
+	size_t	contentLength = 0;
 	size_t	contentLengthPos = this->_buffer.find("Content-Length: ");
 	if (contentLengthPos != std::string::npos)
 	{
 		contentLengthPos += std::strlen("Content-Length: ");
-		this->_contentLength = std::stoi(this->_buffer.substr(contentLengthPos));
-	}
-
-	this->_messageBody.resize(this->_contentLength);
-	int	total = 0;
-	while (total < this->_contentLength)
-	{
-		this->_valread = ft_select1(this->_socket, &this->_messageBody[total], this->_contentLength - total, READ);
-		if (this->_valread <= 0)
-		{
-			close(this->_socket);
-			return ;
-		}
-		total += this->_valread;
-		std::cout << "Received: " << this->_valread << "\tTotal: " << total << " / " << this->_contentLength << std::endl;
+		contentLength = std::stoi(this->_buffer.substr(contentLengthPos));
 	}
 
 	this->_saveFile();
 	std::string responseBody = "Server has received your POST request!";
 	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + std::to_string(responseBody.length()) + "\r\n\r\n" + responseBody;
 	send(this->_socket, response.c_str(), response.length(), 0);
+	return ;
+	(void)this->_valread;
 }
