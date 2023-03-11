@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/11 14:36:26 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/11 18:15:17 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@
 # define WS_FLAGS		AI_PASSIVE
 # define WS_SERVER_NAME	"localhost"
 # define WS_BACKLOG		10
-# define WS_PORT		8080
+# define WS_PORT		8081
 # define WS_BUFFER_SIZE	30000
 # define WS_TIMEOUT		3
 
@@ -55,10 +55,11 @@ class WebServer
 	private:
 		void				_perrorExit(std::string msg, int exitTrue = 1);
 		void				_setupServer();
+		int					_unchunkResponse();
 		void				_serverLoop();
 		long				ft_select2(int fd, void *buffer, size_t size, Mode mode);
 
-		std::string					_configFilePath, _path;
+		std::string					_configFilePath, _path, _buffer;
 		std::vector<int>			_serverFd;
 		int							_socket;
 		std::vector<sockaddr_in>	_serverAddr;
