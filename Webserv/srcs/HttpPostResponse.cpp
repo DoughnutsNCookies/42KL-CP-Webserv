@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:27:42 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/10 22:02:47 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/11 11:52:12 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,9 @@ void	HttpPostResponse::_saveFile()
 
 	size_t		boundaryPos = this->_messageBody.find("------WebKitFormBoundary");
 	std::string	boundary = this->_messageBody.substr(boundaryPos, this->_messageBody.find("\r\n", boundaryPos) - boundaryPos);
+
 	size_t		boundaryEndPos = this->_messageBody.find("\r\n" + boundary + "--");
+
 	size_t		dataLength = boundaryEndPos - (boundaryPos + boundary.length());
 	std::string	fileData = this->_messageBody.substr(boundaryPos + boundary.length(), dataLength);
 
@@ -83,6 +85,7 @@ void	HttpPostResponse::_saveFile()
 		return ;
 	}
 	std::string	toWrite = fileData.substr(fileData.find("\r\n\r\n") + 4);
+
 	newFile.write(toWrite.c_str(), toWrite.length());
 	newFile.close();
 }
@@ -97,10 +100,20 @@ void	HttpPostResponse::handlePost()
 	}
 
 	this->_messageBody.resize(this->_contentLength);
-	this->_valread = ft_select1(this->_socket, &this->_messageBody[0], this->_contentLength, READ);
+	int	total = 0;
+	while (total < this->_contentLength)
+	{
+		this->_valread = ft_select1(this->_socket, &this->_messageBody[total], this->_contentLength - total, READ);
+		if (this->_valread <= 0)
+		{
+			close(this->_socket);
+			return ;
+		}
+		total += this->_valread;
+		std::cout << "Received: " << this->_valread << "\tTotal: " << total << " / " << this->_contentLength << std::endl;
+	}
 
 	this->_saveFile();
-
 	std::string responseBody = "Server has received your POST request!";
 	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + std::to_string(responseBody.length()) + "\r\n\r\n" + responseBody;
 	send(this->_socket, response.c_str(), response.length(), 0);
