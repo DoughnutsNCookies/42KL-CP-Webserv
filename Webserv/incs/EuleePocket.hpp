@@ -6,7 +6,7 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 17:51:51 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/13 19:31:08 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/13 20:00:47 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,14 +54,14 @@ class EuleePocket
 		iterator	end(void);
 
 		// member variable
-		std::vector<EuleeWallet>	location;
-		std::vector<int>			serverFd;
-		std::vector<sockaddr_in>	serverAddr;
-		std::string					path, method, buffer;
-		int							socket, contentLength, valread;
+		std::map<std::string, std::string>	envp;
+		std::vector<EuleeWallet>			location;
+		std::vector<int>					serverFd;
+		std::vector<sockaddr_in>			serverAddr;
+		std::string							path, method, buffer;
+		int									socket, contentLength, valread;
 
 	private:
-		std::map<std::string, std::string>	_envp;
 		EuleeWallet							_server;
 
 };
