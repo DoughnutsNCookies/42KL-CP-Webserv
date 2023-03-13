@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:55:14 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/11 12:19:18 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/13 18:47:51 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,65 +16,15 @@ HttpCgiResponse::HttpCgiResponse(std::string path, std::string method, int socke
 
 HttpCgiResponse::~HttpCgiResponse() {}
 
-/* TO BE REMOVED */
-void	HttpCgiResponse::_perrorExit(std::string msg)
-{
-	std::cerr << RED << msg << ": ";
-	perror("");
-	std::cerr << RESET;
-	exit(EXIT_FAILURE);
-}
-
-/* TO BE REMOVED */
-enum	Mode
-{
-	READ,
-	WRITE
-};
-
-/* TO BE REMOVED */
-int	ft_select3(int fd, void *buffer, size_t size, Mode mode)
-{
-	fd_set readFds, writeFds;
-    FD_ZERO(&readFds);
-    FD_ZERO(&writeFds);
-    if (mode == READ)
-        FD_SET(fd, &readFds);
-    else if (mode == WRITE)
-        FD_SET(fd, &writeFds);
-
-    timeval	timeout;
-    timeout.tv_sec = WS_TIMEOUT;
-    timeout.tv_usec = 0;
-
-    int ret = select(fd + 1, &readFds, &writeFds, nullptr, &timeout);
-    if (ret == -1)
-	{
-        std::cerr << "Error: select() failed.\n";
-        return (-1);
-    }
-    else if (ret == 0)
-	{
-        std::cout << "Select timeout.\n";
-        return (0);
-    }
-
-    if (FD_ISSET(fd, &readFds) && mode == READ)
-        return (read(fd, buffer, size));
-    else if (FD_ISSET(fd, &writeFds) && mode == WRITE)
-        return (write(fd, buffer, size));
-    return (0);
-}
-
 void	HttpCgiResponse::handleCgi()
 {
 	int		cgiInput[2], cgiOutput[2], status;
 	pid_t	pid;
 
     if (pipe(cgiInput) < 0 || pipe(cgiOutput) < 0)
-		this->_perrorExit("Pipe Error");
+		perrorExit("Pipe Error");
     if ((pid = fork()) < 0)
-		this->_perrorExit("Fork Error");
+		perrorExit("Fork Error");
 
     if (pid == 0)	// child process
 	{
@@ -94,6 +44,7 @@ void	HttpCgiResponse::handleCgi()
 		char	*cmds[2] = {(char *)(this->_path.c_str() + 1), NULL};
 		execve(cmds[0], cmds, NULL);
 		std::cerr << RED << "Failed to execve CGI: " << strerror(errno) << RESET << std::endl;
+        std::cout << "HTTP/1.1 404 Not Found\r\n\r\nCGI requested is not found...\r\n" << std::endl;
         exit(EXIT_FAILURE);
     }
 	else	// parent process
@@ -105,7 +56,7 @@ void	HttpCgiResponse::handleCgi()
         int n = read(cgiOutput[0], &buffer[0], WS_BUFFER_SIZE);
         while (n > 0)
 		{
-			ft_select3(this->_socket, &buffer[0], n, WRITE);
+			ft_select(this->_socket, &buffer[0], n, WRITE);
 			n = read(cgiOutput[0], &buffer[0], WS_BUFFER_SIZE);
         }
 

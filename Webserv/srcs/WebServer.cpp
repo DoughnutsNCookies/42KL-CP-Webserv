@@ -6,27 +6,14 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/13 16:31:17 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/13 19:03:41 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/WebServer.hpp"
 
-#include <signal.h>
-
-WebServer::WebServer(std::string configFilePath): _configFilePath(configFilePath)
-{
-	this->_configManager = ConfigManager(configFilePath);
-	
-	//Temporary to host 2 ports
-	this->_serverAddr.resize(2);
-	this->_serverFd.resize(2); 
-}
-
-WebServer::~WebServer() {}
-
 /* TO BE REMOVED */
-void	WebServer::_perrorExit(std::string msg, int exitTrue)
+void	perrorExit(std::string msg, int exitTrue)
 {
 	std::cerr << RED << msg << ": ";
 	perror("");
@@ -36,7 +23,7 @@ void	WebServer::_perrorExit(std::string msg, int exitTrue)
 }
 
 /* TO BE REMOVED */
-long	WebServer::ft_select2(int fd, void *buffer, size_t size, Mode mode)
+long	ft_select(int fd, void *buffer, size_t size, Mode mode)
 {
 	fd_set read_fds, write_fds;
     FD_ZERO(&read_fds);
@@ -50,7 +37,7 @@ long	WebServer::ft_select2(int fd, void *buffer, size_t size, Mode mode)
     int num_ready = select(fd + 1, &read_fds, &write_fds, NULL, &timeout);
     if (num_ready == -1)
 	{
-		this->_perrorExit("Select Error", 0);
+		perrorExit("Select Error", 0);
         return (-1);
     }
     else if (num_ready == 0)
@@ -62,18 +49,29 @@ long	WebServer::ft_select2(int fd, void *buffer, size_t size, Mode mode)
 	long	val = 0;
     if (FD_ISSET(fd, &read_fds) && mode == READ)
 	{
-		val = read(fd, buffer, size);
+		val = recv(fd, buffer, size, 0);
 		if (val == -1)
-			this->_perrorExit("Read Error", 0);
+			perrorExit("Read Error", 0);
 	}
     else if (FD_ISSET(fd, &write_fds) && mode == WRITE)
 	{
-		val = write(fd, buffer, size);
+		val = send(fd, buffer, size, 0);
 		if (val == -1)
-			this->_perrorExit("Write Error", 0);
+			perrorExit("Write Error", 0);
 	}
 	return (val);
 }
+
+WebServer::WebServer(std::string configFilePath): _configFilePath(configFilePath)
+{
+	this->_configManager = ConfigManager(configFilePath);
+	
+	//Temporary to host 2 ports
+	this->_serverAddr.resize(2);
+	this->_serverFd.resize(2); 
+}
+
+WebServer::~WebServer() {}
 
 void	WebServer::_setupServer()
 {
@@ -86,44 +84,44 @@ void	WebServer::_setupServer()
 
 	// Default port
 	if ((this->_serverFd[0] = socket(WS_DOMAIN, WS_TYPE, WS_PROTOCOL)) < 0)
-		this->_perrorExit("Socket Error");
+		perrorExit("Socket Error");
 
 	int	optval = 1;
 	if (setsockopt(this->_serverFd[0], SOL_SOCKET, SO_NOSIGPIPE, &optval, sizeof(optval)) == -1) //Done to keep socket alive even after Broken Pipe
-		this->_perrorExit("Setsockopt Error");
+		perrorExit("Setsockopt Error");
 
 	if (getaddrinfo(WS_SERVER_NAME, std::to_string(WS_PORT).c_str(), &hints, &res) != 0)
-		this->_perrorExit("Getaddrinfo Error");
+		perrorExit("Getaddrinfo Error");
 	
 	memcpy(&this->_serverAddr[0], res->ai_addr, res->ai_addrlen);
 	freeaddrinfo(res);
 	this->_serverAddr[0].sin_port = htons(WS_PORT);
 
 	if (bind(this->_serverFd[0], (sockaddr *)&this->_serverAddr[0], sizeof(this->_serverAddr[0])) < 0)
-		this->_perrorExit("Bind Error");
+		perrorExit("Bind Error");
 	if (listen(this->_serverFd[0], WS_BACKLOG) < 0)
-		this->_perrorExit("Listen Error");
+		perrorExit("Listen Error");
 
 	// Trying port 9090
 	int	port = 9090;
 	if ((this->_serverFd[1] = socket(WS_DOMAIN, WS_TYPE, WS_PROTOCOL)) < 0)
-		this->_perrorExit("Socket Error");
+		perrorExit("Socket Error");
 
 	int	optval2 = 1;
 	if (setsockopt(this->_serverFd[1], SOL_SOCKET, SO_NOSIGPIPE, &optval2, sizeof(optval)) == -1)
-		this->_perrorExit("Setsockopt Error");
+		perrorExit("Setsockopt Error");
 
 	if (getaddrinfo(WS_SERVER_NAME, std::to_string(port).c_str(), &hints, &res) != 0)
-		this->_perrorExit("Getaddrinfo Error");
+		perrorExit("Getaddrinfo Error");
 	
 	memcpy(&this->_serverAddr[1], res->ai_addr, res->ai_addrlen);
 	freeaddrinfo(res);
 	this->_serverAddr[1].sin_port = htons(port);
 
 	if (bind(this->_serverFd[1], (sockaddr *)&this->_serverAddr[1], sizeof(this->_serverAddr[1])) < 0)
-		this->_perrorExit("Bind Error");
+		perrorExit("Bind Error");
 	if (listen(this->_serverFd[1], WS_BACKLOG) < 0)
-		this->_perrorExit("Listen Error");
+		perrorExit("Listen Error");
 }
 
 int	WebServer::_unchunkResponse()
@@ -174,12 +172,12 @@ void	WebServer::_serverLoop()
 			}
 		}
 		if (this->_socket < 0)
-			this->_perrorExit("Accept Error");
+			perrorExit("Accept Error");
 
 		size_t		total = 0;
 		char		readBuffer[WS_BUFFER_SIZE];
 		this->_buffer.clear();
-		long		valread = ft_select2(this->_socket, readBuffer, WS_BUFFER_SIZE, READ);
+		long		valread = ft_select(this->_socket, readBuffer, WS_BUFFER_SIZE, READ);
 		while (valread > 0)
 		{
 			total += valread;
@@ -190,7 +188,7 @@ void	WebServer::_serverLoop()
 				return ;
 			}
 			this->_buffer.append(readBuffer, valread);
-			valread = ft_select2(this->_socket, readBuffer, WS_BUFFER_SIZE, READ);
+			valread = ft_select(this->_socket, readBuffer, WS_BUFFER_SIZE, READ);
 		}
 
 		if (this->_unchunkResponse() == -1)
@@ -205,14 +203,23 @@ void	WebServer::_serverLoop()
 		request >> method >> this->_path;
 		if (this->_path == "/favicon.ico") // Ignore favicon
 		{
-			std::cout << RED << "Go away favicon" << RESET << std::endl;
+			std::string	message = "Go away favicon";
+			std::cout << RED << message << RESET << std::endl;
+			std::string response = "HTTP/1.1 404 Not Found\r\n\r\n" + message;
+
+			ft_select(this->_socket, (void *)response.c_str(), response.length(), WRITE);
 			close(this->_socket);
 			continue;
 		}
-		// std::cout << BLUE << this->_buffer.substr(0, this->_buffer.find("\r\n\r\n")) << RESET << std::endl;
-		std::cout << BLUE << this->_buffer << RESET;
+		std::cout << BLUE << this->_buffer.substr(0, this->_buffer.find("\r\n\r\n")) << RESET << std::endl;
 
-		if (method == "POST")
+		if (method == "HEAD")
+		{
+			std::cout << "Head method called" << std::endl;
+			HttpHeadResponse	headResponse(this->_socket, this->_path);
+			headResponse.handleHead();
+		}
+		else if (method == "POST")
 		{
 			std::cout << "Post method called" << std::endl;
 			HttpPostResponse	postResponse(this->_socket, this->_buffer);

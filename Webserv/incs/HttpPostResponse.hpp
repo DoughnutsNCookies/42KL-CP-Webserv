@@ -6,23 +6,14 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:22:30 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/11 18:19:27 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/13 18:39:12 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef HTTPPOSTRESPONSE_HPP
 # define HTTPPOSTRESPONSE_HPP
 
-# include <iostream>
-# include <fstream>
-# include <string>
-# include <unistd.h>
-# include <sys/socket.h>
-
-# define RED			"\033[1;31m"
-# define RESET			"\033[0m"
-# define WS_BUFFER_SIZE	30000
-# define WS_TIMEOUT		3
+# include "WebServer.hpp"
 
 class HttpPostResponse
 {
