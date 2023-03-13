@@ -6,7 +6,7 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/10 15:53:09 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/13 13:07:58 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ class EuleeHand
 		void	parseConfigFile(void);
 		void	configLibrary(void);
 		void	errorHandleShit(void);
+		void	printServers(void);
 		void	parseConfigServer(void);
 
 		std::vector<EuleePocket>	server;
@@ -37,6 +38,10 @@ class EuleeHand
 	private:
 		std::string		_configFilePath;
 		ConfigManager	_configManager;
+		size_t			_parseServer(std::vector<Token> &tokens, size_t i);
+		size_t			_parseLocation(std::vector<Token> &tokens, std::vector<EuleeWallet> &location, size_t i);
+		size_t			_parsingHelper(std::vector<Token> &tokens, size_t i, std::string &val, std::string needle);
+		size_t			_LocationPriorityCheck(std::vector<Token> &tokens, size_t i, RegularExpression &priority, std::string &readPath);
 };
 
 #endif

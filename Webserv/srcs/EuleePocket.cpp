@@ -6,7 +6,7 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 17:51:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/10 16:28:14 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/10 19:00:27 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 EuleePocket::EuleePocket(void) : envp(), location(), port(), root(), index(), domain(), autoIndex(), uploadSize(), errorPath(), serverFd(), serverAddr(), path(), method(), buffer(), socket(), contentLength(), valread() {}
 
-EuleePocket::EuleePocket(std::string port, std::string root, std::string index, std::string domain, std::string autoIndex, std::string uploadSize, std::string errorPath) : envp(), location(), port(), root(), index(), domain(), autoIndex(), uploadSize(), errorPath(), serverFd(), serverAddr(), path(), method(), buffer(), socket(), contentLength(), valread()
+EuleePocket::EuleePocket(std::string port, std::string root, std::string index, std::string domain, std::string autoIndex, std::string uploadSize, std::string errorPath, std::vector<EuleeWallet> location) : envp(), location(location), port(), root(), index(), domain(), autoIndex(), uploadSize(), errorPath(), serverFd(), serverAddr(), path(), method(), buffer(), socket(), contentLength(), valread()
 {
 	this->port = port;
 	this->root = root;
