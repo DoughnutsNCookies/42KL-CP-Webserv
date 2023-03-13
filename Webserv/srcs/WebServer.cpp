@@ -6,7 +6,7 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/10 19:20:20 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/13 20:10:58 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,9 @@ void	WebServer::runServer(void)
 	this->_database.parseConfigFile();
 	// this->_database.printTokens();
 	std::cout << GREEN "Config File Parsing Done..." RESET << std::endl;
-	// this->_database.configLibrary();
-	// this->_database.errorHandleShit();
-	// std::cout << GREEN "Error Handling File Done..." RESET << std::endl;
+	this->_database.configLibrary();
+	this->_database.errorHandleShit();
+	std::cout << GREEN "Error Handling File Done..." RESET << std::endl;
 	this->_database.parseConfigServer();
 	this->_database.printServers();
 	std::cout << GREEN "Config Server Parsing Done..." RESET << std::endl;
