@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:27:42 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/11 15:13:07 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/13 14:57:37 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,7 @@ int	ft_select1(int fd, void *buffer, size_t size, Mode mode)
 	fd_set readFds, writeFds;
     FD_ZERO(&readFds);
     FD_ZERO(&writeFds);
-    if (mode == READ)
-        FD_SET(fd, &readFds);
-    else if (mode == WRITE)
-        FD_SET(fd, &writeFds);
+	FD_SET(fd, (mode == READ) ? &readFds : &writeFds);
 
     timeval	timeout;
     timeout.tv_sec = WS_TIMEOUT;
@@ -50,19 +47,22 @@ int	ft_select1(int fd, void *buffer, size_t size, Mode mode)
         return (0);
     }
 
-	for (int i = 0; i < FD_SETSIZE; i++)
-	{
-		if (FD_ISSET(fd, &readFds) && mode == READ && i == fd)
-			return (read(fd, buffer, size));
-		else if (FD_ISSET(fd, &writeFds) && mode == WRITE && i == fd)
-			return (write(fd, buffer, size));
-	}
+	if (FD_ISSET(fd, &readFds) && mode == READ)
+		return (read(fd, buffer, size));
+	else if (FD_ISSET(fd, &writeFds) && mode == WRITE)
+		return (write(fd, buffer, size));
     return (0);
 }
 
 void	HttpPostResponse::_saveFile(size_t contentLength, int contentLengthSpecified)
 {
 	size_t		boundaryPos = this->_buffer.find("boundary=") + std::strlen("boundary=");
+	if (boundaryPos == std::string::npos)
+	{
+		std::cerr << RED << "No boundary found!" << RESET << std::endl;
+		return ;
+	}
+
 	std::string	boundary = this->_buffer.substr(boundaryPos, this->_buffer.find("\r\n", boundaryPos) - boundaryPos);
 	boundaryPos = this->_buffer.find(boundary, boundaryPos + boundary.length());
 	
@@ -74,13 +74,18 @@ void	HttpPostResponse::_saveFile(size_t contentLength, int contentLengthSpecifie
 	size_t	namePos = this->_buffer.find("filename=\"");
 	if (namePos == std::string::npos)
 	{
-		std::cerr << RED << "No file name found" << RESET << std::endl;
+		std::cerr << RED << "No file name found!" << RESET << std::endl;
 		return ;
 	}
 	namePos += std::strlen("filename=\"");
 	std::string	fileName = this->_buffer.substr(namePos, this->_buffer.find("\"", namePos) - namePos);
 
 	size_t		boundaryEndPos = this->_buffer.find("--" + boundary + "--");
+	if (boundaryEndPos == std::string::npos)
+	{
+		std::cerr << RED << "No end boundary found!" << RESET << std::endl;
+		return ;
+	}
 	size_t		dataLength = boundaryEndPos - (boundaryPos + boundary.length());
 	std::string	fileData = this->_buffer.substr(boundaryPos + boundary.length(), dataLength - std::strlen("\r\n"));
 

@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:39:08 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/10 19:39:37 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/13 14:57:21 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,13 +43,10 @@ int	ft_select(int fd, void *buffer, size_t size, Mode mode)
         return (0);
     }
 
-	for (int i = 0; i < FD_SETSIZE; i++)
-	{
-		if (FD_ISSET(fd, &readFds) && mode == READ && i == fd)
-			return (read(fd, buffer, size));
-		else if (FD_ISSET(fd, &writeFds) && mode == WRITE && i == fd)
-			return (write(fd, buffer, size));
-	}
+    if (FD_ISSET(fd, &readFds) && mode == READ)
+        return (read(fd, buffer, size));
+    else if (FD_ISSET(fd, &writeFds) && mode == WRITE)
+        return (write(fd, buffer, size));
     return (0);
 }
 
