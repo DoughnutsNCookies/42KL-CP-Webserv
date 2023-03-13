@@ -33,14 +33,20 @@ class ConfigManager
 		void			printTokens(void);
 		void			configLibrary(void);
 
-		int				checkKey(int i, int previous, int *braces, int *main_block);
+		void			checkImportantCheck(int i);
+
+		int				checkServerKey(size_t i, int previous, int *braces, int *main_block);
+		int				checkLocationKey(size_t i, int previous, int *braces, int *main_block);
+		
+
 		int				checkValue(int i, int previous);
+
 		int				checkSemicolon(int i, int previous);
 		int				checkOpenBrace(int i, int previous, int *braces, int main_block);
 		int				checkCloseBrace(int i, int previous, int *braces, int *main_block);
 		
 	
-		int				locationBlock(int *i, int previous);
+		int				locationBlock(size_t *i);
 		void			errorHandleShit(void);
 
 		// Utils
