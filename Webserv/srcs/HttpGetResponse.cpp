@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:20:26 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/11 13:07:40 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/13 16:02:57 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,10 @@ int	ft_select2(int fd, void *buffer, size_t size, Mode mode)
 
 void	HttpGetResponse::handleGet()
 {
+	size_t	queryPos = this->_path.find('?');
+	if (queryPos != std::string::npos)
+		this->_path = this->_path.substr(0, queryPos);
+
 	std::ifstream	file(this->_path.c_str() + 1);
 	if (file.fail())
 	{

@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/13 15:23:19 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/13 16:31:17 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,13 +210,19 @@ void	WebServer::_serverLoop()
 			continue;
 		}
 		// std::cout << BLUE << this->_buffer.substr(0, this->_buffer.find("\r\n\r\n")) << RESET << std::endl;
-		std::cout << BLUE << this->_buffer << RESET << std::endl;
+		std::cout << BLUE << this->_buffer << RESET;
 
 		if (method == "POST")
 		{
 			std::cout << "Post method called" << std::endl;
 			HttpPostResponse	postResponse(this->_socket, this->_buffer);
 			postResponse.handlePost();
+		}
+		else if (method == "DELETE")
+		{
+			std::cout << "Delete method called" << std::endl;
+			HttpDeleteResponse	deleteResponse(this->_socket, this->_path);
+			deleteResponse.handleDelete();
 		}
 		else if (method == "GET" && this->_path != "/" && this->_path.find(".php") == std::string::npos && this->_path.find(".py") == std::string::npos && this->_path.find(".cgi") == std::string::npos) // Will be determined by the config
 		{

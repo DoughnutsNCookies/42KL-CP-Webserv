@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/11 18:20:04 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/13 16:27:09 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 # include "../incs/HttpDefaultResponse.hpp"
 # include "../incs/HttpCgiResponse.hpp"
 # include "../incs/HttpGetResponse.hpp"
+# include "../incs/HttpDeleteResponse.hpp"
 # include "webserv.hpp"
 
 # define WS_DOMAIN		AF_INET
