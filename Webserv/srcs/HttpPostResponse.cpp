@@ -6,13 +6,13 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:27:42 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/13 18:13:20 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/13 20:52:59 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/HttpPostResponse.hpp"
 
-HttpPostResponse::HttpPostResponse(int socket, std::string buffer) : _socket(socket), _buffer(buffer) {}
+HttpPostResponse::HttpPostResponse(int socket, std::string buffer, EuleeHand database) : _socket(socket), _buffer(buffer), _database(database) {}
 
 HttpPostResponse::~HttpPostResponse() {}
 
@@ -77,5 +77,5 @@ void	HttpPostResponse::handlePost()
 	this->_saveFile(contentLength, contentLengthSpecified);
 	std::string responseBody = "Server has received your POST request!";
 	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + std::to_string(responseBody.length()) + "\r\n\r\n" + responseBody;
-	ft_select(this->_socket, (void *)response.c_str(), response.length(), WRITE);
+	this->_database.ft_select(this->_socket, (void *)response.c_str(), response.length(), WRITE);
 }

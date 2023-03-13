@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Token.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/03 10:18:53 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/03 13:12:46 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/10 17:37:32 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,18 +25,14 @@ enum Type
     CLOSE_BRACE
 };
 
-class Token
+struct Token
 {
-	public:
-		Token(std::string context, Type type, int lineNum);
-		~Token();
-		std::string	getToken();
-		int			getLineNum();
-		Type		getType();
-	private:
-		std::string	_token;
-		int			_lineNum;
-		Type		_type;
+	Token(std::string context, Type type, int lineNum);
+	~Token(void);
+
+	Type		type;
+	std::string	token;
+	int			lineNum;
 };
 
 #endif

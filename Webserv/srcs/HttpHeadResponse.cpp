@@ -6,13 +6,13 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/13 17:44:45 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/13 18:57:10 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/13 20:57:40 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/HttpHeadResponse.hpp"
 
-HttpHeadResponse::HttpHeadResponse(int socket, std::string path) : _socket(socket), _path(path) {}
+HttpHeadResponse::HttpHeadResponse(int socket, std::string path, EuleeHand database) : _socket(socket), _path(path), _database(database) {}
 
 HttpHeadResponse::~HttpHeadResponse() {}
 
@@ -30,7 +30,7 @@ void	HttpHeadResponse::handleHead()
 		std::cout << GREEN << "File " << this->_path << " found!!\n" << RESET << std::endl;
 		http = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n";
 	}
-	ft_select(this->_socket, (void *)http.c_str(), http.length(), WRITE);
+	this->_database.ft_select(this->_socket, (void *)http.c_str(), http.length(), WRITE);
 	file.close();
 	close(this->_socket);
 }

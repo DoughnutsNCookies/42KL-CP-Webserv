@@ -6,13 +6,13 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:55:14 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/13 18:47:51 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/13 20:49:04 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/HttpCgiResponse.hpp"
 
-HttpCgiResponse::HttpCgiResponse(std::string path, std::string method, int socket) : _path(path), _method(method), _socket(socket) {}
+HttpCgiResponse::HttpCgiResponse(std::string path, std::string method, int socket, EuleeHand database) : _path(path), _method(method), _socket(socket), _database(database) {}
 
 HttpCgiResponse::~HttpCgiResponse() {}
 
@@ -22,9 +22,9 @@ void	HttpCgiResponse::handleCgi()
 	pid_t	pid;
 
     if (pipe(cgiInput) < 0 || pipe(cgiOutput) < 0)
-		perrorExit("Pipe Error");
+        this->_database.perrorExit("Pipe Error");
     if ((pid = fork()) < 0)
-		perrorExit("Fork Error");
+        this->_database.perrorExit("Fork Error");
 
     if (pid == 0)	// child process
 	{
@@ -56,7 +56,7 @@ void	HttpCgiResponse::handleCgi()
         int n = read(cgiOutput[0], &buffer[0], WS_BUFFER_SIZE);
         while (n > 0)
 		{
-			ft_select(this->_socket, &buffer[0], n, WRITE);
+			this->_database.ft_select(this->_socket, &buffer[0], n, WRITE);
 			n = read(cgiOutput[0], &buffer[0], WS_BUFFER_SIZE);
         }
 

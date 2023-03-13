@@ -6,7 +6,7 @@
 #    By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/28 17:38:48 by jhii              #+#    #+#              #
-#    Updated: 2023/03/13 18:21:33 by schuah           ###   ########.fr        #
+#    Updated: 2023/03/13 20:39:06 by schuah           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,6 +26,9 @@ MAIN		=	srcs/main.cpp
 SRC			=	WebServer.cpp \
 				ConfigManager.cpp \
 				Token.cpp \
+				EuleeHand.cpp \
+				EuleePocket.cpp \
+				EuleeWallet.cpp \
 				HttpPostResponse.cpp \
 				HttpDefaultResponse.cpp \
 				HttpCgiResponse.cpp \

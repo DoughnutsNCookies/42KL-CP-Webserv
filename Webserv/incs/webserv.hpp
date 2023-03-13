@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/07 18:13:39 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/13 18:37:37 by schuah           ###   ########.fr       */
+/*   Created: 2023/03/09 14:32:49 by jhii              #+#    #+#             */
+/*   Updated: 2023/03/13 20:39:46 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,5 +25,6 @@
 
 # include "WebServer.hpp"
 # include "ConfigManager.hpp"
+# include "EuleeHand.hpp"
 
 #endif

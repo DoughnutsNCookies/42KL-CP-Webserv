@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/13 19:04:27 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/13 20:47:49 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
 
 # include "webserv.hpp"
 # include "ConfigManager.hpp"
+# include "EuleeHand.hpp"
 # include "HttpPostResponse.hpp"
 # include "HttpDefaultResponse.hpp"
 # include "HttpCgiResponse.hpp"
@@ -43,33 +44,24 @@
 # define WS_TIMEOUT				3
 # define DEFAULT_CONFIG_PATH	"conf/default.conf"
 
-/* TO BE REMOVED */
-enum	Mode
-{
-	READ,
-	WRITE
-};
-#include <string>
-void	perrorExit(std::string msg, int exitTrue = 1);
-long	ft_select(int fd, void *buffer, size_t size, Mode mode);
-
 class WebServer
 {
 	public:
 		WebServer(std::string configFilePath);
-		~WebServer();
-		void						runServer();
+		~WebServer(void);
+		void					runServer(void);
 
 	private:
 		void						_setupServer();
 		int							_unchunkResponse();
 		void						_serverLoop();
 
-		std::string					_configFilePath, _path, _buffer;
+		std::string					_path, _buffer;
 		std::vector<int>			_serverFd;
 		int							_socket;
 		std::vector<sockaddr_in>	_serverAddr;
 		ConfigManager				_configManager;
+		EuleeHand					_database;
 };
 
 #endif

@@ -6,13 +6,13 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:20:26 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/13 18:55:52 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/13 20:55:25 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/HttpGetResponse.hpp"
 
-HttpGetResponse::HttpGetResponse(std::string path, int socket) : _socket(socket), _path(path) {}
+HttpGetResponse::HttpGetResponse(std::string path, int socket, EuleeHand database) : _socket(socket), _path(path), _database(database) {}
 
 HttpGetResponse::~HttpGetResponse() {}
 
@@ -27,7 +27,7 @@ void	HttpGetResponse::handleGet()
 	if (file.fail())
 	{
 		std::cerr << RED << "Error opening " << this->_path << "!\n" << RESET << std::endl;
-		ft_select(this->_socket, (void *)failedResponse.c_str(), failedResponse.length(), WRITE);
+		this->_database.ft_select(this->_socket, (void *)failedResponse.c_str(), failedResponse.length(), WRITE);
 		close(this->_socket);
 		return ;
 	}
@@ -41,7 +41,7 @@ void	HttpGetResponse::handleGet()
 	if (file.read(&fileContents[0], file_size).fail())
 	{
 		std::cerr << RED << "Error reading " << this->_path << "!\n" << RESET << std::endl;
-		ft_select(this->_socket, (void *)failedResponse.c_str(), failedResponse.length(), WRITE);
+		this->_database.ft_select(this->_socket, (void *)failedResponse.c_str(), failedResponse.length(), WRITE);
 		file.close();
 		close(this->_socket);
 		return ;
@@ -52,7 +52,7 @@ void	HttpGetResponse::handleGet()
 	int	total = 0;
 	while (total < (int)httpResponse.size())
 	{
-		int sent = ft_select(this->_socket, &httpResponse[total], httpResponse.size() - total, WRITE);
+		int sent = this->_database.ft_select(this->_socket, &httpResponse[total], httpResponse.size() - total, WRITE);
 		if (sent <= 0)
 		{
 			close(this->_socket);
