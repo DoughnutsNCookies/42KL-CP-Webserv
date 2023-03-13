@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   EuleeHand.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/13 20:02:43 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/13 20:44:39 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ class EuleeHand
 		void	errorHandleShit(void);
 		void	printServers(void);
 		void	parseConfigServer(void);
+		void	perrorExit(std::string msg, int exitTrue = 1);
+		long	ft_select(int fd, void *buff, size_t size, Mode mode);
 
 		std::vector<EuleePocket>	server;
 

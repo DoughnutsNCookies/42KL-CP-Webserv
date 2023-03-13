@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigManager.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:49:34 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/13 20:11:59 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/13 20:36:53 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,14 +50,15 @@ class ConfigManager
 		std::vector<Token>	&getToken(void);
 
 	private:
+		void						_lexLine(std::string line, int lineNum);
+		void						_createToken(std::string *token, Type *currentType, Type type, std::string c, int lineNum);
+
 		std::string					_configFilePath;
 		std::vector<Token>			_tokens;
 		std::vector<std::string>	_validStr;
 		std::vector<std::string>	_serverVar;
 		std::vector<std::string>	_locationVar;
 
-		void						_lexLine(std::string line, int lineNum);
-		void						_createToken(std::string *token, Type *currentType, Type type, std::string c, int lineNum);
 };
 
 #endif
