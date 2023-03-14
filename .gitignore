@@ -1,0 +1,5 @@
+.gitignore
+.vscode
+*.dSYM
+Webserv/objs
+Webserv/webserv
