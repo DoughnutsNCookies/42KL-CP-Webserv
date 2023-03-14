@@ -6,7 +6,7 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 17:51:51 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/14 14:37:06 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/14 14:45:07 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,6 @@ class EuleePocket
 		mapped_type	&operator[](key_type key);
 
 		// member function
-		void		perrorExit(std::string msg, int exitTrue = 1);
-		long		ft_select(int fd, void *buff, size_t size, Mode mode);
 		iterator	begin(void);
 		iterator	end(void);
 

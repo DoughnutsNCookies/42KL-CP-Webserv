@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigManager.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:55:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/13 20:09:38 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/13 20:32:56 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ConfigManager.hpp"
-#include <unistd.h>
+#include "../incs/ConfigManager.hpp"
 
 ConfigManager::ConfigManager(void): _configFilePath() {}
 

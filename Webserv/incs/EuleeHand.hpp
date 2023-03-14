@@ -6,7 +6,7 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/14 14:42:22 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/14 14:45:06 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ class EuleeHand
 		void	errorHandleShit(void);
 		void	printServers(void);
 		void	parseConfigServer(void);
+		void	perrorExit(std::string msg, int exitTrue = 1);
+		long	ft_select(int fd, void *buff, size_t size, Mode mode);
 
 		std::vector<EuleePocket>	server;
 		std::vector<int>			serverFd;
