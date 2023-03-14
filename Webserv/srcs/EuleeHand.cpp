@@ -3,18 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   EuleeHand.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/14 14:45:10 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/14 15:05:56 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "EuleeHand.hpp"
 
-EuleeHand::EuleeHand(void) : server(), serverFd(), serverAddr(), methodPath(), buffer(), socket(), contentLength(), _configFilePath(), _configManager() {}
+EuleeHand::EuleeHand(void) : socket(), server(), serverFd(), serverAddr(), methodPath(), buffer(), _configFilePath(), _configManager() {}
 
-EuleeHand::EuleeHand(std::string configFilePath, ConfigManager const &configManager) : server(), serverFd(), serverAddr(), methodPath(), buffer(), socket(), contentLength(), _configFilePath(configFilePath), _configManager(configManager) {}
+EuleeHand::EuleeHand(std::string configFilePath, ConfigManager const &configManager) :  socket(), server(), serverFd(), serverAddr(), methodPath(), buffer(), _configFilePath(configFilePath), _configManager(configManager) {}
 
 EuleeHand::~EuleeHand(void) {}
 

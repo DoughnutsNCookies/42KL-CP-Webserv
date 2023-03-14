@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 14:00:35 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/14 14:51:22 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/14 15:19:52 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 class HttpPutResponse
 {
 	public:
-		HttpPutResponse(int socket, std::string buffer, std::string path, EuleeHand database);
+		HttpPutResponse(EuleeHand database);
 		~HttpPutResponse();
 		void		handlePut();
 

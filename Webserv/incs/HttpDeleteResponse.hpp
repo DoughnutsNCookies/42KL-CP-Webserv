@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/13 16:22:15 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/13 20:55:53 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/14 15:21:35 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,13 +18,11 @@
 class HttpDeleteResponse
 {
 	public:
-		HttpDeleteResponse(int socket, std::string path, EuleeHand database);
+		HttpDeleteResponse(EuleeHand database);
 		~HttpDeleteResponse();
 		void	handleDelete();
 
 	private:
-		int			_socket;
-		std::string	_path;
 		EuleeHand	_database;
 };
 

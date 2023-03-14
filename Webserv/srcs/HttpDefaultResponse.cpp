@@ -6,13 +6,13 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:39:08 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/13 20:53:44 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/14 15:23:28 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/HttpDefaultResponse.hpp"
 
-HttpDefaultResponse::HttpDefaultResponse(int socket, EuleeHand database) : _database(database), _socket(socket) {}
+HttpDefaultResponse::HttpDefaultResponse(EuleeHand database) : _database(database) {}
 
 HttpDefaultResponse::~HttpDefaultResponse() {}
 
@@ -23,6 +23,6 @@ void	HttpDefaultResponse::handleDefault()
 	std::string content_length_str = "Content-Length: " + std::to_string(message.length()) + "\r\n\r\n";
 	std::string output = http + content_length_str + message;
 
-	this->_database.ft_select(this->_socket, (void *)output.c_str(), output.length(), WRITE);
-	close(this->_socket);
+	this->_database.ft_select(this->_database.socket, (void *)output.c_str(), output.length(), WRITE);
+	close(this->_database.socket);
 }
