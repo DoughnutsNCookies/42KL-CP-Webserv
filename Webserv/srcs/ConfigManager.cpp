@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:55:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/13 20:32:56 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/14 19:21:15 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,7 +115,7 @@ int		ConfigManager::checkValue(int i, int previous)
 	if (this->_tokens[i].type == VALUE) // 2
 	{
 		if (previous == 1 || previous == 2)
-			previous = 2;
+			previous = VALUE;
 		else
 			printError("Not a key/value before another value. ", i);
 	}
@@ -127,7 +127,7 @@ int	ConfigManager::checkSemicolon(int i, int previous)
 	if (this->_tokens[i].type == SEMICOLON) // 3
 	{
 		if (previous == 2)
-			previous = 3;
+			previous = SEMICOLON;
 		else
 			printError("Semicolon not after value. ", i);
 	}
@@ -141,7 +141,7 @@ int		ConfigManager::checkOpenBrace(int i, int previous, int *braces, int main_bl
 		if (main_block > 0)
 			*braces += 1;
 		if (previous == 1 || previous  == 2)
-			previous = 4;
+			previous = OPEN_BRACE;
 		else
 			printError("Open braces not after key or value. ", i);
 	}
@@ -152,13 +152,11 @@ int		ConfigManager::checkCloseBrace(int i, int previous, int *braces, int *main_
 {
 	if (this->_tokens[i].type == CLOSE_BRACE) // 5
 	{
-		
-		if (*braces > 0)
-			*braces -= 1;
+		*braces -= 1;
 		if (*braces == 0)
 			*main_block -= 1;
 		if (previous == 3 || previous == 5)
-			previous = 5;
+			previous = CLOSE_BRACE;
 		else
 			printError("Close braces not after close braces or semicolon. ", i);
 
@@ -179,26 +177,29 @@ int		ConfigManager::checkLocationKey(size_t i, int previous, int *braces, int *m
 {
 	if (this->_tokens[i].type == KEY) // 1
 	{
+		if (*main_block == 1)
+		{
+			if (!(std::find(this->_locationVar.begin(), this->_locationVar.end(),
+				this->_tokens[i].token) != this->_locationVar.end())) // server
+				printError("Not a valid string for Location block. ", i);
+		}
+
 		if ((previous == 3 || previous == 4 || previous == 5) || *main_block == 0)
-			previous = 1;
+			previous = KEY;
 		else
 			printError("Key is not after braces or semicolon. ", i);
-		this->checkImportantCheck(i);
 
-		if (*main_block == 1 && this->_tokens[i].token == this->_serverVar[0])
-				printError("Server cannot be non-main directive. ", i);
+		this->checkImportantCheck(i);
 
 		if (*main_block == 0)
 		{
-			// if (this->_tokens[i].token != this->_serverVar[0])
-			// 	printError("Invalid main directive (should be server). ", i);
 			if (*braces > 0)
 				printError("Invalid number of braces.", i);
 			*main_block = 1;
 		}
-		if (!(std::find(this->_locationVar.begin(), this->_locationVar.end(),
-			this->_tokens[i].token) != this->_locationVar.end())) // server
-			printError("Not a valid string for Location block. ", i);
+		// if (!(std::find(this->_locationVar.begin(), this->_locationVar.end(),
+		// 	this->_tokens[i].token) != this->_locationVar.end())) // server
+		// 	printError("Not a valid string for Location block. ", i);
 	}
 	return (previous);
 }
@@ -211,9 +212,10 @@ int		ConfigManager::checkServerKey(size_t i, int previous, int *braces, int *mai
 	if (this->_tokens[i].type == KEY) // 1
 	{
 		if ((previous == 3 || previous == 4 || previous == 5) || *main_block == 0)
-			previous = 1;
+			previous = KEY;
 		else
 			printError("Key is not after braces or semicolon. ", i);
+
 		this->checkImportantCheck(i);
 		if (*main_block == 1 && this->_tokens[i].token == this->_serverVar[0])
 				printError("Server cannot be non-main directive. ", i);
@@ -235,33 +237,29 @@ int		ConfigManager::checkServerKey(size_t i, int previous, int *braces, int *mai
 		{
 			if (this->_tokens[i + 2].type != OPEN_BRACE)
 				printError("Location should only have one value. ", i + 2);
-			i++;
-			this->locationBlock(&i); // 99% throw up looking at this i++ shit
-			i++;
+			*main_block = 2;
 		}
 	}
 	return (previous);
 }
 
-int	ConfigManager::locationBlock(size_t *i)
+int	ConfigManager::locationBlock(size_t i)
 {
-	int		main_block = 0;
+	int		loc_block = 0;
 	int		braces = 0;
-	int		previous = 1;
+	int		previous = 0;
 
-	// std::cout << "entered location block" << std::endl;
 	while (!(previous == 5 && braces == 0))
 	{
-		previous = this->checkLocationKey(*i, previous, &braces, &main_block);
-		previous = this->checkValue(*i, previous);
-		previous = this->checkSemicolon(*i, previous);
-		previous = this->checkOpenBrace(*i, previous, &braces, main_block);
-		previous = this->checkCloseBrace(*i , previous, &braces, &main_block);
-		*i += 1;
+		previous = this->checkLocationKey(i, previous, &braces, &loc_block);
+		previous = this->checkValue(i, previous);
+		previous = this->checkSemicolon(i, previous);
+		previous = this->checkOpenBrace(i, previous, &braces, loc_block);
+		previous = this->checkCloseBrace(i , previous, &braces, &loc_block);
+		i += 1;
 	}
-	return (*i);
+	return (i);
 }
-
 void	ConfigManager::errorHandleShit(void)
 {
 	size_t	i = 0;
@@ -274,15 +272,21 @@ void	ConfigManager::errorHandleShit(void)
 		if (this->_tokens[i].type == CONTEXT) // 0
 			printError("Random word out of blocks. ", i);
 		previous = this->checkServerKey(i, previous, &braces, &main_block);
+		if (main_block == 2) // location block
+		{
+			i = this->locationBlock(i);
+			main_block = 1;
+			previous = 5;
+			continue ;
+		}
 		previous = this->checkValue(i, previous);
 		previous = this->checkSemicolon(i, previous);
 		previous = this->checkOpenBrace(i, previous, &braces, main_block);
 		previous = this->checkCloseBrace(i , previous, &braces, &main_block);
 		i++;
 	}
-	if (braces > 0)
-		std::cout << "Not enough closing braces. " << std::endl;
-		// printError("Not enough closing braces at the end. ", i);
+	if (braces != 0)
+		printError("Invalid number of brace. ", this->_tokens.size() - 1);
 	return ;
 }
 

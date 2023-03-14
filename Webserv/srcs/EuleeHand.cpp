@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/14 15:05:56 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/14 18:03:58 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,10 +56,10 @@ void	EuleeHand::printServers(void)
 			std::cout << std::endl;
 		}
 		std::cout << RESET << std::endl;
-		for (size_t j = 0; j < this->server[i].location.size(); ++j)
+		for (size_t j = 0; j < this->server[i].vectorLocation.size(); ++j)
 		{
 			std::cout << BLUE "location " << j + 1 << RESET << std::endl;
-			for (EuleePocket::iterator it2 = this->server[i].location[j].begin(); it2 != this->server[i].location[j].end(); ++it2)
+			for (EuleePocket::iterator it2 = this->server[i].vectorLocation[j].begin(); it2 != this->server[i].vectorLocation[j].end(); ++it2)
 			{
 				std::cout << BLUENORM << it2->first << " : ";
 				for (size_t d = 0; d < it2->second.size(); ++d)
@@ -70,7 +70,7 @@ void	EuleeHand::printServers(void)
 				}
 				std::cout << std::endl;
 			}
-			if (j + 1 < this->server[i].location.size())
+			if (j + 1 < this->server[i].vectorLocation.size())
 				std::cout << std::endl;
 		}
 		std::cout << RESET;
@@ -147,6 +147,9 @@ void	EuleeHand::parseConfigServer(void)
 	size_t	i = 1;
 	while (i < tokens.size())
 		i = this->_parseServer(tokens, i);
+	for (size_t j = 0; j < this->server.size(); j++)
+		for (size_t k = 0; k < this->server[j].vectorLocation.size(); k++)
+			this->server[j].location[this->server[j].vectorLocation[k][LOCATION_READ_PATH][0]] = this->server[j].vectorLocation[k];
 }
 
 void	EuleeHand::perrorExit(std::string msg, int exitTrue)
