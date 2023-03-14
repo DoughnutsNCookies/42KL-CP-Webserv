@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 17:51:51 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/14 14:32:25 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/14 14:48:09 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,10 +54,6 @@ class EuleePocket
 		// member variable
 		std::map<std::string, std::string>	envp;
 		std::vector<EuleeWallet>			location;
-		std::vector<int>					serverFd; // Move to Hand
-		std::vector<sockaddr_in>			serverAddr; // Move to Hand
-		std::string							path, buffer; // Move to Hand, rename path for method to methodPath, config path to configPath
-		int									socket, contentLength; // Move to Hand
 
 	private:
 		EuleeWallet							_server;
