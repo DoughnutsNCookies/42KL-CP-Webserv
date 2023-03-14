@@ -46,7 +46,7 @@ class ConfigManager
 		int				checkCloseBrace(int i, int previous, int *braces, int *main_block);
 		
 	
-		int				locationBlock(size_t *i);
+		int				locationBlock(size_t i);
 		void			errorHandleShit(void);
 
 		// Utils
