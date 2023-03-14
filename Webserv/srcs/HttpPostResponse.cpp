@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:27:42 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/13 20:52:59 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/14 14:19:06 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ void	HttpPostResponse::handlePost()
 	if (contentLengthPos != std::string::npos)
 	{
 		contentLengthPos += std::strlen("Content-Length: ");
-		contentLength = std::stoi(this->_buffer.substr(contentLengthPos));
+		contentLength = std::stoul(this->_buffer.substr(contentLengthPos));
 		contentLengthSpecified = 1;
 	}
 
@@ -78,4 +78,5 @@ void	HttpPostResponse::handlePost()
 	std::string responseBody = "Server has received your POST request!";
 	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + std::to_string(responseBody.length()) + "\r\n\r\n" + responseBody;
 	this->_database.ft_select(this->_socket, (void *)response.c_str(), response.length(), WRITE);
+	close(this->_socket);
 }

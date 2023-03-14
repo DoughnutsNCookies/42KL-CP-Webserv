@@ -6,7 +6,7 @@
 #    By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/28 17:38:48 by jhii              #+#    #+#              #
-#    Updated: 2023/03/13 20:39:06 by schuah           ###   ########.fr        #
+#    Updated: 2023/03/14 14:02:46 by schuah           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,7 +34,8 @@ SRC			=	WebServer.cpp \
 				HttpCgiResponse.cpp \
 				HttpGetResponse.cpp \
 				HttpDeleteResponse.cpp \
-				HttpHeadResponse.cpp
+				HttpHeadResponse.cpp \
+				HttpPutResponse.cpp
 OBJ			=	${addprefix ${OBJ_PATH}/, ${SRC:.cpp=.o}}
 
 all: 

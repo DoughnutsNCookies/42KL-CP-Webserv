@@ -1,32 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HttpPostResponse.hpp                               :+:      :+:    :+:   */
+/*   HttpPutResponse.hpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/03/08 15:22:30 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/14 14:19:59 by schuah           ###   ########.fr       */
+/*   Created: 2023/03/14 14:00:35 by schuah            #+#    #+#             */
+/*   Updated: 2023/03/14 14:21:25 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HTTPPOSTRESPONSE_HPP
-# define HTTPPOSTRESPONSE_HPP
+#ifndef HTTPPUTRESPONSE_HPP
+# define HTTPPUTRESPONSE_HPP
 
 # include "WebServer.hpp"
 
-class HttpPostResponse
+class HttpPutResponse
 {
 	public:
-		HttpPostResponse(int socket, std::string buffer, EuleeHand database);
-		~HttpPostResponse();
-		void		handlePost();
+		HttpPutResponse(int socket, std::string buffer, std::string path, EuleeHand database);
+		~HttpPutResponse();
+		void		handlePut();
 
 	private:
 		void		_saveFile(size_t contentLength, int contentLengthSpecified);
 
 		int			_socket;
-		std::string	_buffer;
+		std::string	_buffer, _path;
 		EuleeHand	_database;
 };
 

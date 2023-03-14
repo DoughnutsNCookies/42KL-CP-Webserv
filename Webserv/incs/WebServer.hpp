@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/13 20:47:49 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/14 14:10:46 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,29 +14,28 @@
 # define WEBSERVER_HPP
 
 # include <iostream>
-# include <string>
 # include <sstream>
 # include <fstream>
+# include <string>
 # include <vector>
+# include <map>
+# include <sys/socket.h>
 # include <unistd.h>
 # include <netdb.h>
 # include <fcntl.h>
-# include <sys/socket.h>
 
 # include "webserv.hpp"
 # include "ConfigManager.hpp"
 # include "EuleeHand.hpp"
+# include "EuleeWallet.hpp"
 # include "HttpPostResponse.hpp"
 # include "HttpDefaultResponse.hpp"
 # include "HttpCgiResponse.hpp"
 # include "HttpGetResponse.hpp"
 # include "HttpDeleteResponse.hpp"
 # include "HttpHeadResponse.hpp"
+# include "HttpPutResponse.hpp"
 
-# define WS_DOMAIN				AF_INET
-# define WS_TYPE				SOCK_STREAM
-# define WS_PROTOCOL			0
-# define WS_FLAGS				AI_PASSIVE
 # define WS_SERVER_NAME			"localhost"
 # define WS_BACKLOG				10
 # define WS_PORT				8080
