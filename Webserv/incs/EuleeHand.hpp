@@ -6,7 +6,7 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/13 20:02:43 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/14 14:42:22 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,7 @@ class EuleeHand
 	public:
 		EuleeHand(void);
 		EuleeHand(std::string configFilePath, const ConfigManager &configManager);
-		EuleeHand(const EuleeHand &ref);
 		~EuleeHand(void);
-
-		EuleeHand	&operator=(const EuleeHand &ref);
 
 		void	printTokens(void);
 		void	parseConfigFile(void);
@@ -34,6 +31,10 @@ class EuleeHand
 		void	parseConfigServer(void);
 
 		std::vector<EuleePocket>	server;
+		std::vector<int>			serverFd;
+		std::vector<sockaddr_in>	serverAddr;
+		std::string					methodPath, buffer;
+		int							socket, contentLength;
 
 	private:
 		std::string		_configFilePath;
