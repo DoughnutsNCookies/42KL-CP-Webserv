@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/14 15:28:55 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/14 16:26:59 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ class WebServer
 	public:
 		WebServer(std::string configFilePath);
 		~WebServer(void);
-		void					runServer(void);
+		void						runServer(void);
 
 	private:
 		void						_setupServer();

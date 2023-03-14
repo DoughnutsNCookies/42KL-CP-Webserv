@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/14 15:37:02 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/14 16:26:54 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,6 @@ int	WebServer::_unchunkResponse()
 	{
 		std::string	chunkSize = remaining.substr(0, remaining.find("\r\n"));
 		size_t		size = std::stoul(chunkSize, 0, 16);
-		std::cout << size << std::endl;
 		if (size == 0)
 			return (0);
 		if (size > remaining.size() - std::strlen("\r\n"))
@@ -138,7 +137,7 @@ void	WebServer::_serverLoop()
 		std::cout << CYAN << "Port Accepted: ";
 		for (size_t i = 0; i < this->_database.server.size(); i++)
 			std::cout << this->_database.server[i][LISTEN][0] << " ";
-		std::cout << "Waiting for new connection..." << RESET << std::endl;
+		std::cout << "\nWaiting for new connection..." << RESET << std::endl;
 		this->_database.socket = 0;
 		for (size_t i = 0; i < this->_database.server.size(); i++)
 			fcntl(this->_database.serverFd[i], F_SETFL, O_NONBLOCK);
@@ -194,6 +193,8 @@ void	WebServer::_serverLoop()
 		std::cout << BLUE << this->_database.buffer.substr(0, this->_database.buffer.find("\r\n\r\n")) << RESET << std::endl;
 		// std::cout << BLUE << this->_database.buffer << RESET << std::endl;
 
+
+
 		if (method == "HEAD")
 		{
 			std::cout << MAGENTA << "Head method called" << RESET << std::endl;
@@ -232,7 +233,7 @@ void	WebServer::_serverLoop()
 		}
 		else
 		{
-			std::cout << "Default method called" << std::endl;
+			std::cout << MAGENTA << "Default method called" << RESET << std::endl;
 			HttpDefaultResponse	defaultResponse(this->_database);
 			defaultResponse.handleDefault();
 		}
