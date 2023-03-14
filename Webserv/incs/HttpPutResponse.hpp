@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 14:00:35 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/14 14:21:25 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/14 14:51:22 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,6 @@ class HttpPutResponse
 		void		handlePut();
 
 	private:
-		void		_saveFile(size_t contentLength, int contentLengthSpecified);
-
 		int			_socket;
 		std::string	_buffer, _path;
 		EuleeHand	_database;
