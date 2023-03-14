@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/14 19:06:37 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/14 21:52:22 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ class WebServer
 		int				_checkExcept(std::string method);
 		int				_isCGI();
 		void			_setupServer();
+		void			_convertLocation();
 		int				_unchunkResponse();
 		void			_serverLoop();
 

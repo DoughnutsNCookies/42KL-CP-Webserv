@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/14 19:10:31 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/14 22:44:33 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,13 +126,31 @@ int	WebServer::_checkExcept(std::string method) // Util
 
 int		WebServer::_isCGI() // Util
 {
-	std::string extension = this->_database.methodPath.substr(this->_database.methodPath.find_last_of('.'));
+	size_t extensionPos = this->_database.methodPath.find_last_of('.');
+	if (extensionPos == std::string::npos)
+		return (0);
+	std::string extension = this->_database.methodPath.substr(extensionPos);
 	for (size_t i = 0; i < this->_database.server[this->_database.serverIndex][CGI].size(); i++)
-	{
 		if (this->_database.server[this->_database.serverIndex][CGI][i] == extension)
 			return (1);
-	}
 	return (0);
+}
+
+void	WebServer::_convertLocation()
+{
+	size_t	firstSlashPos = this->_database.methodPath.find("/", 1);
+	std::string	locationToFind = this->_database.methodPath;
+	if (firstSlashPos != std::string::npos)
+		locationToFind = "/" + this->_database.methodPath.substr(1, firstSlashPos - 1);
+	if (this->_database.server[this->_database.serverIndex].location.find(locationToFind) == this->_database.server[this->_database.serverIndex].location.end())
+		return ;
+	if (this->_database.server[this->_database.serverIndex].location[locationToFind][ROOT].size() == 0)
+		return ;
+	
+	std::string root = this->_database.server[this->_database.serverIndex].location[locationToFind][ROOT][0];
+	std::string newPath = root + this->_database.methodPath.substr(this->_database.methodPath.find(root) + root.length());
+	std::cout << GREEN << "New path: " << this->_database.methodPath << RESET << std::endl;
+	this->_database.methodPath = "/" + root + this->_database.methodPath.substr(this->_database.methodPath.find(root) + root.length());
 }
 
 void	WebServer::_serverLoop()
@@ -168,7 +186,7 @@ void	WebServer::_serverLoop()
 		while (valread > 0)
 		{
 			total += valread;
-			// std::cout << GREEN << "Received: " << valread << "\tTotal: " << total << RESET << std::endl;
+			std::cout << GREEN << "Received: " << valread << "\tTotal: " << total << RESET << std::endl;
 			if (valread < 0)
 			{
 				close(this->_database.socket);
@@ -210,6 +228,7 @@ void	WebServer::_serverLoop()
 		// 	continue ;
 		// }
 
+		this->_convertLocation();
 		if (this->_checkExcept(method))
 			continue ;
 		// if (this->_checkDirectory())

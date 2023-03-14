@@ -6,11 +6,12 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:20:26 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/14 18:59:26 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/14 22:31:21 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/HttpGetResponse.hpp"
+# include <filesystem>
 
 HttpGetResponse::HttpGetResponse(EuleeHand database) : _database(database) {}
 
@@ -41,7 +42,18 @@ void	HttpGetResponse::handleGet()
 	if (file.read(&fileContents[0], file_size).fail())
 	{
 		std::cerr << RED << "Error reading " << this->_database.methodPath << "!\n" << RESET << std::endl;
+		std::ifstream	checkFile((this->_database.methodPath + "/").c_str() + 1);
+		if (checkFile.good())
+		{
+			std::string	response = "HTTP/1.1 200 OK\r\n\r\n";
+			this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.length(), WRITE);
+			checkFile.close();
+			file.close();
+			close(this->_database.socket);
+			return ;
+		}
 		this->_database.ft_select(this->_database.socket, (void *)failedResponse.c_str(), failedResponse.length(), WRITE);
+		checkFile.close();
 		file.close();
 		close(this->_database.socket);
 		return ;
