@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigManager.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:55:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/07 16:34:28 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/13 20:32:56 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ConfigManager.hpp"
-#include <unistd.h>
+#include "../incs/ConfigManager.hpp"
 
 ConfigManager::ConfigManager(void): _configFilePath() {}
 
@@ -91,14 +90,14 @@ void	ConfigManager::parseConfigFile()
 void	ConfigManager::printTokens(void)
 {
 	for (size_t i = 0; i < this->_tokens.size(); i++)
-		std::cout << "Token: |" << this->_tokens[i].getToken() << "| Type: |" << this->_tokens[i].getType() << "| Line: |" << this->_tokens[i].getLineNum() << "|" << std::endl;
+		std::cout << "Token: |" << this->_tokens[i].token << "| Type: |" << this->_tokens[i].type << "| Line: |" << this->_tokens[i].lineNum << "|" << std::endl;
 }
 
 void	ConfigManager::printError(std::string str, int i)
 {
 
-	std::cout << str << "Line: " << this->_tokens[i].getLineNum() << std::endl;
-	std::cout << this->_tokens[i].getToken() << std::endl;
+	std::cout << str << "Line: " << this->_tokens[i].lineNum << std::endl;
+	std::cout << this->_tokens[i].token << std::endl;
 	exit(1);
 }
 
@@ -113,16 +112,16 @@ void	ConfigManager::configLibrary(void)
 
 void	ConfigManager::checkImportantCheck(int i)
 {
-	if (this->_tokens[i].getToken() == "root" || this->_tokens[i].getToken() == "auto_index" || this->_tokens[i].getToken() == "client_max_body_size")
+	if (this->_tokens[i].token == "root" || this->_tokens[i].token == "auto_index" || this->_tokens[i].token == "client_max_body_size")
 	{
-		if (this->_tokens[i + 2].getType() == VALUE)
+		if (this->_tokens[i + 2].type == VALUE)
 			printError("I hardcoded these 3 to obtain this error, problem?. ", i + 2);
 	}
 }
 
 int		ConfigManager::checkValue(int i, int previous)
 {
-	if (this->_tokens[i].getType() == VALUE) // 2
+	if (this->_tokens[i].type == VALUE) // 2
 	{
 		if (previous == 1 || previous == 2)
 			previous = VALUE;
@@ -134,7 +133,7 @@ int		ConfigManager::checkValue(int i, int previous)
 
 int	ConfigManager::checkSemicolon(int i, int previous)
 {
-	if (this->_tokens[i].getType() == SEMICOLON) // 3
+	if (this->_tokens[i].type == SEMICOLON) // 3
 	{
 		if (previous == 2)
 			previous = SEMICOLON;
@@ -146,7 +145,7 @@ int	ConfigManager::checkSemicolon(int i, int previous)
 
 int		ConfigManager::checkOpenBrace(int i, int previous, int *braces, int main_block)
 {
-	if (this->_tokens[i].getType() == OPEN_BRACE) // 4
+	if (this->_tokens[i].type == OPEN_BRACE) // 4
 	{
 		if (main_block > 0)
 			*braces += 1;
@@ -160,7 +159,7 @@ int		ConfigManager::checkOpenBrace(int i, int previous, int *braces, int main_bl
 
 int		ConfigManager::checkCloseBrace(int i, int previous, int *braces, int *main_block)
 {
-	if (this->_tokens[i].getType() == CLOSE_BRACE) // 5
+	if (this->_tokens[i].type == CLOSE_BRACE) // 5
 	{
 		*braces -= 1;
 		if (*braces == 0)
@@ -176,12 +175,12 @@ int		ConfigManager::checkCloseBrace(int i, int previous, int *braces, int *main_
 
 int		ConfigManager::checkLocationKey(size_t i, int previous, int *braces, int *main_block)
 {
-	if (this->_tokens[i].getType() == KEY) // 1
+	if (this->_tokens[i].type == KEY) // 1
 	{
 		if (*main_block == 1)
 		{
 			if (!(std::find(this->_locationVar.begin(), this->_locationVar.end(),
-				this->_tokens[i].getToken()) != this->_locationVar.end())) // server
+				this->_tokens[i].token) != this->_locationVar.end())) // server
 				printError("Not a valid string for Location block. ", i);
 		}
 
@@ -198,13 +197,17 @@ int		ConfigManager::checkLocationKey(size_t i, int previous, int *braces, int *m
 				printError("Invalid number of braces.", i);
 			*main_block = 1;
 		}
+		// if (!(std::find(this->_locationVar.begin(), this->_locationVar.end(),
+		// 	this->_tokens[i].token) != this->_locationVar.end())) // server
+		// 	printError("Not a valid string for Location block. ", i);
 	}
 	return (previous);
 }
 
 int		ConfigManager::checkServerKey(size_t i, int previous, int *braces, int *main_block)
 {
-	if (this->_tokens[i].getType() == KEY) // 1
+
+	if (this->_tokens[i].type == KEY) // 1
 	{
 		if ((previous == 3 || previous == 4 || previous == 5) || *main_block == 0)
 			previous = KEY;
@@ -212,26 +215,25 @@ int		ConfigManager::checkServerKey(size_t i, int previous, int *braces, int *mai
 			printError("Key is not after braces or semicolon. ", i);
 
 		this->checkImportantCheck(i);
-
-		if (*main_block == 1 && this->_tokens[i].getToken() == this->_serverVar[0])
+		if (*main_block == 1 && this->_tokens[i].token == this->_serverVar[0])
 				printError("Server cannot be non-main directive. ", i);
 
 		if (!(std::find(this->_serverVar.begin(), this->_serverVar.end(),
-			this->_tokens[i].getToken()) != this->_serverVar.end())) // server
+			this->_tokens[i].token) != this->_serverVar.end())) // server
 			printError("Not a valid string for Server block. ", i);
 
 		if (*main_block == 0)
 		{
-			if (this->_tokens[i].getToken() != this->_serverVar[0])
+			if (this->_tokens[i].token != this->_serverVar[0])
 				printError("Invalid main directive (should be server). ", i);
 			if (*braces > 0)
 				printError("Invalid number of braces.", i);
 			*main_block = 1;
 		}
-
-		if (this->_tokens[i].getToken() == this->_serverVar[1]) // location
+		
+		if (this->_tokens[i].token == this->_serverVar[1]) // location
 		{
-			if (this->_tokens[i + 2].getType() != OPEN_BRACE)
+			if (this->_tokens[i + 2].type != OPEN_BRACE)
 				printError("Location should only have one value. ", i + 2);
 			*main_block = 2;
 		}
@@ -266,7 +268,7 @@ void	ConfigManager::errorHandleShit(void)
 
 	while (i < this->_tokens.size())
 	{
-		if (this->_tokens[i].getType() == CONTEXT) // 0
+		if (this->_tokens[i].type == CONTEXT) // 0
 			printError("Random word out of blocks. ", i);
 		previous = this->checkServerKey(i, previous, &braces, &main_block);
 		if (main_block == 2) // location block
@@ -285,4 +287,9 @@ void	ConfigManager::errorHandleShit(void)
 	if (braces != 0)
 		printError("Invalid number of brace. ", this->_tokens.size() - 1);
 	return ;
+}
+
+std::vector<Token>	&ConfigManager::getToken(void)
+{
+	return (this->_tokens);
 }
