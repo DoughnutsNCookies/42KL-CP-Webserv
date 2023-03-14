@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/14 15:25:00 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/14 15:37:02 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,25 +33,52 @@ void	WebServer::_setupServer()
 	this->_database.serverAddr.resize(this->_database.server.size());
 	this->_database.serverFd.resize(this->_database.server.size()); 
 
-	// Default port
-	if ((this->_database.serverFd[0] = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-		this->_database.perrorExit("Socket Error");
-
-	int	optval = 1;
-	if (setsockopt(this->_database.serverFd[0], SOL_SOCKET, SO_NOSIGPIPE, &optval, sizeof(optval)) == -1) //Done to keep socket alive even after Broken Pipe
-		this->_database.perrorExit("Setsockopt Error");
-
-	if (getaddrinfo(WS_SERVER_NAME, this->_database.server[0][LISTEN][0].c_str(), &hints, &res) != 0)
-		this->_database.perrorExit("Getaddrinfo Error");
 	
-	memcpy(&this->_database.serverAddr[0], res->ai_addr, res->ai_addrlen);
-	freeaddrinfo(res);
-	this->_database.serverAddr[0].sin_port = htons(std::stoi(this->_database.server[0][LISTEN][0]));
+	// Default port
+	for (size_t i = 0; i < this->_database.server.size(); i++)
+	{
+		if ((this->_database.serverFd[i] = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+			this->_database.perrorExit("Socket Error");
 
-	if (bind(this->_database.serverFd[0], (sockaddr *)&this->_database.serverAddr[0], sizeof(this->_database.serverAddr[0])) < 0)
-		this->_database.perrorExit("Bind Error");
-	if (listen(this->_database.serverFd[0], WS_BACKLOG) < 0)
-		this->_database.perrorExit("Listen Error");
+		int	optval = 1;
+		if (setsockopt(this->_database.serverFd[i], SOL_SOCKET, SO_NOSIGPIPE, &optval, sizeof(optval)) == -1) //Done to keep socket alive even after Broken Pipe
+			this->_database.perrorExit("Setsockopt Error");
+
+		if (getaddrinfo(this->_database.server[i][SERVER_NAME][0].c_str(), this->_database.server[i][LISTEN][0].c_str(), &hints, &res) != 0)
+			this->_database.perrorExit("Getaddrinfo Error");
+		
+		memcpy(&this->_database.serverAddr[i], res->ai_addr, res->ai_addrlen);
+		freeaddrinfo(res);
+		this->_database.serverAddr[i].sin_port = htons(std::stoi(this->_database.server[i][LISTEN][0]));
+
+		if (bind(this->_database.serverFd[i], (sockaddr *)&this->_database.serverAddr[i], sizeof(this->_database.serverAddr[i])) < 0)
+			this->_database.perrorExit("Bind Error");
+		if (listen(this->_database.serverFd[i], WS_BACKLOG) < 0)
+			this->_database.perrorExit("Listen Error");
+	}
+
+
+	// for (size_t i = 0; i < this->_database.server.size(); i++)
+	// {
+	// 	if ((this->_database.serverFd[i] = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+	// 		this->_database.perrorExit("Socket Error");
+
+	// 	int	optval = 1;
+	// 	if (setsockopt(this->_database.serverFd[i], SOL_SOCKET, SO_NOSIGPIPE, &optval, sizeof(optval)) == -1) //Done to keep socket alive even after Broken Pipe
+	// 		this->_database.perrorExit("Setsockopt Error");
+
+	// 	if (getaddrinfo(this->_database.server[i][SERVER_NAME][0].c_str(), this->_database.server[i][LISTEN][0].c_str(), &hints, &res) != 0)
+	// 		this->_database.perrorExit("Getaddrinfo Error");
+		
+	// 	memcpy(&this->_database.serverAddr[i], res->ai_addr, res->ai_addrlen);
+	// 	freeaddrinfo(res);
+	// 	this->_database.serverAddr[i].sin_port = htons(std::stoi(this->_database.server[i][LISTEN][0]));
+
+	// 	if (bind(this->_database.serverFd[i], (sockaddr *)&this->_database.serverAddr[i], sizeof(this->_database.serverAddr[i])) < 0)
+	// 		this->_database.perrorExit("Bind Error");
+	// 	if (listen(this->_database.serverFd[i], WS_BACKLOG) < 0)
+	// 		this->_database.perrorExit("Listen Error");
+	// }
 
 	// Trying port 9090
 	// int	port = 9090;
@@ -108,13 +135,16 @@ void	WebServer::_serverLoop()
 {
 	while(1)
 	{
-		std::cout << CYAN << "Port: " << WS_PORT << "\nWaiting for new connection..." << RESET << std::endl;
+		std::cout << CYAN << "Port Accepted: ";
+		for (size_t i = 0; i < this->_database.server.size(); i++)
+			std::cout << this->_database.server[i][LISTEN][0] << " ";
+		std::cout << "Waiting for new connection..." << RESET << std::endl;
 		this->_database.socket = 0;
-		for (size_t i = 0; i < this->_database.serverFd.size(); i++)
+		for (size_t i = 0; i < this->_database.server.size(); i++)
 			fcntl(this->_database.serverFd[i], F_SETFL, O_NONBLOCK);
 		while (this->_database.socket <= 0)
 		{
-			for (size_t i = 0; i < this->_database.serverFd.size(); i++)
+			for (size_t i = 0; i < this->_database.server.size(); i++)
 			{
 				this->_database.socket = accept(this->_database.serverFd[i], NULL, NULL);
 				if (this->_database.socket != -1)

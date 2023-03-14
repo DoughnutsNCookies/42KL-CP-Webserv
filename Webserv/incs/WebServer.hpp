@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/14 15:16:45 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/14 15:28:55 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,6 @@
 # include "HttpHeadResponse.hpp"
 # include "HttpPutResponse.hpp"
 
-# define WS_SERVER_NAME			"localhost"
 # define WS_BACKLOG				10
 # define WS_PORT				8081
 # define WS_BUFFER_SIZE			30000
