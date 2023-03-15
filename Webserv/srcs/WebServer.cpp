@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/14 22:44:33 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/15 13:53:41 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,7 +136,7 @@ int		WebServer::_isCGI() // Util
 	return (0);
 }
 
-void	WebServer::_convertLocation()
+void	WebServer::_convertLocation() // Util
 {
 	size_t	firstSlashPos = this->_database.methodPath.find("/", 1);
 	std::string	locationToFind = this->_database.methodPath;
@@ -220,9 +220,9 @@ void	WebServer::_serverLoop()
 		// std::cout << BLUE << this->_database.buffer << RESET << std::endl;
 
 		// std::cout << this->_database.methodPath << std::endl;
-		// if (this->_database.methodPath == "/directory/youpi.bad_extension")
+		// if (this->_database.methodPath == "/directory/Yeah")
 		// {
-		// 	std::string response = "HTTP/1.1 200 OK\r\n\r\n";
+		// 	std::string response = "HTTP/1.1 404 Not Found\r\n\r\n";
 		// 	this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.size(), WRITE);
 		// 	close(this->_database.socket);
 		// 	continue ;
@@ -231,8 +231,6 @@ void	WebServer::_serverLoop()
 		this->_convertLocation();
 		if (this->_checkExcept(method))
 			continue ;
-		// if (this->_checkDirectory())
-		// 	continue ;
 
 		if (method == "HEAD")
 		{

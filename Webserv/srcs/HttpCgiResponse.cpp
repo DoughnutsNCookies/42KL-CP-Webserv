@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:55:14 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/14 15:24:33 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/15 13:39:26 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,12 +39,12 @@ void	HttpCgiResponse::handleCgi()
         // setenv("QUERY_STRING", query_string, 1);
         // setenv("CONTENT_TYPE", content_type, 1);
         // setenv("CONTENT_LENGTH", std::to_string(contentLength.c_str(), 1);
-		setenv("CONTENT_LENGTH", "69", 1);
+		// setenv("CONTENT_LENGTH", "69", 1);
 
 		char	*cmds[2] = {(char *)(this->_database.methodPath.c_str() + 1), NULL};
 		execve(cmds[0], cmds, NULL);
 		std::cerr << RED << "Failed to execve CGI: " << strerror(errno) << RESET << std::endl;
-        std::cout << "HTTP/1.1 404 Not Found\r\n\r\nCGI requested is not found...\r\n" << std::endl;
+        std::cout << "HTTP/1.1 200 OK\r\n\r\n" << std::endl;
         exit(EXIT_FAILURE);
     }
 	else	// parent process
