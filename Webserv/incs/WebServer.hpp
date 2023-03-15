@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/14 21:52:22 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/15 19:13:50 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <iostream>
 # include <sstream>
 # include <fstream>
+# include <cstring>
 # include <string>
 # include <vector>
 # include <map>
@@ -47,10 +48,10 @@ class WebServer
 	public:
 		WebServer(std::string configFilePath);
 		~WebServer(void);
-		void			runServer(void);
+		void			runServer();
 
 	private:
-		int				_checkExcept(std::string method);
+		int				_checkExcept();
 		int				_isCGI();
 		void			_setupServer();
 		void			_convertLocation();

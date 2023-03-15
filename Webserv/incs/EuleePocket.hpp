@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 17:51:51 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/14 17:09:34 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/15 16:29:57 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ class EuleePocket
 		std::map<std::string, std::string>	envp;
 		std::vector<EuleeWallet>			vectorLocation;
 		std::map<std::string, EuleeWallet>	location;
+		int									portIndex;
 
 	private:
 		EuleeWallet							_server;
