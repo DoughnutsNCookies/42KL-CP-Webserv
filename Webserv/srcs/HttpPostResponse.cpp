@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:27:42 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/14 16:09:16 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/16 12:58:54 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int	HttpPostResponse::_saveFile(size_t contentLength, int contentLengthSpecified
 		std::cerr << RED << "No boundary found!" << RESET << std::endl;
 		return (0);
 	}
-
+	std::cout << "Moving..." << std::endl;
 	std::string	boundary = this->_database.buffer.substr(boundaryPos, this->_database.buffer.find("\r\n", boundaryPos) - boundaryPos);
 	boundaryPos = this->_database.buffer.find(boundary, boundaryPos + boundary.length());
 	
@@ -33,14 +33,21 @@ int	HttpPostResponse::_saveFile(size_t contentLength, int contentLengthSpecified
 		std::cerr << RED << "Error: Content-Length does not match actual content length!" << RESET << std::endl;
 		return (0);
 	}
-	size_t	namePos = this->_database.buffer.find("filename=\"");
+	size_t		namePos = this->_database.buffer.find("filename=\"");
+	std::string	fileName;
 	if (namePos == std::string::npos)
 	{
-		std::cerr << RED << "No file name found!" << RESET << std::endl;
-		return (0);
+		std::cerr << RED << "No file name found in header! Extracting from path..." << RESET << std::endl;
+		std::cout << "Entered" << std::endl;
+		fileName = this->_database.methodPath.substr(this->_database.methodPath.find_last_of("/"));
+		std::cout << "DNC" << std::endl;
 	}
-	namePos += std::strlen("filename=\"");
-	std::string	fileName = this->_database.buffer.substr(namePos, this->_database.buffer.find("\"", namePos) - namePos);
+	else
+	{
+		namePos += std::strlen("filename=\"");
+		fileName = this->_database.buffer.substr(namePos, this->_database.buffer.find("\"", namePos) - namePos);
+	}
+	std::cout << GREEN << "File name to be saved as: " << fileName << std::endl;
 
 	size_t		boundaryEndPos = this->_database.buffer.find("--" + boundary + "--");
 	if (boundaryEndPos == std::string::npos)

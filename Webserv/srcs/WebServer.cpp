@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/15 22:16:48 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/16 12:59:20 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -281,8 +281,8 @@ void	WebServer::_serverLoop()
 			close(this->_database.socket);
 			continue;
 		}
-		std::cout << BLUE << this->_database.buffer.substr(0, this->_database.buffer.find("\r\n\r\n")) << RESET << std::endl;
-		// std::cout << BLUE << this->_database.buffer << RESET << std::endl;
+		// std::cout << BLUE << this->_database.buffer.substr(0, this->_database.buffer.find("\r\n\r\n")) << RESET << std::endl;
+		std::cout << BLUE << this->_database.buffer << RESET << std::endl;
 
 		// std::cout << this->_database.methodPath << std::endl;
 		// if (this->_database.methodPath == "/directory/youpi.bad_extension")
