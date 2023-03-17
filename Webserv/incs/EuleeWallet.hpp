@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   EuleeWallet.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 15:10:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/14 17:26:34 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/17 17:26:26 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,10 +39,11 @@ enum	Key
 class EuleeWallet
 {
 	public:
-		typedef Key								key_type;
-		typedef std::vector<std::string>		mapped_type;
-		typedef std::map<key_type, mapped_type>	value_type;
-		typedef	value_type::iterator			iterator;
+		typedef Key									key_type;
+		typedef std::vector<std::string>			mapped_type;
+		typedef std::map<key_type, mapped_type>		value_type;
+		typedef std::map<std::string, std::string>	cgi_type;
+		typedef	value_type::iterator				iterator;
 
 		EuleeWallet(void);
 		EuleeWallet(value_type location);
@@ -52,6 +53,8 @@ class EuleeWallet
 
 		iterator	begin(void);
 		iterator	end(void);
+
+		cgi_type	cgi;
 
 	private:
 		value_type	_location;

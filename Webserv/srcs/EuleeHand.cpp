@@ -6,7 +6,7 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/17 14:51:33 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/17 18:48:12 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,11 +48,14 @@ void	EuleeHand::printServers(void)
 		{
 			std::cout << CYANNORM << it->first << " : ";
 			for (size_t k = 0; k < it->second.size(); ++k)
-			{
-				std::cout << it->second[k];
-				if (k + 1 < it->second.size())
-					std::cout << " ";
-			}
+				std::cout << it->second[k] << " ";
+			std::cout << std::endl;
+		}
+		if (this->cgi.size())
+		{
+			std::cout << CGI << " : ";
+			for (std::map<std::string, std::string>::iterator it3 = cgi.begin(); it3 != cgi.end(); ++it3)
+				std::cout << it3->first << " ";
 			std::cout << std::endl;
 		}
 		std::cout << RESET << std::endl;
@@ -63,11 +66,14 @@ void	EuleeHand::printServers(void)
 			{
 				std::cout << BLUENORM << it2->first << " : ";
 				for (size_t d = 0; d < it2->second.size(); ++d)
-				{
-					std::cout << it2->second[d];
-					if (d + 1 < it2->second.size())
-						std::cout << " ";
-				}
+					std::cout << it2->second[d] << " ";
+				std::cout << std::endl;
+			}
+			if (this->server[i].vectorLocation[j].cgi.size())
+			{
+				std::cout << CGI << " : ";
+				for (std::map<std::string, std::string>::iterator it4 = this->server[i].vectorLocation[j].cgi.begin(); it4 != this->server[i].vectorLocation[j].cgi.end(); ++it4)
+					std::cout << it4->first << " ";
 				std::cout << std::endl;
 			}
 			if (j + 1 < this->server[i].vectorLocation.size())
@@ -78,30 +84,48 @@ void	EuleeHand::printServers(void)
 	}
 }
 
-// size_t	EuleeHand::_parseCgi(std::vector<Token> &tokens, size_t i)
-// {
-// 	if (tokens[i].token == "cgi_script" && tokens[i].type == KEY)
-// 	{
-// 		size_t	j = -1;
-// 		size_t	size = 0;
-// 		std::string	path;
-// 		while (tokens[++j].token != ";")
-// 		{
-// 			if (tokens[j].token.find('/') >= 0)
-// 			{
-// 				path = tokens[j].token;
-// 				size++;
-// 			}
-// 		}
-// 		if (size > 1)
-// 			printError();
-// 		// while (tokens[++i].token != ";")
-// 		// {
-// 		// 	this->cgi[key].push_back(tokens[i].token);
-// 		// }
-// 	}
-// 	return (i);
-// }
+size_t	EuleeHand::_parseCgi(std::vector<Token> &tokens, size_t i, EuleeWallet &location, int blockType)
+{
+	if (tokens[i].token == "cgi_script" && tokens[i].type == KEY)
+	{
+		size_t	j = i;
+		size_t	size = 0;
+		std::string	path;
+		while (tokens[++j].token != ";")
+		{
+			if (tokens[j].token.find("/") != std::string::npos || tokens[j].token.find(".") == std::string::npos)
+			{
+				if (++size > 1)
+					this->_configManager.printError("cgi_index : too many paths. ", j);
+				path = tokens[j].token;
+			}
+			else if (tokens[j].token[0] != '.')
+				this->_configManager.printError("cgi_index : invalid extension. ", j);
+			else if (tokens[j].token[0] == '.')
+			{
+				std::string	temp = tokens[j].token.substr(1, tokens[j].token.length());
+				for (size_t k = 0; k < temp.length(); ++k)
+				{
+					if (!isalpha(temp[k]))
+						this->_configManager.printError("cgi_index : invalid extension. ", j);
+				}
+			}
+		}
+		if (size == 0)
+			this->_configManager.printError("cgi_index : no specified path. ", j);
+		while (tokens[++i].token != ";")
+		{
+			if (tokens[i].token[0] == '.')
+			{
+				if (blockType == 1)
+					this->cgi[tokens[i].token] = path;
+				else
+					location.cgi[tokens[i].token] = path;
+			}
+		}
+	}
+	return (i);
+}
 
 size_t	EuleeHand::_parsingHelper(std::vector<Token> &tokens, size_t i, EuleeWallet &location, std::string needle, Key key)
 {
@@ -121,7 +145,7 @@ size_t	EuleeHand::_parseLocation(std::vector<Token> &tokens, std::vector<EuleeWa
 		loc[LOCATION_READ_PATH].push_back(tokens[i++].token);
 	while (tokens[i].token != "}")
 	{
-		i = this->_parsingHelper(tokens, i, loc, "cgi_index", CGI);
+		i = this->_parseCgi(tokens, i, loc, 2);
 		i = this->_parsingHelper(tokens, i, loc, "root", ROOT);
 		i = this->_parsingHelper(tokens, i, loc, "index", INDEX);
 		i = this->_parsingHelper(tokens, i, loc, "return", RETURN);
@@ -144,7 +168,7 @@ size_t	EuleeHand::_parseServer(std::vector<Token> &tokens, size_t i)
 
 	while (i < tokens.size() && tokens[i].token != "server")
 	{
-		i = this->_parseCgi(tokens, i);
+		i = this->_parseCgi(tokens, i, serv, 1);
 		i = this->_parsingHelper(tokens, i, serv, "root", ROOT);
 		i = this->_parsingHelper(tokens, i, serv, "index", INDEX);
 		i = this->_parsingHelper(tokens, i, serv, "listen", LISTEN);
@@ -413,4 +437,16 @@ void	EuleeHand::convertLocation(void)
 	}
 	std::cout << "Location Path: " << locationPath << std::endl;
 	std::cout << GREEN << "New Path: " << this->methodPath << RESET << std::endl;
+}
+
+std::string	EuleeHand::cgiPath(void)
+{
+	for (std::map<std::string, std::string>::iterator it = cgi.begin(); it != cgi.end(); ++it)
+	{
+		if (this->methodPath == it->second)
+		{
+			return (it->second);
+		}
+	}
+	return ("");
 }
