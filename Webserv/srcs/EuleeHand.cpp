@@ -12,9 +12,9 @@
 
 #include "EuleeHand.hpp"
 
-EuleeHand::EuleeHand(void) : envp(), cgi(), server(), serverFd(), serverAddr(), methodPath(), buffer(), socket(), serverIndex(), useDefaultIndex(), _configFilePath(), _configManager() {}
+EuleeHand::EuleeHand(void) : envp(), cgi(), statusCode(), server(), serverFd(), serverAddr(), methodPath(), buffer(), socket(), serverIndex(), useDefaultIndex(), _configFilePath(), _configManager() {}
 
-EuleeHand::EuleeHand(std::string configFilePath, ConfigManager const &configManager) : envp(), cgi(), server(), serverFd(), serverAddr(), methodPath(), buffer(), socket(), serverIndex(), useDefaultIndex(), _configFilePath(configFilePath), _configManager(configManager) {}
+EuleeHand::EuleeHand(std::string configFilePath, ConfigManager const &configManager) : envp(), cgi(), statusCode(), server(), serverFd(), serverAddr(), methodPath(), buffer(), socket(), serverIndex(), useDefaultIndex(), _configFilePath(configFilePath), _configManager(configManager) {}
 
 EuleeHand::~EuleeHand(void) {}
 
@@ -188,6 +188,7 @@ void	EuleeHand::parseConfigServer(void)
 	for (size_t j = 0; j < this->server.size(); j++)
 		for (size_t k = 0; k < this->server[j].vectorLocation.size(); k++)
 			this->server[j].location[this->server[j].vectorLocation[k][LOCATION_READ_PATH][0]] = this->server[j].vectorLocation[k];
+	this->statusCode = {{"200", "OK"}, {"404", "Not Found"}, {"405", "Not Allowed"}};
 }
 
 void	EuleeHand::perrorExit(std::string msg, int exitTrue)
@@ -413,4 +414,50 @@ void	EuleeHand::convertLocation(void)
 	}
 	std::cout << "Location Path: " << locationPath << std::endl;
 	std::cout << GREEN << "New Path: " << this->methodPath << RESET << std::endl;
+}
+/*
+-> int    sendHttp(int statusCode, std::string path = "")
+    -> std::cout << MAGENTA << "Closed with status code: " << statusCode << RESET << std::endl;
+    -> return (statusCode);
+    statusCode = 200, 404, 405
+    statusMessage = OK, Not Found, Not Allowed
+    "HTTP/1.1 {statusCode} {statusCodeMessage}\r\n\r\n"
+    Check if string.size() == 0 -> Use our default page as filePath;
+     Else -> Check whether the html file exists or not
+    If it doesn't exist, then statusCode becomes 404;    
+    path = defaultErrorPage
+    Else -> Extract html from file
+    Apped the content in the .html file to the header -> output = header + html;
+    std::cout << MAGENTA << "Closed with status code: " << statusCode << RESET << std::endl;
+    ft_select(this->_database.socket, (void *)output.c_str(), output.length(), WRITE)
+    close(this->_database.socket);
+    return (statusCode);
+*/
+
+int		EuleeHand::sendHttp(std::string statusCode, std::string path)
+{
+
+	// std::string statusMessage = OK, Not Found, Not Allowed
+
+	if (path.size() == 0)
+		std::cout << "using bullshit" << std::endl;
+	else
+	{
+
+		std::cout << "checking whether if html file exist or not" << std::endl;
+		if (this->checkPath(path, 1, 0) == 0)
+		{
+			std::cout << "Check failed" << std::endl;
+			statusCode = 404;
+			return (statusCode);
+		}
+	}
+
+	std::string response = "HTTP/1.1 {statusCode} {statusCodeMessage}\r\n\r\n";
+
+	std::cout << MAGENTA << "Closed with status code: " << statusCode << RESET << std::endl;
+    ft_select(this->socket, (void *)output.c_str(), output.length(), WRITE);
+    close(this->socket);
+	
+	return(statusCode);
 }

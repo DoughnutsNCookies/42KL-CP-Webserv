@@ -22,6 +22,7 @@
 # define RED		"\033[1;31m"
 # define GREEN		"\033[1;32m"
 # define BLUE		"\033[1;34m"
+# define MAGENTA	"\033[1;35m"
 # define CYAN		"\033[1;36m"
 # define BLUENORM	"\033[34m"
 # define CYANNORM	"\033[36m"
