@@ -8,7 +8,7 @@ if len(sys.argv) != 2:
     sys.exit(1)
 
 try:
-	response = requests.head(sys.argv[1])
+	response = requests.get(sys.argv[1])
 except:
 	print("Error: Could not connect to server")
 	sys.exit(1)

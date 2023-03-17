@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/14 15:03:51 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/15 20:25:02 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,12 +31,13 @@ class EuleeHand
 		void	parseConfigServer(void);
 		void	perrorExit(std::string msg, int exitTrue = 1);
 		long	ft_select(int fd, void *buff, size_t size, Mode mode);
+		int		checkPath(std::string path, int	isFile, int isDirectory);
 
-		int							socket;
+		int							socket, serverIndex, useDefaultIndex;
 		std::vector<EuleePocket>	server;
 		std::vector<int>			serverFd;
 		std::vector<sockaddr_in>	serverAddr;
-		std::string					methodPath, buffer;
+		std::string					method, methodPath, buffer;
 
 	private:
 		std::string		_configFilePath;

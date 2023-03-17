@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 17:51:51 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/14 14:48:09 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/15 16:29:57 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ class EuleePocket
 		typedef	value_type::iterator			iterator;
 
 		EuleePocket(void);
-		EuleePocket(EuleeWallet server, std::vector<EuleeWallet> location);
+		EuleePocket(EuleeWallet server, std::vector<EuleeWallet> vectorLocation);
 		~EuleePocket(void);
 
 		mapped_type	&operator[](key_type key);
@@ -53,7 +53,9 @@ class EuleePocket
 
 		// member variable
 		std::map<std::string, std::string>	envp;
-		std::vector<EuleeWallet>			location;
+		std::vector<EuleeWallet>			vectorLocation;
+		std::map<std::string, EuleeWallet>	location;
+		int									portIndex;
 
 	private:
 		EuleeWallet							_server;

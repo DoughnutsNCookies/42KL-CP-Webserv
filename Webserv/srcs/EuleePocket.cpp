@@ -6,15 +6,15 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 17:51:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/14 14:48:16 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/15 16:36:38 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "EuleePocket.hpp"
 
-EuleePocket::EuleePocket(void) : envp(), location(), _server() {}
+EuleePocket::EuleePocket(void) : envp(), vectorLocation(), location(), portIndex(-1), _server() {}
 
-EuleePocket::EuleePocket(EuleeWallet server, std::vector<EuleeWallet> location) : envp(), location(location), _server(server) {}
+EuleePocket::EuleePocket(EuleeWallet server, std::vector<EuleeWallet> vectorLocation) : envp(), vectorLocation(vectorLocation), location(), portIndex(-1), _server(server) {}
 
 EuleePocket::~EuleePocket(void) {}
 

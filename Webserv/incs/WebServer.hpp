@@ -6,16 +6,18 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/14 15:28:55 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/16 12:40:39 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef WEBSERVER_HPP
 # define WEBSERVER_HPP
 
+# include <filesystem>
 # include <iostream>
 # include <sstream>
 # include <fstream>
+# include <cstring>
 # include <string>
 # include <vector>
 # include <map>
@@ -47,15 +49,18 @@ class WebServer
 	public:
 		WebServer(std::string configFilePath);
 		~WebServer(void);
-		void					runServer(void);
+		void			runServer();
 
 	private:
-		void						_setupServer();
-		int							_unchunkResponse();
-		void						_serverLoop();
+		int				_checkExcept();
+		int				_isCGI();
+		void			_setupServer();
+		void			_convertLocation();
+		int				_unchunkResponse();
+		void			_serverLoop();
 
-		ConfigManager				_configManager;
-		EuleeHand					_database;
+		ConfigManager	_configManager;
+		EuleeHand		_database;
 };
 
 #endif

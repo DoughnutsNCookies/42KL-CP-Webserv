@@ -6,11 +6,12 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:20:26 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/14 15:22:51 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/15 22:10:38 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/HttpGetResponse.hpp"
+# include <filesystem>
 
 HttpGetResponse::HttpGetResponse(EuleeHand database) : _database(database) {}
 
@@ -23,8 +24,7 @@ void	HttpGetResponse::handleGet()
 	if (queryPos != std::string::npos)
 		this->_database.methodPath = this->_database.methodPath.substr(0, queryPos);
 
-	std::ifstream	file(this->_database.methodPath.c_str() + 1);
-	if (file.fail())
+	if (this->_database.checkPath(this->_database.methodPath.c_str() + 1, 0, 0))
 	{
 		std::cerr << RED << "Error opening " << this->_database.methodPath << "!\n" << RESET << std::endl;
 		this->_database.ft_select(this->_database.socket, (void *)failedResponse.c_str(), failedResponse.length(), WRITE);
@@ -32,16 +32,27 @@ void	HttpGetResponse::handleGet()
 		return ;
 	}
 
+	std::ifstream	file(this->_database.methodPath.c_str() + 1);
 	file.seekg(0, std::ios::end);
 	long	file_size = file.tellg();
 	file.seekg(0, std::ios::beg);
 
 	std::string	fileContents;
 	fileContents.resize(file_size + 1);
+
+
 	if (file.read(&fileContents[0], file_size).fail())
 	{
 		std::cerr << RED << "Error reading " << this->_database.methodPath << "!\n" << RESET << std::endl;
-		this->_database.ft_select(this->_database.socket, (void *)failedResponse.c_str(), failedResponse.length(), WRITE);
+		if (this->_database.checkPath(this->_database.methodPath.c_str() + 1, 0, 1) || this->_database.useDefaultIndex)
+		{
+			std::cout << "Returned OK!" << std::endl;
+			std::cout << this->_database.checkPath(this->_database.methodPath.c_str() + 1, 0, 1) << std::endl;
+			std::string	response = "HTTP/1.1 200 OK\r\n\r\n";
+			this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.length(), WRITE);
+		}
+		else
+			this->_database.ft_select(this->_database.socket, (void *)failedResponse.c_str(), failedResponse.length(), WRITE);
 		file.close();
 		close(this->_database.socket);
 		return ;

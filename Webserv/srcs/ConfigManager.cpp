@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:55:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/13 20:32:56 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/14 19:21:15 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -258,7 +258,6 @@ int	ConfigManager::locationBlock(size_t i)
 	}
 	return (i);
 }
-
 void	ConfigManager::errorHandleShit(void)
 {
 	size_t	i = 0;

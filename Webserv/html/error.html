@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Error</title>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <?php
+      $error_code = $_SERVER['REDIRECT_STATUS'];
+      switch ($error_code) {
+        case 400:
+          echo '<h1>Error 400: Bad Request</h1>';
+          echo '<p>The server could not understand the request due to invalid syntax.</p>';
+          break;
+		case 403:
+          echo '<h1>Error 403: Forbidden</h1>';
+          echo '<p>The requested page is forbidden.</p>';
+          break;
+        case 404:
+          echo '<h1>Error 404: Not Found</h1>';
+          echo '<p>The requested page could not be found.</p>';
+          break;
+        case 500:
+          echo '<h1>Error 500: Internal Server Error</h1>';
+          echo '<p>The server encountered an unexpected condition that prevented it from fulfilling the request.</p>';
+          break;
+        default:
+          echo '<h1>Error '.$error_code.'</h1>';
+          echo '<p>An error occurred while processing your request.</p>';
+      }
+    ?>
+  </body>
+</html>
