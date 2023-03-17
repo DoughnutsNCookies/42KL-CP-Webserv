@@ -37,9 +37,11 @@ class EuleeHand
 		int		checkExcept(void);
 		int		unchunkResponse(void);
 		void	convertLocation(void);
-		int		sendHttp(std::string statusCode, std::string path);
+		std::string extractHTML(std::string path);
+		int		sendHttp(int statusCode, std::string path);
 
-		std::map<std::string, std::string>	envp, cgi , statusCode;
+		std::map<int, std::string>			statusList;
+		std::map<std::string, std::string>	envp, cgi;
 		std::vector<EuleePocket>			server;
 		std::vector<int>					serverFd;
 		std::vector<sockaddr_in>			serverAddr;

@@ -23,6 +23,8 @@ void	HttpHeadResponse::handleHead()
 	if (file.fail() && this->_database.methodPath != "/")
 	{
 		std::cerr << RED << "Error opening " << this->_database.methodPath << "!\n" << RESET << std::endl;
+		this->_database.sendHttp(404, this->_database.methodPath);
+
 		http = "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\n";
 	}
 	else

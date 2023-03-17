@@ -33,4 +33,9 @@ int	main(int ac, char **av)
 		return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);
+	// (void)ac;
+	// (void)av;
+	// EuleeHand hand;
+
+	// hand.sendHttp(404, "./html/error.html");
 }

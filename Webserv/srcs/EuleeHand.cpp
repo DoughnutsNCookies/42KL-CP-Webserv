@@ -12,9 +12,9 @@
 
 #include "EuleeHand.hpp"
 
-EuleeHand::EuleeHand(void) : envp(), cgi(), statusCode(), server(), serverFd(), serverAddr(), methodPath(), buffer(), socket(), serverIndex(), useDefaultIndex(), _configFilePath(), _configManager() {}
+EuleeHand::EuleeHand(void) : statusList(), envp(), cgi(), server(), serverFd(), serverAddr(), methodPath(), buffer(), socket(), serverIndex(), useDefaultIndex(), _configFilePath(), _configManager() {}
 
-EuleeHand::EuleeHand(std::string configFilePath, ConfigManager const &configManager) : envp(), cgi(), statusCode(), server(), serverFd(), serverAddr(), methodPath(), buffer(), socket(), serverIndex(), useDefaultIndex(), _configFilePath(configFilePath), _configManager(configManager) {}
+EuleeHand::EuleeHand(std::string configFilePath, ConfigManager const &configManager) :  statusList(), envp(), cgi(), server(), serverFd(), serverAddr(), methodPath(), buffer(), socket(), serverIndex(), useDefaultIndex(), _configFilePath(configFilePath), _configManager(configManager) {}
 
 EuleeHand::~EuleeHand(void) {}
 
@@ -142,9 +142,10 @@ size_t	EuleeHand::_parseServer(std::vector<Token> &tokens, size_t i)
 	EuleeWallet					serv;
 	std::vector<EuleeWallet>	location;
 
+		// i = this->_parseCgi(tokens, i);
 	while (i < tokens.size() && tokens[i].token != "server")
 	{
-		i = this->_parseCgi(tokens, i);
+		i = this->_parsingHelper(tokens, i, serv, "cgi_index", CGI);
 		i = this->_parsingHelper(tokens, i, serv, "root", ROOT);
 		i = this->_parsingHelper(tokens, i, serv, "index", INDEX);
 		i = this->_parsingHelper(tokens, i, serv, "listen", LISTEN);
@@ -188,7 +189,9 @@ void	EuleeHand::parseConfigServer(void)
 	for (size_t j = 0; j < this->server.size(); j++)
 		for (size_t k = 0; k < this->server[j].vectorLocation.size(); k++)
 			this->server[j].location[this->server[j].vectorLocation[k][LOCATION_READ_PATH][0]] = this->server[j].vectorLocation[k];
-	this->statusCode = {{"200", "OK"}, {"404", "Not Found"}, {"405", "Not Allowed"}};
+	this->statusList[200] = "OK";
+	this->statusList[404] = "Not Found";
+	this->statusList[405] = "Not Allowed";
 }
 
 void	EuleeHand::perrorExit(std::string msg, int exitTrue)
@@ -434,30 +437,68 @@ void	EuleeHand::convertLocation(void)
     return (statusCode);
 */
 
-int		EuleeHand::sendHttp(std::string statusCode, std::string path)
-{
+/*
 
-	// std::string statusMessage = OK, Not Found, Not Allowed
+statusCode
+take the statusCode, check from your map, return the statusMessage;
+check = statuslist.find(statusCode);
+response = "http//1.1 " + statusCode + " " + statusList[statusCode] + " \r\n\r\n";
+ 
+response = response + read(path); //if exist
+ft_select();
+close(socket);
+
+*/
+
+std::string EuleeHand::extractHTML(std::string path)
+{
+	std::ifstream file(path);
+
+	if (!file.is_open())
+	{
+		std::cerr << "Error: Could not open file" << std::endl;
+		exit(1);
+	}
+	std::string extract;
+	std::string output;
+
+	while (std::getline(file, output))
+		extract = extract + output;
+	return (extract);
+}
+
+int		EuleeHand::sendHttp(int statusCode, std::string path)
+{
+	this->statusList[200] = "OK";
+	this->statusList[404] = "Not Found"; // temps
+	this->statusList[405] = "Not Allowed";
+
+	std::string statusStr = std::to_string(statusCode);
+	if (this->statusList.find(statusCode) == this->statusList.end())
+	{
+		std::cout << "Find Error" << std::endl;
+		exit(1);
+	}
+	std::string response = "http//1.1" + statusStr + " " + statusList[statusCode] + " \r\n\r\n";
 
 	if (path.size() == 0)
-		std::cout << "using bullshit" << std::endl;
+	{
+		std::cout << "html default page" << std::endl;
+		path =  "./html/index.html";
+	}
 	else
 	{
-
-		std::cout << "checking whether if html file exist or not" << std::endl;
-		if (this->checkPath(path, 1, 0) == 0)
+		if (this->checkPath(path, 1, 0 ) == 0)
 		{
-			std::cout << "Check failed" << std::endl;
 			statusCode = 404;
-			return (statusCode);
+			std::cout << "error default page" << std::endl;
+			path =  "./html/error.html";
 		}
 	}
+	response = response + extractHTML(path);
 
-	std::string response = "HTTP/1.1 {statusCode} {statusCodeMessage}\r\n\r\n";
-
-	std::cout << MAGENTA << "Closed with status code: " << statusCode << RESET << std::endl;
-    ft_select(this->socket, (void *)output.c_str(), output.length(), WRITE);
-    close(this->socket);
-	
-	return(statusCode);
+	// std::cout << response << std::endl;
+	ft_select(this->socket, (void *)response.c_str(), response.length(), WRITE);
+	close (this->socket);
+	return (statusCode);
 }

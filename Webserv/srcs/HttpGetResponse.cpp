@@ -40,16 +40,17 @@ void	HttpGetResponse::handleGet()
 	std::string	fileContents;
 	fileContents.resize(file_size + 1);
 
-
+	/* I gotta take a look here*/
 	if (file.read(&fileContents[0], file_size).fail())
 	{
 		std::cerr << RED << "Error reading " << this->_database.methodPath << "!\n" << RESET << std::endl;
 		if (this->_database.checkPath(this->_database.methodPath.c_str() + 1, 0, 1) || this->_database.useDefaultIndex)
 		{
 			std::cout << "Returned OK!" << std::endl;
-			std::cout << this->_database.checkPath(this->_database.methodPath.c_str() + 1, 0, 1) << std::endl;
-			std::string	response = "HTTP/1.1 200 OK\r\n\r\n";
-			this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.length(), WRITE);
+			this->_database.sendHttp(200, this->_database.methodPath);
+			// std::cout << this->_database.checkPath(this->_database.methodPath.c_str() + 1, 0, 1) << std::endl;
+			// std::string	response = "HTTP/1.1 200 OK\r\n\r\n";
+			// this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.length(), WRITE);
 		}
 		else
 			this->_database.ft_select(this->_database.socket, (void *)failedResponse.c_str(), failedResponse.length(), WRITE);

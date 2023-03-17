@@ -23,6 +23,8 @@ void	HttpDeleteResponse::handleDelete()
 	if (result != 0)
 	{
 		std::cerr << RED << "Error: " << filePath << " cannot be deleted" << RESET << std::endl;
+		this->_database.sendHttp(200, this->_database.methodPath.c_str());
+
 		std::string	response = "HTTP/1.1 404 Not Found\r\n\r\nFile to delete is not found...\r\n";
 		this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.length(), WRITE);
 		close(this->_database.socket);
