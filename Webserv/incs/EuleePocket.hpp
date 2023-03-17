@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   EuleePocket.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 17:51:51 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/15 16:29:57 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/17 13:50:00 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 
 # define RESET		"\033[0m"
 # define RED		"\033[1;31m"
+# define GREEN		"\033[1;32m"
 # define BLUE		"\033[1;34m"
 # define CYAN		"\033[1;36m"
 # define BLUENORM	"\033[34m"

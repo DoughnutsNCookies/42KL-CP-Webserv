@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   EuleeHand.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/15 22:05:49 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/17 13:51:21 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,8 +155,7 @@ void	EuleeHand::parseConfigServer(void)
 				unique[this->server[n][LISTEN][m]] = this->server[n][LISTEN][m];
 			else if (n != 0)
 			{
-				this->server.erase(this->server.begin() + n);
-				n--;
+				this->server.erase(this->server.begin() + n--);
 				break ;
 			}
 		}
@@ -236,4 +235,157 @@ int	EuleeHand::checkPath(std::string path, int isFile, int isDirectory)
             return (1);
 	}
 	return (0);
+}
+
+int	EuleeHand::isCGI(void)
+{
+	size_t extensionPos = this->methodPath.find_last_of('.');
+	if (extensionPos == std::string::npos)
+		return (0);
+	std::string extension = this->methodPath.substr(extensionPos);
+	for (size_t i = 0; i < this->server[this->serverIndex][CGI].size(); i++)
+		if (this->server[this->serverIndex][CGI][i] == extension)
+			return (1);
+	return (0);
+}
+
+int	EuleeHand::checkExcept(void)
+{
+	if (this->server[this->serverIndex].location.find(this->methodPath) == this->server[this->serverIndex].location.end())
+		return (0);
+	int	found = 0;
+	if (this->server[this->serverIndex].location[this->methodPath][LIMIT_EXCEPT].size() == 0)
+		return (0);
+	for (size_t j = 0; j < this->server[this->serverIndex].location[this->methodPath][LIMIT_EXCEPT].size(); j++)
+	{
+		if (this->server[this->serverIndex].location[this->methodPath][LIMIT_EXCEPT][j] == this->method)
+			found++;
+	}
+	if (found == 0)
+	{
+		std::string response = "HTTP/1.1 405 Method Not Allowed\r\n\r\n";
+		this->ft_select(this->socket, (void *)response.c_str(), response.size(), WRITE);
+		close(this->socket);
+		return (1);
+	}
+	return (0);
+}
+
+int	EuleeHand::unchunkResponse(void)
+{
+	std::string	output;
+	std::string	header = this->buffer.substr(0, this->buffer.find("\r\n\r\n"));
+
+	if (header.find("Transfer-Encoding: chunked") == std::string::npos)
+		return (0);
+	std::string	remaining = this->buffer.substr(this->buffer.find("\r\n\r\n") + 4);
+	std::string	newBody = "";
+
+	while (remaining.find("\r\n") != std::string::npos)
+	{
+		std::string	chunkSize = remaining.substr(0, remaining.find("\r\n"));
+		size_t		size = std::stoul(chunkSize, 0, 16);
+		if (size == 0)
+			return (0);
+		if (size > remaining.size() - std::strlen("\r\n"))
+		{
+			std::cout << RED << "Error: Chunk size is bigger than remaining size" << RESET << std::endl;
+			return (-1);
+		}
+		newBody += remaining.substr(remaining.find("\r\n") + std::strlen("\r\n"), size);
+		remaining = remaining.substr(remaining.find("\r\n") + size + std::strlen("\r\n\r\n"));
+	}
+	this->buffer = header + "\r\n\r\n" + newBody;
+	return (1);
+}
+
+void	EuleeHand::convertLocation(void)
+{
+	/*
+	 * Extract methodPath 
+	 * strcmp each location path to method path to see whether it is a location or not
+	 * -> If yes, check whether it has file trailing behind or not ....
+	 * 		-> If yes, then we check whether it is file or directory
+	 * 			-> If file, then we serve the file + 200 OK
+	 * 			-> If directory, then do step below
+	 * 		-> If no, then 404 Not Found
+	 * -> If no, then we find whether it has index specified in the location block or not XXX
+	 * 		-> If yes, then we append it back to methodPath and find
+	 * 			-> If found, then we serve the file + 200 OK
+	 * 			-> If not found, 404 Not found
+	 * 		-> If no, then we go back to server block to find index
+	 * 			-> If yes, then we append it back to methodPath and find
+	 * 				-> If found, then we serve the file + 200 OK
+	 * 				-> If not found, then 404 Not found
+	 * 			-> If no, then 404 Not found
+	 */
+
+	this->useDefaultIndex = 0;
+	EuleePocket	myServer = this->server[this->serverIndex];
+	std::string	methodPathCopy = this->methodPath.c_str();
+	size_t		longestPathSize = 0;
+	std::string	locationPath, pathToFind, locationRoot, newPath, indexFile;
+	for (std::map<std::string, EuleeWallet>::iterator it = myServer.location.begin(); it != myServer.location.end(); it++)
+	{
+		if (strncmp(it->first.c_str(), methodPathCopy.c_str(), it->first.length()) == 0 && it->first.length() > longestPathSize)
+		{
+			longestPathSize = it->first.length();
+			locationPath = it->first;
+		}
+	}
+	newPath = this->methodPath;
+	if (methodPathCopy.length() - locationPath.length() > 1)
+	{
+		std::cout << "Trailing File" << std::endl;
+		if (myServer.location[locationPath][ROOT].size() != 0)
+		{
+			locationRoot = myServer.location[locationPath][ROOT][0];
+			newPath = locationRoot + methodPathCopy.substr(locationPath.length());
+		}
+		if (this->checkPath(newPath, 1, 1)) // Either file or directory
+		{
+			std::cout << "Found" << std::endl;
+			if (this->checkPath(newPath, 1, 0)) // File
+			{
+				std::cout << "File" << std::endl;
+				this->methodPath = "/" + newPath;
+				std::cout << "Location Path: " << locationPath << std::endl;
+				std::cout << GREEN << "New Path: " << this->methodPath << RESET << std::endl;
+				return ;
+			}
+			else // Directory
+				std::cout << "Directory" << std::endl;
+		}
+		else // Not Found
+		{
+			std::cout << "Not Found" << std::endl;
+			return ;
+		}
+	}
+	// 	-> If yes, then we append it back to methodPath and find
+	//  	-> If found, then we serve the file + 200 OK
+	//  	-> If not found, 404 Not found
+	//  -> If no, then we go back to server block to find index
+	//  	-> If yes, then we append it back to methodPath and find
+	//  		-> If found, then we serve the file + 200 OK
+	//  		-> If not found, then 404 Not found
+	//  	-> If no, then 404 Not found
+	std::cout << "No Trailing File" << std::endl;
+	if (myServer.location[locationPath][INDEX].size() == 0)
+	{
+		std::cout << "Append back and find" << std::endl;
+		indexFile = myServer[INDEX][0];
+		this->methodPath = myServer[ROOT][0] + locationRoot + "/" + indexFile; 
+		this->useDefaultIndex = 1;
+	}
+	else
+	{
+		std::cout << "Using index: " << newPath << std::endl;
+		locationRoot = myServer.location[locationPath][ROOT][0];
+		std::string	remainingPath = methodPathCopy.erase(0, locationPath.length());
+		indexFile = myServer.location[locationPath][INDEX][0];
+		this->methodPath = "/" + myServer.location[locationPath][ROOT][0] + remainingPath + "/" + indexFile;
+	}
+	std::cout << "Location Path: " << locationPath << std::endl;
+	std::cout << GREEN << "New Path: " << this->methodPath << RESET << std::endl;
 }

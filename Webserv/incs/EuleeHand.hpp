@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   EuleeHand.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/15 20:25:02 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/17 13:49:13 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,11 +33,16 @@ class EuleeHand
 		long	ft_select(int fd, void *buff, size_t size, Mode mode);
 		int		checkPath(std::string path, int	isFile, int isDirectory);
 
-		int							socket, serverIndex, useDefaultIndex;
+		int		isCGI(void);
+		int		checkExcept(void);
+		int		unchunkResponse(void);
+		void	convertLocation(void);
+
 		std::vector<EuleePocket>	server;
 		std::vector<int>			serverFd;
 		std::vector<sockaddr_in>	serverAddr;
 		std::string					method, methodPath, buffer;
+		int							socket, serverIndex, useDefaultIndex;
 
 	private:
 		std::string		_configFilePath;
