@@ -6,15 +6,15 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/17 13:51:21 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/17 14:51:33 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "EuleeHand.hpp"
 
-EuleeHand::EuleeHand(void) : socket(), serverIndex(), useDefaultIndex(), server(), serverFd(), serverAddr(), methodPath(), buffer(), _configFilePath(), _configManager() {}
+EuleeHand::EuleeHand(void) : envp(), cgi(), server(), serverFd(), serverAddr(), methodPath(), buffer(), socket(), serverIndex(), useDefaultIndex(), _configFilePath(), _configManager() {}
 
-EuleeHand::EuleeHand(std::string configFilePath, ConfigManager const &configManager) :  socket(), serverIndex(), useDefaultIndex(), server(), serverFd(), serverAddr(), methodPath(), buffer(), _configFilePath(configFilePath), _configManager(configManager) {}
+EuleeHand::EuleeHand(std::string configFilePath, ConfigManager const &configManager) : envp(), cgi(), server(), serverFd(), serverAddr(), methodPath(), buffer(), socket(), serverIndex(), useDefaultIndex(), _configFilePath(configFilePath), _configManager(configManager) {}
 
 EuleeHand::~EuleeHand(void) {}
 
@@ -78,9 +78,34 @@ void	EuleeHand::printServers(void)
 	}
 }
 
+// size_t	EuleeHand::_parseCgi(std::vector<Token> &tokens, size_t i)
+// {
+// 	if (tokens[i].token == "cgi_script" && tokens[i].type == KEY)
+// 	{
+// 		size_t	j = -1;
+// 		size_t	size = 0;
+// 		std::string	path;
+// 		while (tokens[++j].token != ";")
+// 		{
+// 			if (tokens[j].token.find('/') >= 0)
+// 			{
+// 				path = tokens[j].token;
+// 				size++;
+// 			}
+// 		}
+// 		if (size > 1)
+// 			printError();
+// 		// while (tokens[++i].token != ";")
+// 		// {
+// 		// 	this->cgi[key].push_back(tokens[i].token);
+// 		// }
+// 	}
+// 	return (i);
+// }
+
 size_t	EuleeHand::_parsingHelper(std::vector<Token> &tokens, size_t i, EuleeWallet &location, std::string needle, Key key)
 {
-	if (tokens[i].token == needle)
+	if (tokens[i].token == needle && tokens[i].type == KEY)
 	{
 		while (tokens[++i].token != ";")
 			location[key].push_back(tokens[i].token);
@@ -96,7 +121,7 @@ size_t	EuleeHand::_parseLocation(std::vector<Token> &tokens, std::vector<EuleeWa
 		loc[LOCATION_READ_PATH].push_back(tokens[i++].token);
 	while (tokens[i].token != "}")
 	{
-		i = this->_parsingHelper(tokens, i, loc, "cgi", CGI);
+		i = this->_parsingHelper(tokens, i, loc, "cgi_index", CGI);
 		i = this->_parsingHelper(tokens, i, loc, "root", ROOT);
 		i = this->_parsingHelper(tokens, i, loc, "index", INDEX);
 		i = this->_parsingHelper(tokens, i, loc, "return", RETURN);
@@ -119,7 +144,7 @@ size_t	EuleeHand::_parseServer(std::vector<Token> &tokens, size_t i)
 
 	while (i < tokens.size() && tokens[i].token != "server")
 	{
-		i = this->_parsingHelper(tokens, i, serv, "cgi", CGI);
+		i = this->_parseCgi(tokens, i);
 		i = this->_parsingHelper(tokens, i, serv, "root", ROOT);
 		i = this->_parsingHelper(tokens, i, serv, "index", INDEX);
 		i = this->_parsingHelper(tokens, i, serv, "listen", LISTEN);
