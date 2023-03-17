@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+         #
+#    By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/28 17:38:48 by jhii              #+#    #+#              #
-#    Updated: 2023/03/15 13:40:40 by schuah           ###   ########.fr        #
+#    Updated: 2023/03/17 13:56:38 by jhii             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,7 +21,7 @@ RM			=	rm -rf
 MKDIR		=	mkdir -p
 SRC_PATH	=	srcs
 OBJ_PATH	=	objs
-ANNOYING	=	*.dSYM .vscode
+ANNOYING	=	*.dSYM ../.vscode
 MAIN		=	srcs/main.cpp
 SRC			=	WebServer.cpp \
 				ConfigManager.cpp \

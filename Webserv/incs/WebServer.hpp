@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/16 12:40:39 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/17 13:55:57 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,15 +49,11 @@ class WebServer
 	public:
 		WebServer(std::string configFilePath);
 		~WebServer(void);
-		void			runServer();
+		void			runServer(void);
 
 	private:
-		int				_checkExcept();
-		int				_isCGI();
-		void			_setupServer();
-		void			_convertLocation();
-		int				_unchunkResponse();
-		void			_serverLoop();
+		void			_setupServer(void);
+		void			_serverLoop(void);
 
 		ConfigManager	_configManager;
 		EuleeHand		_database;

@@ -3,18 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   EuleePocket.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 17:51:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/15 16:36:38 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/17 14:03:04 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "EuleePocket.hpp"
 
-EuleePocket::EuleePocket(void) : envp(), vectorLocation(), location(), portIndex(-1), _server() {}
+EuleePocket::EuleePocket(void) : vectorLocation(), location(), portIndex(-1), _server() {}
 
-EuleePocket::EuleePocket(EuleeWallet server, std::vector<EuleeWallet> vectorLocation) : envp(), vectorLocation(vectorLocation), location(), portIndex(-1), _server(server) {}
+EuleePocket::EuleePocket(EuleeWallet server, std::vector<EuleeWallet> vectorLocation) : vectorLocation(vectorLocation), location(), portIndex(-1), _server(server) {}
 
 EuleePocket::~EuleePocket(void) {}
 
