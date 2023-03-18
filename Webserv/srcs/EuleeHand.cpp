@@ -469,21 +469,20 @@ std::string EuleeHand::extractHTML(std::string path)
 
 int		EuleeHand::sendHttp(int statusCode, std::string path)
 {
-	this->statusList[200] = "OK";
-	this->statusList[404] = "Not Found"; // temps
-	this->statusList[405] = "Not Allowed";
+	// this->statusList[200] = "OK";
+	// this->statusList[404] = "Not Found"; // temps
+	// this->statusList[405] = "Not Allowed";
 
 	std::string statusStr = std::to_string(statusCode);
 	if (this->statusList.find(statusCode) == this->statusList.end())
 	{
-		std::cout << "Find Error" << std::endl;
+		std::cerr << "Find error" << std::endl;
 		exit(1);
 	}
 	std::string response = "http//1.1" + statusStr + " " + statusList[statusCode] + " \r\n\r\n";
-
 	if (path.size() == 0)
 	{
-		std::cout << "html default page" << std::endl;
+		// std::cout << "html default page" << std::endl;
 		path =  "./html/index.html";
 	}
 	else
@@ -491,13 +490,20 @@ int		EuleeHand::sendHttp(int statusCode, std::string path)
 		if (this->checkPath(path, 1, 0 ) == 0)
 		{
 			statusCode = 404;
-			std::cout << "error default page" << std::endl;
+			// std::cout << "error default page" << std::endl;
 			path =  "./html/error.html";
 		}
 	}
 	response = response + extractHTML(path);
+	std::string code = "{{error_code}}"; // maybe I can find a way to change this trash
+	std::string msg = "{{error_message}}";
 
-	// std::cout << response << std::endl;
+	if (statusCode != 200)
+	{
+		response.replace(response.find(code), code.length(), std::to_string(statusCode));	
+		response.replace(response.find(code), code.length(), std::to_string(statusCode));	
+		response.replace(response.find(msg), msg.length(), this->statusList[statusCode]);
+	}
 	ft_select(this->socket, (void *)response.c_str(), response.length(), WRITE);
 	close (this->socket);
 	return (statusCode);
