@@ -441,12 +441,13 @@ void	EuleeHand::convertLocation(void)
 
 std::string	EuleeHand::cgiPath(void)
 {
+	if (this->methodPath.find_last_of(".") == std::string::npos)
+		return ("");
+	std::string	temp = this->methodPath.substr(this->methodPath.find_last_of("."));
 	for (std::map<std::string, std::string>::iterator it = cgi.begin(); it != cgi.end(); ++it)
 	{
-		if (this->methodPath == it->second)
-		{
+		if (temp == it->first)
 			return (it->second);
-		}
 	}
 	return ("");
 }
