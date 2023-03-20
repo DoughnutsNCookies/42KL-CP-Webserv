@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/20 14:23:49 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/20 16:14:02 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,12 +48,12 @@ class WebServer
 {
 	public:
 		WebServer(std::string configFilePath, char **envp);
-		~WebServer(void);
+		~WebServer();
 		void			runServer();
 
 	private:
-		void			_setupServer(void);
-		void			_serverLoop(void);
+		void			_setupServer();
+		void			_serverLoop();
 
 		ConfigManager	_configManager;
 		EuleeHand		_database;

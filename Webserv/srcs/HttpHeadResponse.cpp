@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/13 17:44:45 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/14 15:12:31 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/20 15:33:44 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,15 +22,13 @@ void	HttpHeadResponse::handleHead()
 	std::string		http = "";
 	if (file.fail() && this->_database.methodPath != "/")
 	{
-		std::cerr << RED << "Error opening " << this->_database.methodPath << "!\n" << RESET << std::endl;
-		http = "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\n";
+		std::cerr << RED << "Error opening " << this->_database.methodPath << "!" << RESET << std::endl;
+		this->_database.sendHttp(404, 1);
 	}
 	else
 	{
-		std::cout << GREEN << "File " << this->_database.methodPath << " found!!\n" << RESET << std::endl;
-		http = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n";
+		std::cout << GREEN << "File " << this->_database.methodPath << " found!" << RESET << std::endl;
+		this->_database.sendHttp(200, 1);
 	}
-	this->_database.ft_select(this->_database.socket, (void *)http.c_str(), http.length(), WRITE);
 	file.close();
-	close(this->_database.socket);
 }

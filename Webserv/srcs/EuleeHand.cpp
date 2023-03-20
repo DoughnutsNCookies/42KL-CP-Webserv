@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/20 14:31:17 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/20 17:16:12 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -251,19 +251,29 @@ long	EuleeHand::ft_select(int fd, void *buff, size_t size, Mode mode)
 	}
 
 	long	val = 0;
+	size_t	total = 0;
 	if (FD_ISSET(fd, &readFds) && mode == READ)
 	{
 		val = recv(fd, buff, size, 0);
 		if (val == -1)
 			this->perrorExit("Read Error", 0);
+		return (val);
 	}
 	else if (FD_ISSET(fd, &writeFds) && mode == WRITE)
 	{
-		val = send(fd, buff, size, 0);
-		if (val == -1)
-			this->perrorExit("Write Error", 0);
+		val = send(fd, (char *)buff, size, 0);
+		if (val == (long)size)
+			return (val);
+		while (val > 0)
+		{
+			total += val;
+			std::cout << GREEN << "Sent: " << val << "\tTotal: " << total << RESET << std::endl;
+			val = this->ft_select(fd, (char *)buff + total, size - total, WRITE);
+			if (val == -1)
+				this->perrorExit("Write Error", 0);
+		}
 	}
-	return (val);
+	return (total);
 }
 
 int	EuleeHand::checkPath(std::string path, int isFile, int isDirectory)
@@ -354,25 +364,6 @@ int	EuleeHand::unchunkResponse()
 
 void	EuleeHand::convertLocation()
 {
-	/*
-	 * Extract methodPath 
-	 * strcmp each location path to method path to see whether it is a location or not
-	 * -> If yes, check whether it has file trailing behind or not ....
-	 * 		-> If yes, then we check whether it is file or directory
-	 * 			-> If file, then we serve the file + 200 OK
-	 * 			-> If directory, then do step below
-	 * 		-> If no, then 404 Not Found
-	 * -> If no, then we find whether it has index specified in the location block or not XXX
-	 * 		-> If yes, then we append it back to methodPath and find
-	 * 			-> If found, then we serve the file + 200 OK
-	 * 			-> If not found, 404 Not found
-	 * 		-> If no, then we go back to server block to find index
-	 * 			-> If yes, then we append it back to methodPath and find
-	 * 				-> If found, then we serve the file + 200 OK
-	 * 				-> If not found, then 404 Not found
-	 * 			-> If no, then 404 Not found
-	 */
-
 	this->useDefaultIndex = 0;
 	EuleePocket	myServer = this->server[this->serverIndex];
 	std::string	methodPathCopy = this->methodPath.c_str();
@@ -387,9 +378,8 @@ void	EuleeHand::convertLocation()
 		}
 	}
 	newPath = this->methodPath;
-	if (methodPathCopy.length() - this->locationPath.length() > 1)
+	if (methodPathCopy.length() - this->locationPath.length() > 1) // Trailing File
 	{
-		std::cout << "Trailing File" << std::endl;
 		if (myServer.location[this->locationPath][ROOT].size() != 0)
 		{
 			locationRoot = myServer.location[this->locationPath][ROOT][0];
@@ -397,82 +387,35 @@ void	EuleeHand::convertLocation()
 		}
 		if (this->checkPath(newPath, 1, 1)) // Either file or directory
 		{
-			std::cout << "Found" << std::endl;
-			if (this->checkPath(newPath, 1, 0)) // File
+			if (this->checkPath(newPath, 1, 0)) // Found file, else found directory
 			{
-				std::cout << "File" << std::endl;
 				this->methodPath = "/" + newPath;
-				std::cout << "Location Path: " << this->locationPath << std::endl;
+				std::cout << GREEN << "Location Path: " << this->locationPath << RESET << std::endl;
 				std::cout << GREEN << "New Path: " << this->methodPath << RESET << std::endl;
 				return ;
 			}
-			else // Directory
-				std::cout << "Directory" << std::endl;
 		}
 		else // Not Found
-		{
-			std::cout << "Not Found" << std::endl;
 			return ;
-		}
 	}
-	// 	-> If yes, then we append it back to methodPath and find
-	//  	-> If found, then we serve the file + 200 OK
-	//  	-> If not found, 404 Not found
-	//  -> If no, then we go back to server block to find index
-	//  	-> If yes, then we append it back to methodPath and find
-	//  		-> If found, then we serve the file + 200 OK
-	//  		-> If not found, then 404 Not found
-	//  	-> If no, then 404 Not found
-	std::cout << "No Trailing File" << std::endl;
-	if (myServer.location[this->locationPath][INDEX].size() == 0)
+	if (myServer.location[this->locationPath][INDEX].size() == 0) // No Trailing File -> Append back and find
 	{
-		std::cout << "Append back and find" << std::endl;
-		indexFile = myServer[INDEX][0];
+		indexFile = "./html/index.html";
+		if (myServer[INDEX].size() != 0)
+			indexFile = myServer[INDEX][0];
 		this->methodPath = myServer[ROOT][0] + locationRoot + "/" + indexFile; 
 		this->useDefaultIndex = 1;
 	}
-	else
+	else // Using Index
 	{
-		std::cout << "Using index: " << newPath << std::endl;
 		locationRoot = myServer.location[this->locationPath][ROOT][0];
 		std::string	remainingPath = methodPathCopy.erase(0, this->locationPath.length());
 		indexFile = myServer.location[this->locationPath][INDEX][0];
 		this->methodPath = "/" + myServer.location[this->locationPath][ROOT][0] + remainingPath + "/" + indexFile;
 	}
-	std::cout << "Location Path: " << this->locationPath << std::endl;
+	std::cout << GREEN << "Location Path: " << this->locationPath << RESET << std::endl;
 	std::cout << GREEN << "New Path: " << this->methodPath << RESET << std::endl;
 }
-/*
--> int    sendHttp(int statusCode, std::string path = "")
-    -> std::cout << MAGENTA << "Closed with status code: " << statusCode << RESET << std::endl;
-    -> return (statusCode);
-    statusCode = 200, 404, 405
-    statusMessage = OK, Not Found, Not Allowed
-    "HTTP/1.1 {statusCode} {statusCodeMessage}\r\n\r\n"
-    Check if string.size() == 0 -> Use our default page as filePath;
-     Else -> Check whether the html file exists or not
-    If it doesn't exist, then statusCode becomes 404;    
-    path = defaultErrorPage
-    Else -> Extract html from file
-    Apped the content in the .html file to the header -> output = header + html;
-    std::cout << MAGENTA << "Closed with status code: " << statusCode << RESET << std::endl;
-    ft_select(this->_database.socket, (void *)output.c_str(), output.length(), WRITE)
-    close(this->_database.socket);
-    return (statusCode);
-*/
-
-/*
-
-statusCode
-take the statusCode, check from your map, return the statusMessage;
-check = statuslist.find(statusCode);
-response = "http//1.1 " + statusCode + " " + statusList[statusCode] + " \r\n\r\n";
- 
-response = response + read(path); //if exist
-ft_select();
-close(socket);
-
-*/
 
 std::string	EuleeHand::extractHTML(std::string path)
 {
@@ -491,35 +434,29 @@ std::string	EuleeHand::extractHTML(std::string path)
 	return (extract);
 }
 
-int		EuleeHand::sendHttp(int statusCode, std::string path)
+int		EuleeHand::sendHttp(int statusCode, int closeSocket, std::string htmlPath)
 {
-	// this->statusList[200] = "OK";
-	// this->statusList[404] = "Not Found"; // temps
-	// this->statusList[405] = "Not Allowed";
-
-	std::string statusStr = std::to_string(statusCode);
 	if (this->statusList.find(statusCode) == this->statusList.end())
 	{
-		std::cerr << "Find error" << std::endl;
-		exit(1);
+		std::cerr << RED << "Cannot find status code!" << RESET << std::endl;
+		std::cout << MAGENTA << "Returned " << statusCode << "!" << RESET << std::endl;
+		return (statusCode);
 	}
-	std::string response = "http//1.1" + statusStr + " " + statusList[statusCode] + " \r\n\r\n";
-	if (path.size() == 0)
-	{
-		// std::cout << "html default page" << std::endl;
-		path =  "./html/index.html";
-	}
+	std::string response = "HTTP/1.1 " + std::to_string(statusCode) + " " + statusList[statusCode] + " \r\n\r\n";
+	if (htmlPath.size() == 0 && statusCode != 200)
+		htmlPath =  "./html/error.html";
+	else if (htmlPath.size() == 0)
+		htmlPath =  "./html/index.html";
 	else
 	{
-		if (this->checkPath(path, 1, 0 ) == 0)
+		if (this->checkPath(htmlPath, 1, 0) == 0)
 		{
 			statusCode = 404;
-			// std::cout << "error default page" << std::endl;
-			path =  "./html/error.html";
+			htmlPath =  "./html/error.html";
 		}
 	}
-	response = response + extractHTML(path);
-	std::string code = "{{error_code}}"; // maybe I can find a way to change this trash
+	response += extractHTML(htmlPath);
+	std::string code = "{{error_code}}";
 	std::string msg = "{{error_message}}";
 
 	if (statusCode != 200)
@@ -529,7 +466,9 @@ int		EuleeHand::sendHttp(int statusCode, std::string path)
 		response.replace(response.find(msg), msg.length(), this->statusList[statusCode]);
 	}
 	ft_select(this->socket, (void *)response.c_str(), response.length(), WRITE);
-	close (this->socket);
+	if (closeSocket)
+		close (this->socket);
+	std::cout << MAGENTA << "Returned " << statusCode << "!" << RESET << std::endl;
 	return (statusCode);
 }
 

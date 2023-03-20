@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 14:01:49 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/16 13:52:33 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/20 15:39:22 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,9 +66,5 @@ void	HttpPutResponse::handlePut()
 			originalPath.write(toWrite.c_str(), toWrite.length());
 		originalPath.close();
 	}
-
-	std::string responseBody = "Server has received your POST request!";
-	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + std::to_string(responseBody.length()) + "\r\n\r\n" + responseBody;
-	this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.length(), WRITE);
-	close(this->_database.socket);
+	this->_database.sendHttp(200, 1);
 }

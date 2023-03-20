@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/20 14:24:54 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/20 17:05:48 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,9 @@ WebServer::WebServer(std::string configFilePath, char **envp)
 	this->_configManager = ConfigManager(configFilePath);
 }
 
-WebServer::~WebServer(void) {}
+WebServer::~WebServer() {}
 
-void	WebServer::_setupServer(void)
+void	WebServer::_setupServer()
 {
 	addrinfo	hints, *res;
 
@@ -132,11 +132,14 @@ void	WebServer::_serverLoop(void)
 		// std::cout << BLUE << this->_database.buffer << RESET << std::endl;
 
 		/* FOR DEBUGGING: TO DELETE */
-		// if (this->_database.method == "POST" && this->_database.methodPath == "/directory/youpi.bla")
+		// if (this->_database.method == "GET")
 		// {
 		// 	std::cout << "Entered force output!" << std::endl;
 		// 	std::string response = "HTTP/1.1 200 OK\r\n\r\n";
 		// 	this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.size(), WRITE);
+		// 	// this->_database.methodPath = "/cgi/srcs/cgi_static.cgi";
+		// 	// HttpGetResponse	getResponse(this->_database);
+		// 	// getResponse.handleGet();
 		// 	close(this->_database.socket);
 		// 	continue ;
 		// }

@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/20 14:26:10 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/20 15:26:59 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ class EuleeHand
 		long		ft_select(int fd, void *buff, size_t size, Mode mode);
 		int			checkPath(std::string path, int	isFile, int isDirectory);
 		std::string	extractHTML(std::string path);
-		int			sendHttp(int statusCode, std::string path);
+		int			sendHttp(int statusCode, int closeSocket = 0, std::string htmlPath = "");
 
 
 		int			isCGI();

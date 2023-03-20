@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:38:49 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/14 15:23:13 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/20 15:28:26 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include "WebServer.hpp"
 
+/* MIGHT NOT NEED ANYMORE */
 class HttpDefaultResponse
 {
 	public:
