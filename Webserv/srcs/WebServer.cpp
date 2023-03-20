@@ -6,16 +6,16 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/16 12:59:20 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/16 20:17:46 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/WebServer.hpp"
 
 /* Class constructor that takes in configFilePath string */
-WebServer::WebServer(std::string configFilePath)
+WebServer::WebServer(std::string configFilePath, char **envp)
 {
-	this->_database = EuleeHand(configFilePath, ConfigManager(configFilePath));
+	this->_database = EuleeHand(configFilePath, ConfigManager(configFilePath), envp);
 	this->_configManager = ConfigManager(configFilePath);
 }
 
@@ -73,37 +73,44 @@ int	WebServer::_unchunkResponse() // Util
 
 	if (header.find("Transfer-Encoding: chunked") == std::string::npos)
 		return (0);
-	std::string	remaining = this->_database.buffer.substr(this->_database.buffer.find("\r\n\r\n") + 4);
+	std::string	remaining = this->_database.buffer.substr(this->_database.buffer.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
 	std::string	newBody = "";
 
-	while (remaining.find("\r\n") != std::string::npos)
+	while (true)
 	{
-		std::string	chunkSize = remaining.substr(0, remaining.find("\r\n"));
-		size_t		size = std::stoul(chunkSize, 0, 16);
-		if (size == 0)
-			return (0);
-		if (size > remaining.size() - std::strlen("\r\n"))
+		size_t delimiter_pos = remaining.find("\r\n");
+		if (delimiter_pos == std::string::npos)
+			break ;
+		size_t chunk_size = std::stoul(remaining.substr(0, delimiter_pos), 0, 16);
+		if (chunk_size == 0)
+			break ;
+		size_t data_pos = delimiter_pos + std::strlen("\r\n");
+		if (data_pos + chunk_size > remaining.size())
 		{
 			std::cout << RED << "Error: Chunk size is bigger than remaining size" << RESET << std::endl;
+			std::string response = "HTTP/1.1 400 Bad Request\r\n\r\n";
+			this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.length(), WRITE);
+			close(this->_database.socket);
 			return (-1);
 		}
-		newBody += remaining.substr(remaining.find("\r\n") + std::strlen("\r\n"), size);
-		remaining = remaining.substr(remaining.find("\r\n") + size + std::strlen("\r\n\r\n"));
+		newBody += remaining.substr(data_pos, chunk_size);
+		remaining = remaining.substr(data_pos + chunk_size + std::strlen("\r\n"));
 	}
+
 	this->_database.buffer = header + "\r\n\r\n" + newBody;
 	return (1);
 }
 
 int	WebServer::_checkExcept() // Util
 {
-	if (this->_database.server[this->_database.serverIndex].location.find(this->_database.methodPath) == this->_database.server[this->_database.serverIndex].location.end())
+	if (this->_database.server[this->_database.serverIndex].location.find(this->_database.locationPath) == this->_database.server[this->_database.serverIndex].location.end())
 		return (0);
 	int	found = 0;
-	if (this->_database.server[this->_database.serverIndex].location[this->_database.methodPath][LIMIT_EXCEPT].size() == 0)
+	if (this->_database.server[this->_database.serverIndex].location[this->_database.locationPath][LIMIT_EXCEPT].size() == 0)
 		return (0);
-	for (size_t j = 0; j < this->_database.server[this->_database.serverIndex].location[this->_database.methodPath][LIMIT_EXCEPT].size(); j++)
+	for (size_t j = 0; j < this->_database.server[this->_database.serverIndex].location[this->_database.locationPath][LIMIT_EXCEPT].size(); j++)
 	{
-		if (this->_database.server[this->_database.serverIndex].location[this->_database.methodPath][LIMIT_EXCEPT][j] == this->_database.method)
+		if (this->_database.server[this->_database.serverIndex].location[this->_database.locationPath][LIMIT_EXCEPT][j] == this->_database.method)
 			found++;
 	}
 	if (found == 0)
@@ -153,23 +160,23 @@ void	WebServer::_convertLocation() // Util
 	EuleePocket	myServer = this->_database.server[this->_database.serverIndex];
 	std::string	methodPathCopy = this->_database.methodPath.c_str();
 	size_t		longestPathSize = 0;
-	std::string	locationPath, pathToFind, locationRoot, newPath, indexFile;
+	std::string	pathToFind, locationRoot, newPath, indexFile;
 	for (std::map<std::string, EuleeWallet>::iterator it = myServer.location.begin(); it != myServer.location.end(); it++)
 	{
 		if (strncmp(it->first.c_str(), methodPathCopy.c_str(), it->first.length()) == 0 && it->first.length() > longestPathSize)
 		{
 			longestPathSize = it->first.length();
-			locationPath = it->first;
+			this->_database.locationPath = it->first;
 		}
 	}
 	newPath = this->_database.methodPath;
-	if (methodPathCopy.length() - locationPath.length() > 1)
+	if (methodPathCopy.length() - this->_database.locationPath.length() > 1)
 	{
 		std::cout << "Trailing File" << std::endl;
-		if (myServer.location[locationPath][ROOT].size() != 0)
+		if (myServer.location[this->_database.locationPath][ROOT].size() != 0)
 		{
-			locationRoot = myServer.location[locationPath][ROOT][0];
-			newPath = locationRoot + methodPathCopy.substr(locationPath.length());
+			locationRoot = myServer.location[this->_database.locationPath][ROOT][0];
+			newPath = locationRoot + methodPathCopy.substr(this->_database.locationPath.length());
 		}
 		if (this->_database.checkPath(newPath, 1, 1)) // Either file or directory
 		{
@@ -178,7 +185,7 @@ void	WebServer::_convertLocation() // Util
 			{
 				std::cout << "File" << std::endl;
 				this->_database.methodPath = "/" + newPath;
-				std::cout << "Location Path: " << locationPath << std::endl;
+				std::cout << "Location Path: " << this->_database.locationPath << std::endl;
 				std::cout << GREEN << "New Path: " << this->_database.methodPath << RESET << std::endl;
 				return ;
 			}
@@ -200,22 +207,22 @@ void	WebServer::_convertLocation() // Util
 	//  * 				-> If not found, then 404 Not found
 	//  * 			-> If no, then 404 Not found
 	std::cout << "No Trailing File" << std::endl;
-	if (myServer.location[locationPath][INDEX].size() == 0)
+	if (myServer.location[this->_database.locationPath][INDEX].size() == 0)
 	{
 		std::cout << "Append back and find" << std::endl;
 		indexFile = myServer[INDEX][0];
-		this->_database.methodPath = myServer[ROOT][0] + locationRoot + "/" + indexFile; 
+		this->_database.methodPath = "/" + myServer[ROOT][0] + locationRoot + "/" + indexFile; 
 		this->_database.useDefaultIndex = 1;
 	}
 	else
 	{
 		std::cout << "Using index: " << newPath << std::endl;
-		locationRoot = myServer.location[locationPath][ROOT][0];
-		std::string	remainingPath = methodPathCopy.erase(0, locationPath.length());
-		indexFile = myServer.location[locationPath][INDEX][0];
-		this->_database.methodPath = "/" + myServer.location[locationPath][ROOT][0] + remainingPath + "/" + indexFile;
+		locationRoot = myServer.location[this->_database.locationPath][ROOT][0];
+		std::string	remainingPath = methodPathCopy.erase(0, this->_database.locationPath.length());
+		indexFile = myServer.location[this->_database.locationPath][INDEX][0];
+		this->_database.methodPath = "/" + myServer.location[this->_database.locationPath][ROOT][0] + remainingPath + "/" + indexFile;
 	}
-	std::cout << "Location Path: " << locationPath << std::endl;
+	std::cout << "Location Path: " << this->_database.locationPath << std::endl;
 	std::cout << GREEN << "New Path: " << this->_database.methodPath << RESET << std::endl;
 }
 
@@ -263,10 +270,8 @@ void	WebServer::_serverLoop()
 		}
 
 		if (this->_unchunkResponse() == -1)
-		{
-			close(this->_database.socket);
 			continue ;
-		}
+		std::cout << GREEN << "Finished unchunking" << RESET << std::endl;
 
 		std::istringstream	request(this->_database.buffer);
 		
@@ -276,32 +281,41 @@ void	WebServer::_serverLoop()
 			std::string	message = "Go away favicon";
 			std::cout << RED << message << RESET << std::endl;
 			std::string response = "HTTP/1.1 404 Not Found\r\n\r\n" + message;
-
 			this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.length(), WRITE);
 			close(this->_database.socket);
 			continue;
 		}
-		// std::cout << BLUE << this->_database.buffer.substr(0, this->_database.buffer.find("\r\n\r\n")) << RESET << std::endl;
-		std::cout << BLUE << this->_database.buffer << RESET << std::endl;
+		std::cout << BLUE << this->_database.buffer.substr(0, this->_database.buffer.find("\r\n\r\n")) << RESET << std::endl;
+		// std::cout << BLUE << this->_database.buffer << RESET << std::endl;
 
-		// std::cout << this->_database.methodPath << std::endl;
-		// if (this->_database.methodPath == "/directory/youpi.bad_extension")
+		/* FOR DEBUGGING: TO DELETE */
+		// if (this->_database.method == "POST" && this->_database.methodPath == "/directory/youpi.bla")
 		// {
-		// 	std::string response = "HTTP/1.1 404 Not Found\r\n\r\n";
+		// 	std::cout << "Entered force output!" << std::endl;
+		// 	std::string response = "HTTP/1.1 200 OK\r\n\r\n";
 		// 	this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.size(), WRITE);
 		// 	close(this->_database.socket);
 		// 	continue ;
 		// }
 
+		this->_convertLocation();
 		if (this->_checkExcept())
 			continue ;
-		this->_convertLocation();
+		std::cout << "Method: " << this->_database.method << std::endl;
+		std::cout << "MethodPath: " << this->_database.methodPath << std::endl;
 
 		if (this->_database.method == "HEAD")
 		{
 			std::cout << MAGENTA << "Head method called" << RESET << std::endl;
 			HttpHeadResponse	headResponse(this->_database);
 			headResponse.handleHead();
+		}
+		// else if (this->_database.methodPath.find('.') != std::string::npos && (this->_database.method == "POST" && this->_database.methodPath == "/YoupiBanane/youpi.bla"))
+		else if (this->_database.method == "POST" && this->_database.methodPath == "/YoupiBanane/youpi.bla")
+		{
+			std::cout << MAGENTA << "CGI method called" << RESET << std::endl;
+			HttpCgiResponse	cgiResponse(this->_database);
+			cgiResponse.handleCgi();
 		}
 		else if (this->_database.method == "POST")
 		{
@@ -327,12 +341,6 @@ void	WebServer::_serverLoop()
 			HttpGetResponse	getResponse(this->_database);
 			getResponse.handleGet();
 		}
-		else if (this->_database.methodPath.find('.') != std::string::npos)
-		{
-			std::cout << MAGENTA << "CGI method called" << RESET << std::endl;
-			HttpCgiResponse	cgiResponse(this->_database);
-			cgiResponse.handleCgi();
-		}
 		else
 		{
 			std::cout << MAGENTA << "Default method called" << RESET << std::endl;
@@ -355,34 +363,3 @@ void	WebServer::runServer()
 	this->_setupServer();
 	this->_serverLoop();
 }
-
-
-/*
-Test GET http://localhost:1234/
-Test POST http://localhost:1234/ with a size of 0
-Test HEAD http://localhost:1234/
-Test GET http://localhost:1234/directory
-Test GET http://localhost:1234/directory/youpi.bad_extension
-Test GET http://localhost:1234/directory/youpi.bla
-Test GET Expected 404 on http://localhost:1234/directory/oulalala
-Test GET http://localhost:1234/directory/nop
-Test GET http://localhost:1234/directory/nop/
-Test GET http://localhost:1234/directory/nop/other.pouic
-Test GET Expected 404 on http://localhost:1234/directory/nop/other.pouac
-Test GET Expected 404 on http://localhost:1234/directory/Yeah
-Test GET http://localhost:1234/directory/Yeah/not_happy.bad_extension
-	Test Put http://localhost:1234/put_test/file_should_exist_after with a size of 1000
-	Test Put http://localhost:1234/put_test/file_should_exist_after with a size of 10000000
-	Test POST http://localhost:1234/directory/youpi.bla with a size of 100000000
-	Test POST http://localhost:1234/directory/youpla.bla with a size of 100000000
-	Test POST http://localhost:1234/directory/youpi.bla with a size of 100000 with special headers
-	Test POST http://localhost:1234/post_body with a size of 0
-	Test POST http://localhost:1234/post_body with a size of 100
-	Test POST http://localhost:1234/post_body with a size of 200
-	Test POST http://localhost:1234/post_body with a size of 101
-	Test multiple workers(5) doing multiple times(15): GET on /
-	Test multiple workers(20) doing multiple times(5000): GET on /
-	Test multiple workers(128) doing multiple times(50): GET on /directory/nop
-	Test multiple workers(20) doing multiple times(5): Put on /put_test/multiple_same with size 1000000
-	Test multiple workers(20) doing multiple times(5): Post on /directory/youpi.bla with size 100000000
-*/
