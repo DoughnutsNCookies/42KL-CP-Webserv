@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/17 13:55:57 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/20 14:23:49 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,9 +47,9 @@
 class WebServer
 {
 	public:
-		WebServer(std::string configFilePath);
+		WebServer(std::string configFilePath, char **envp);
 		~WebServer(void);
-		void			runServer(void);
+		void			runServer();
 
 	private:
 		void			_setupServer(void);

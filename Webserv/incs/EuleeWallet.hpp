@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 15:10:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/14 17:26:34 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/20 14:22:00 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,29 +20,30 @@
 
 enum	Key
 {
-	LOCATION_READ_PATH,
-	LISTEN,
-	ROOT,
-	INDEX,
-	SERVER_NAME,
+	LOCATION_READ_PATH, //USING
+	LISTEN, //USING
+	ROOT, //USING
+	INDEX, //USING
+	SERVER_NAME, //USING
 	ERROR_PAGE,
 	CLIENT_MAX_BODY_SIZE,
 	AUTO_INDEX,
-	RETURN,
+	RETURN, //TBR
 	CGI,
 	INCLUDE,
-	UPLOAD,
-	LIMIT_EXCEPT
+	UPLOAD, //USING
+	LIMIT_EXCEPT //USING
 };
 
 // location block
 class EuleeWallet
 {
 	public:
-		typedef Key								key_type;
-		typedef std::vector<std::string>		mapped_type;
-		typedef std::map<key_type, mapped_type>	value_type;
-		typedef	value_type::iterator			iterator;
+		typedef Key									key_type;
+		typedef std::vector<std::string>			mapped_type;
+		typedef std::map<key_type, mapped_type>		value_type;
+		typedef std::map<std::string, std::string>	cgi_type;
+		typedef	value_type::iterator				iterator;
 
 		EuleeWallet(void);
 		EuleeWallet(value_type location);
@@ -52,6 +53,8 @@ class EuleeWallet
 
 		iterator	begin(void);
 		iterator	end(void);
+
+		cgi_type	cgi;
 
 	private:
 		value_type	_location;

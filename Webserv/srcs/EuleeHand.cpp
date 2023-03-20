@@ -3,42 +3,42 @@
 /*                                                        :::      ::::::::   */
 /*   EuleeHand.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/17 14:51:33 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/20 14:31:17 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "EuleeHand.hpp"
 
-EuleeHand::EuleeHand(void) : statusList(), envp(), cgi(), server(), serverFd(), serverAddr(), methodPath(), buffer(), socket(), serverIndex(), useDefaultIndex(), _configFilePath(), _configManager() {}
+EuleeHand::EuleeHand() : envp(), cgi(), statusList(), server(), serverFd(), serverAddr(), socket(), serverIndex(), useDefaultIndex(), method(), methodPath(), buffer(), locationPath() {}
 
-EuleeHand::EuleeHand(std::string configFilePath, ConfigManager const &configManager) :  statusList(), envp(), cgi(), server(), serverFd(), serverAddr(), methodPath(), buffer(), socket(), serverIndex(), useDefaultIndex(), _configFilePath(configFilePath), _configManager(configManager) {}
+EuleeHand::EuleeHand(std::string configFilePath, const ConfigManager &configManager, char **envp) : envp(envp), cgi(), statusList(), server(), serverFd(), serverAddr(), socket(), serverIndex(), useDefaultIndex(), method(), methodPath(), buffer(), locationPath(), _configFilePath(configFilePath), _configManager(configManager) {}
 
-EuleeHand::~EuleeHand(void) {}
+EuleeHand::~EuleeHand() {}
 
-void	EuleeHand::printTokens(void)
+void	EuleeHand::printTokens()
 {
 	this->_configManager.printTokens();
 }
 
-void	EuleeHand::parseConfigFile(void)
+void	EuleeHand::parseConfigFile()
 {
 	this->_configManager.parseConfigFile();
 }
 
-void	EuleeHand::configLibrary(void)
+void	EuleeHand::configLibrary()
 {
 	this->_configManager.configLibrary();
 }
 
-void	EuleeHand::errorHandleShit(void)
+void	EuleeHand::errorHandleShit()
 {
 	this->_configManager.errorHandleShit();
 }
 
-void	EuleeHand::printServers(void)
+void	EuleeHand::printServers()
 {
 	for (size_t i = 0; i < this->server.size(); ++i)
 	{
@@ -48,11 +48,14 @@ void	EuleeHand::printServers(void)
 		{
 			std::cout << CYANNORM << it->first << " : ";
 			for (size_t k = 0; k < it->second.size(); ++k)
-			{
-				std::cout << it->second[k];
-				if (k + 1 < it->second.size())
-					std::cout << " ";
-			}
+				std::cout << it->second[k] << " ";
+			std::cout << std::endl;
+		}
+		if (this->cgi.size())
+		{
+			std::cout << CGI << " : ";
+			for (std::map<std::string, std::string>::iterator it3 = cgi.begin(); it3 != cgi.end(); ++it3)
+				std::cout << it3->first << " ";
 			std::cout << std::endl;
 		}
 		std::cout << RESET << std::endl;
@@ -63,11 +66,14 @@ void	EuleeHand::printServers(void)
 			{
 				std::cout << BLUENORM << it2->first << " : ";
 				for (size_t d = 0; d < it2->second.size(); ++d)
-				{
-					std::cout << it2->second[d];
-					if (d + 1 < it2->second.size())
-						std::cout << " ";
-				}
+					std::cout << it2->second[d] << " ";
+				std::cout << std::endl;
+			}
+			if (this->server[i].vectorLocation[j].cgi.size())
+			{
+				std::cout << CGI << " : ";
+				for (std::map<std::string, std::string>::iterator it4 = this->server[i].vectorLocation[j].cgi.begin(); it4 != this->server[i].vectorLocation[j].cgi.end(); ++it4)
+					std::cout << it4->first << " ";
 				std::cout << std::endl;
 			}
 			if (j + 1 < this->server[i].vectorLocation.size())
@@ -78,30 +84,48 @@ void	EuleeHand::printServers(void)
 	}
 }
 
-// size_t	EuleeHand::_parseCgi(std::vector<Token> &tokens, size_t i)
-// {
-// 	if (tokens[i].token == "cgi_script" && tokens[i].type == KEY)
-// 	{
-// 		size_t	j = -1;
-// 		size_t	size = 0;
-// 		std::string	path;
-// 		while (tokens[++j].token != ";")
-// 		{
-// 			if (tokens[j].token.find('/') >= 0)
-// 			{
-// 				path = tokens[j].token;
-// 				size++;
-// 			}
-// 		}
-// 		if (size > 1)
-// 			printError();
-// 		// while (tokens[++i].token != ";")
-// 		// {
-// 		// 	this->cgi[key].push_back(tokens[i].token);
-// 		// }
-// 	}
-// 	return (i);
-// }
+size_t	EuleeHand::_parseCgi(std::vector<Token> &tokens, size_t i, EuleeWallet &location, int blockType)
+{
+	if (tokens[i].token == "cgi_script" && tokens[i].type == KEY)
+	{
+		size_t	j = i;
+		size_t	size = 0;
+		std::string	path;
+		while (tokens[++j].token != ";")
+		{
+			if (tokens[j].token.find("/") != std::string::npos || tokens[j].token.find(".") == std::string::npos)
+			{
+				if (++size > 1)
+					this->_configManager.printError("cgi_index : too many paths. ", j);
+				path = tokens[j].token;
+			}
+			else if (tokens[j].token[0] != '.')
+				this->_configManager.printError("cgi_index : invalid extension. ", j);
+			else if (tokens[j].token[0] == '.')
+			{
+				std::string	temp = tokens[j].token.substr(1, tokens[j].token.length());
+				for (size_t k = 0; k < temp.length(); ++k)
+				{
+					if (!isalpha(temp[k]))
+						this->_configManager.printError("cgi_index : invalid extension. ", j);
+				}
+			}
+		}
+		if (size == 0)
+			this->_configManager.printError("cgi_index : no specified path. ", j);
+		while (tokens[++i].token != ";")
+		{
+			if (tokens[i].token[0] == '.')
+			{
+				if (blockType == 1)
+					this->cgi[tokens[i].token] = path;
+				else
+					location.cgi[tokens[i].token] = path;
+			}
+		}
+	}
+	return (i);
+}
 
 size_t	EuleeHand::_parsingHelper(std::vector<Token> &tokens, size_t i, EuleeWallet &location, std::string needle, Key key)
 {
@@ -121,7 +145,7 @@ size_t	EuleeHand::_parseLocation(std::vector<Token> &tokens, std::vector<EuleeWa
 		loc[LOCATION_READ_PATH].push_back(tokens[i++].token);
 	while (tokens[i].token != "}")
 	{
-		i = this->_parsingHelper(tokens, i, loc, "cgi_index", CGI);
+		i = this->_parseCgi(tokens, i, loc, 2);
 		i = this->_parsingHelper(tokens, i, loc, "root", ROOT);
 		i = this->_parsingHelper(tokens, i, loc, "index", INDEX);
 		i = this->_parsingHelper(tokens, i, loc, "return", RETURN);
@@ -145,7 +169,7 @@ size_t	EuleeHand::_parseServer(std::vector<Token> &tokens, size_t i)
 		// i = this->_parseCgi(tokens, i);
 	while (i < tokens.size() && tokens[i].token != "server")
 	{
-		i = this->_parsingHelper(tokens, i, serv, "cgi_index", CGI);
+		i = this->_parseCgi(tokens, i, serv, 1);
 		i = this->_parsingHelper(tokens, i, serv, "root", ROOT);
 		i = this->_parsingHelper(tokens, i, serv, "index", INDEX);
 		i = this->_parsingHelper(tokens, i, serv, "listen", LISTEN);
@@ -165,7 +189,7 @@ size_t	EuleeHand::_parseServer(std::vector<Token> &tokens, size_t i)
 	return (++i);
 }
 
-void	EuleeHand::parseConfigServer(void)
+void	EuleeHand::parseConfigServer()
 {
 	std::vector<Token>	tokens = this->_configManager.getToken();
 
@@ -266,7 +290,7 @@ int	EuleeHand::checkPath(std::string path, int isFile, int isDirectory)
 	return (0);
 }
 
-int	EuleeHand::isCGI(void)
+int	EuleeHand::isCGI()
 {
 	size_t extensionPos = this->methodPath.find_last_of('.');
 	if (extensionPos == std::string::npos)
@@ -278,7 +302,7 @@ int	EuleeHand::isCGI(void)
 	return (0);
 }
 
-int	EuleeHand::checkExcept(void)
+int	EuleeHand::checkExcept()
 {
 	if (this->server[this->serverIndex].location.find(this->methodPath) == this->server[this->serverIndex].location.end())
 		return (0);
@@ -300,7 +324,7 @@ int	EuleeHand::checkExcept(void)
 	return (0);
 }
 
-int	EuleeHand::unchunkResponse(void)
+int	EuleeHand::unchunkResponse()
 {
 	std::string	output;
 	std::string	header = this->buffer.substr(0, this->buffer.find("\r\n\r\n"));
@@ -328,7 +352,7 @@ int	EuleeHand::unchunkResponse(void)
 	return (1);
 }
 
-void	EuleeHand::convertLocation(void)
+void	EuleeHand::convertLocation()
 {
 	/*
 	 * Extract methodPath 
@@ -353,23 +377,23 @@ void	EuleeHand::convertLocation(void)
 	EuleePocket	myServer = this->server[this->serverIndex];
 	std::string	methodPathCopy = this->methodPath.c_str();
 	size_t		longestPathSize = 0;
-	std::string	locationPath, pathToFind, locationRoot, newPath, indexFile;
+	std::string	pathToFind, locationRoot, newPath, indexFile;
 	for (std::map<std::string, EuleeWallet>::iterator it = myServer.location.begin(); it != myServer.location.end(); it++)
 	{
 		if (strncmp(it->first.c_str(), methodPathCopy.c_str(), it->first.length()) == 0 && it->first.length() > longestPathSize)
 		{
 			longestPathSize = it->first.length();
-			locationPath = it->first;
+			this->locationPath = it->first;
 		}
 	}
 	newPath = this->methodPath;
-	if (methodPathCopy.length() - locationPath.length() > 1)
+	if (methodPathCopy.length() - this->locationPath.length() > 1)
 	{
 		std::cout << "Trailing File" << std::endl;
-		if (myServer.location[locationPath][ROOT].size() != 0)
+		if (myServer.location[this->locationPath][ROOT].size() != 0)
 		{
-			locationRoot = myServer.location[locationPath][ROOT][0];
-			newPath = locationRoot + methodPathCopy.substr(locationPath.length());
+			locationRoot = myServer.location[this->locationPath][ROOT][0];
+			newPath = locationRoot + methodPathCopy.substr(this->locationPath.length());
 		}
 		if (this->checkPath(newPath, 1, 1)) // Either file or directory
 		{
@@ -378,7 +402,7 @@ void	EuleeHand::convertLocation(void)
 			{
 				std::cout << "File" << std::endl;
 				this->methodPath = "/" + newPath;
-				std::cout << "Location Path: " << locationPath << std::endl;
+				std::cout << "Location Path: " << this->locationPath << std::endl;
 				std::cout << GREEN << "New Path: " << this->methodPath << RESET << std::endl;
 				return ;
 			}
@@ -400,7 +424,7 @@ void	EuleeHand::convertLocation(void)
 	//  		-> If not found, then 404 Not found
 	//  	-> If no, then 404 Not found
 	std::cout << "No Trailing File" << std::endl;
-	if (myServer.location[locationPath][INDEX].size() == 0)
+	if (myServer.location[this->locationPath][INDEX].size() == 0)
 	{
 		std::cout << "Append back and find" << std::endl;
 		indexFile = myServer[INDEX][0];
@@ -410,12 +434,12 @@ void	EuleeHand::convertLocation(void)
 	else
 	{
 		std::cout << "Using index: " << newPath << std::endl;
-		locationRoot = myServer.location[locationPath][ROOT][0];
-		std::string	remainingPath = methodPathCopy.erase(0, locationPath.length());
-		indexFile = myServer.location[locationPath][INDEX][0];
-		this->methodPath = "/" + myServer.location[locationPath][ROOT][0] + remainingPath + "/" + indexFile;
+		locationRoot = myServer.location[this->locationPath][ROOT][0];
+		std::string	remainingPath = methodPathCopy.erase(0, this->locationPath.length());
+		indexFile = myServer.location[this->locationPath][INDEX][0];
+		this->methodPath = "/" + myServer.location[this->locationPath][ROOT][0] + remainingPath + "/" + indexFile;
 	}
-	std::cout << "Location Path: " << locationPath << std::endl;
+	std::cout << "Location Path: " << this->locationPath << std::endl;
 	std::cout << GREEN << "New Path: " << this->methodPath << RESET << std::endl;
 }
 /*
@@ -450,7 +474,7 @@ close(socket);
 
 */
 
-std::string EuleeHand::extractHTML(std::string path)
+std::string	EuleeHand::extractHTML(std::string path)
 {
 	std::ifstream file(path);
 
@@ -507,4 +531,17 @@ int		EuleeHand::sendHttp(int statusCode, std::string path)
 	ft_select(this->socket, (void *)response.c_str(), response.length(), WRITE);
 	close (this->socket);
 	return (statusCode);
+}
+
+std::string	EuleeHand::cgiPath()
+{
+	if (this->methodPath.find_last_of(".") == std::string::npos)
+		return ("");
+	std::string	temp = this->methodPath.substr(this->methodPath.find_last_of("."));
+	for (std::map<std::string, std::string>::iterator it = cgi.begin(); it != cgi.end(); ++it)
+	{
+		if (temp == it->first)
+			return (it->second);
+	}
+	return ("");
 }
