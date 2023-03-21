@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   EuleeHand.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/21 08:52:32 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/21 16:39:39 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ class EuleeHand
 
 		char								**envp;
 		std::map<std::string, std::string>	cgi;
+		std::map<int, std::string>			errorpage;
 		std::map<int, std::string>			statusList;
 		std::vector<EuleePocket>			server;
 		std::vector<int>					serverFd;
@@ -55,6 +56,7 @@ class EuleeHand
 		std::string		_configFilePath;
 		ConfigManager	_configManager;
 		size_t			_parseServer(std::vector<Token> &tokens, size_t i);
+		size_t			_parseErrorPage(std::vector<Token> &tokens, size_t i);
 		size_t			_parseCgi(std::vector<Token> &tokens, size_t i, EuleeWallet &location, int blockType);
 		size_t			_parseLocation(std::vector<Token> &tokens, std::vector<EuleeWallet> &location, size_t i);
 		size_t			_parsingHelper(std::vector<Token> &tokens, size_t i, EuleeWallet &location, std::string needle, Key key);
