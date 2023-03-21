@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 14:01:49 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/20 15:39:22 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/21 10:33:31 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,11 @@ void	HttpPutResponse::handlePut()
 		else
 		{
 			int	pathCanUse = 0;
+			if (this->_database.methodPath.substr(this->_database.methodPath.find_last_of("/")) == "/")
+			{
+				std::cout << RED << "File to save is a directory..." << RESET << std::endl;
+				return ;
+			}
 			for (size_t i = 0; this->_database.server[this->_database.serverIndex].location[this->_database.locationPath][UPLOAD].size() && pathCanUse == 0; i++)
 			{
 				std::ofstream	locationPath(this->_database.server[this->_database.serverIndex].location[this->_database.locationPath][UPLOAD][i] + this->_database.methodPath.substr(this->_database.methodPath.find_last_of("/")));

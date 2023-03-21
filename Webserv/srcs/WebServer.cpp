@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/21 08:59:59 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/21 09:45:36 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -222,3 +222,5 @@ void	WebServer::_serverLoop()
 		}
 	}
 }
+
+// Upload to multiple directories
