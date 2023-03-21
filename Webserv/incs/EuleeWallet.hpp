@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 15:10:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/21 12:30:06 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/21 21:36:05 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,19 +20,19 @@
 
 enum	Key
 {
-	LOCATION_READ_PATH, //USING
-	LISTEN, //USING
-	ROOT, //USING
-	INDEX, //USING
-	SERVER_NAME, //USING
+	LOCATION_READ_PATH,
+	LISTEN,
+	ROOT,
+	INDEX,
+	SERVER_NAME,
 	ERROR_PAGE,
-	CLIENT_MAX_BODY_SIZE, //USING
+	CLIENT_MAX_BODY_SIZE,
 	AUTO_INDEX,
 	RETURN,
-	CGI,
-	INCLUDE,
-	UPLOAD, //USING
-	LIMIT_EXCEPT //USING
+	CGI, // NOT USING
+	INCLUDE, // NOT USING
+	UPLOAD,
+	LIMIT_EXCEPT
 };
 
 // location block

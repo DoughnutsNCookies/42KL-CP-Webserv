@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/21 12:53:20 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/21 23:14:57 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,9 +215,11 @@ void	EuleeHand::parseConfigServer()
 			this->server[j].location[this->server[j].vectorLocation[k][LOCATION_READ_PATH][0]] = this->server[j].vectorLocation[k];
 	this->statusList[200] = "OK";
 	this->statusList[301] = "Moved Permanently";
+	this->statusList[400] = "Bad Request";
 	this->statusList[404] = "Not Found";
 	this->statusList[405] = "Not Allowed";
 	this->statusList[413] = "Request Entity Too Large";
+	this->statusList[500] = "Internal Server Error";
 }
 
 void	EuleeHand::perrorExit(std::string msg, int exitTrue)
@@ -269,7 +271,7 @@ long	EuleeHand::ft_select(int fd, void *buff, size_t size, Mode mode)
 		while (val > 0)
 		{
 			total += val;
-			std::cout << GREEN << "Sent: " << val << "\tTotal: " << total << RESET << std::endl;
+			std::cout << GREEN << "Sent: " << val << ((val == WS_BUFFER_SIZE) ? "" : "\t") << "\tTotal: " << total << RESET << std::endl;
 			val = this->ft_select(fd, (char *)buff + total, size - total, WRITE);
 			if (val == -1)
 				this->perrorExit("Write Error", 0);
@@ -308,10 +310,7 @@ int	EuleeHand::isCGI()
 	if (extensionPos == std::string::npos)
 		return (0);
 	std::string extension = this->methodPath.substr(extensionPos);
-	for (size_t i = 0; i < this->server[this->serverIndex][CGI].size(); i++)
-		if (this->server[this->serverIndex][CGI][i] == extension)
-			return (1);
-	return (0);
+	return (this->cgi.find(extension) != this->cgi.end());
 }
 
 int	EuleeHand::checkExcept()
@@ -341,23 +340,25 @@ int	EuleeHand::unchunkResponse()
 
 	if (header.find("Transfer-Encoding: chunked") == std::string::npos)
 		return (0);
-	std::string	remaining = this->buffer.substr(this->buffer.find("\r\n\r\n") + 4);
+	std::string	remaining = this->buffer.substr(this->buffer.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
 	std::string	newBody = "";
 
-	while (remaining.find("\r\n") != std::string::npos)
+	while (1)
 	{
-		std::string	chunkSize = remaining.substr(0, remaining.find("\r\n"));
+		size_t		pos = remaining.find("\r\n");
+		if (pos == std::string::npos)
+			break ;
+		std::string	chunkSize = remaining.substr(0, pos);
 		size_t		size = std::stoul(chunkSize, 0, 16);
 		if (size == 0)
 			return (0);
 		if (size > remaining.size() - std::strlen("\r\n"))
 		{
-			std::cout << RED << "Error: Chunk size is bigger than remaining size" << RESET << std::endl;
-			close(this->socket);
+			this->sendHttp(400, 1);
 			return (1);
 		}
-		newBody += remaining.substr(remaining.find("\r\n") + std::strlen("\r\n"), size);
-		remaining = remaining.substr(remaining.find("\r\n") + size + std::strlen("\r\n\r\n"));
+		newBody += remaining.substr(pos + std::strlen("\r\n"), size);
+		remaining = remaining.substr(pos + size + std::strlen("\r\n\r\n"));
 	}
 	this->buffer = header + "\r\n\r\n" + newBody;
 	return (0);
