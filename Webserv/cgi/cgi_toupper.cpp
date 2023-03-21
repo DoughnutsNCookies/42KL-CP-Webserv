@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cgi_toupper.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 21:19:35 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/20 22:30:32 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/21 14:37:42 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,15 +20,13 @@
 
 int    main(void)
 {
-    // char    buffer[30000000];
-
-    // std::string buffer(10000000, '\0');
-    std::string buffer(WS_BUFFER_SIZE, '\0');
-    // buffer.resize(1000000);
-    read(STDIN_FILENO, &buffer[0], WS_BUFFER_SIZE);
-    // std::cerr << "Buffer: " << buffer <<std::endl;
+    char	*buffer = new char[WS_BUFFER_SIZE];
+	std::cin.getline(buffer, WS_BUFFER_SIZE);
 
     for (size_t i = 0; buffer[i]; i++)
         buffer[i] = toupper(buffer[i]);
     std::cout << buffer;
+
+	delete[] buffer;
+    return (0);
 }
