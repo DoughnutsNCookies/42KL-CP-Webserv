@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/20 15:26:59 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/21 08:52:32 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,12 +35,12 @@ class EuleeHand
 		std::string	extractHTML(std::string path);
 		int			sendHttp(int statusCode, int closeSocket = 0, std::string htmlPath = "");
 
-
 		int			isCGI();
 		int			checkExcept();
 		int			unchunkResponse();
 		void		convertLocation();
 		std::string	cgiPath();
+		int			checkClientBodySize();
 
 		char								**envp;
 		std::map<std::string, std::string>	cgi;
