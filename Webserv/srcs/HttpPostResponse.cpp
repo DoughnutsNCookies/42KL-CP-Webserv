@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:27:42 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/21 10:32:32 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/21 12:29:00 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	HttpPostResponse::_normalSave()
 	if (originalPath.fail())
 	{
 		std::cout << RED << "Directory not found, using upload from config..." << RESET << std::endl;
-		if (this->_database.server[this->_database.serverIndex].location[this->_database.locationPath][UPLOAD].size() == 0)
+		if (this->_database.server[this->_database.serverIndex].location[this->_database.locationPath][UPLOAD].empty())
 			std::cout << RED << "Upload not set in config, cannot save file..." << RESET << std::endl;
 		else
 		{

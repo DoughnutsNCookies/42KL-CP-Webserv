@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/21 11:29:05 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/21 12:53:20 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -214,6 +214,7 @@ void	EuleeHand::parseConfigServer()
 		for (size_t k = 0; k < this->server[j].vectorLocation.size(); k++)
 			this->server[j].location[this->server[j].vectorLocation[k][LOCATION_READ_PATH][0]] = this->server[j].vectorLocation[k];
 	this->statusList[200] = "OK";
+	this->statusList[301] = "Moved Permanently";
 	this->statusList[404] = "Not Found";
 	this->statusList[405] = "Not Allowed";
 	this->statusList[413] = "Request Entity Too Large";
@@ -318,7 +319,7 @@ int	EuleeHand::checkExcept()
 	if (this->server[this->serverIndex].location.find(this->methodPath) == this->server[this->serverIndex].location.end())
 		return (0);
 	int	found = 0;
-	if (this->server[this->serverIndex].location[this->methodPath][LIMIT_EXCEPT].size() == 0)
+	if (this->server[this->serverIndex].location[this->methodPath][LIMIT_EXCEPT].empty())
 		return (0);
 	for (size_t j = 0; j < this->server[this->serverIndex].location[this->methodPath][LIMIT_EXCEPT].size(); j++)
 	{
@@ -327,9 +328,7 @@ int	EuleeHand::checkExcept()
 	}
 	if (found == 0)
 	{
-		std::string response = "HTTP/1.1 405 Method Not Allowed\r\n\r\n";
-		this->ft_select(this->socket, (void *)response.c_str(), response.size(), WRITE);
-		close(this->socket);
+		this->sendHttp(405, 1);
 		return (1);
 	}
 	return (0);
@@ -410,12 +409,16 @@ void	EuleeHand::convertLocation()
 			return ;
 		}
 	}
-	if (myServer.location[this->locationPath][INDEX].size() == 0) // No Trailing File -> Append back and find
+	if (myServer.location[this->locationPath][INDEX].empty()) // No Trailing File -> Append back and find
 	{
 		std::cout << "Server Root Used" << std::endl;
 		remainingPath = this->methodPath.erase(0, this->locationPath.length());
 		indexFile = myServer[INDEX][0];
-		this->methodPath = "/" + myServer[ROOT][0] + this->locationPath + remainingPath + (remainingPath.length() == 0 ? "/" : "") + (this->method == "GET" ? indexFile : ""); 
+		std::cout << "ServerRoot: " << myServer[ROOT][0] << std::endl;
+		std::cout << "LocationPath: " << this->locationPath << std::endl;
+		std::cout << "RemainingPath: " << remainingPath << std::endl;
+		std::cout << "this->method: " << this->method << std::endl;
+		this->methodPath = "/" + myServer[ROOT][0] + this->locationPath + remainingPath + (remainingPath.length() == 0 ? "" : "/") + (this->method == "GET" ? indexFile : ""); 
 		this->useDefaultIndex = 1;
 	}
 	else // Using Index
@@ -457,9 +460,9 @@ int		EuleeHand::sendHttp(int statusCode, int closeSocket, std::string htmlPath)
 		return (statusCode);
 	}
 	std::string response = "HTTP/1.1 " + std::to_string(statusCode) + " " + statusList[statusCode] + " \r\n\r\n";
-	if (htmlPath.size() == 0 && statusCode != 200)
+	if (htmlPath.empty() && statusCode != 200)
 		htmlPath =  "./html/error.html";
-	else if (htmlPath.size() == 0)
+	else if (htmlPath.empty())
 		htmlPath =  "./html/index.html";
 	else
 	{

@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/21 08:56:13 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/21 12:17:39 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ class WebServer
 		void			_acceptConnection();
 		int				_receiveRequest();
 		int				_handleFavicon();
+		int				_handleRedirection();
 		void			_serverLoop();
 
 		ConfigManager	_configManager;

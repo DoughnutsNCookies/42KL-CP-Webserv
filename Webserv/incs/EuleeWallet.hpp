@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 15:10:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/20 14:22:00 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/21 12:30:06 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,9 @@ enum	Key
 	INDEX, //USING
 	SERVER_NAME, //USING
 	ERROR_PAGE,
-	CLIENT_MAX_BODY_SIZE,
+	CLIENT_MAX_BODY_SIZE, //USING
 	AUTO_INDEX,
-	RETURN, //TBR
+	RETURN,
 	CGI,
 	INCLUDE,
 	UPLOAD, //USING

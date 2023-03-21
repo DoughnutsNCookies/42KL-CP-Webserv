@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/21 09:45:36 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/21 12:44:47 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,9 +132,22 @@ int	WebServer::_handleFavicon()
 		return (0);
 	std::string	message = "Go away favicon";
 	std::cout << RED << message << RESET << std::endl;
-	std::string response = "HTTP/1.1 404 Not Found\r\n\r\n" + message;
-	this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.length(), WRITE);
+	this->_database.sendHttp(404, 1);
+	return (1);
+}
+
+int	WebServer::_handleRedirection()
+{
+	if (this->_database.server[this->_database.serverIndex].location.find(this->_database.methodPath) == this->_database.server[this->_database.serverIndex].location.end())
+		return (0);
+	if (this->_database.server[this->_database.serverIndex].location[this->_database.methodPath][RETURN].empty())
+		return (0);
+	std::string	statusCode = this->_database.server[this->_database.serverIndex].location[this->_database.methodPath][RETURN][0];
+	std::string	redirectionPath = this->_database.server[this->_database.serverIndex].location[this->_database.methodPath][RETURN][1];
+	std::string response = "HTTP/1.1 " + statusCode + " " + this->_database.statusList[std::stoi(statusCode)] + "\r\nLocation: " + redirectionPath + "\r\n\r\n";
+	this->_database.ft_select(this->_database.socket, &response[0], response.size(), WRITE);
 	close(this->_database.socket);
+	std::cout << GREEN << "Redirected with status code " + statusCode + " to: " + redirectionPath << RESET << std::endl;
 	return (1);
 }
 
@@ -159,10 +172,11 @@ void	WebServer::_serverLoop()
 		// std::cout << BLUE << this->_database.buffer << RESET << std::endl;
 
 		/* FOR DEBUGGING: TO DELETE */
-		// if (this->_database.method == "GET")
+		// std::cout << this->_database.method << " " << this->_database.methodPath << std::endl;
+		// if (this->_database.method == "GET" && this->_database.methodPath == "/google")
 		// {
 		// 	std::cout << "Entered force output!" << std::endl;
-		// 	std::string response = "HTTP/1.1 200 OK\r\n\r\n";
+		// 	std::string response = "HTTP/1.1 301 Moved Permanently\r\nLocation: https://www.google.com\r\n\r\n";
 		// 	this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.size(), WRITE);
 		// 	// this->_database.methodPath = "/cgi/srcs/cgi_static.cgi";
 		// 	// HttpGetResponse	getResponse(this->_database);
@@ -171,6 +185,8 @@ void	WebServer::_serverLoop()
 		// 	continue ;
 		// }
 
+		if (this->_handleRedirection())
+			continue ;
 		if (this->_database.checkExcept())
 			continue ;
 		this->_database.convertLocation();
