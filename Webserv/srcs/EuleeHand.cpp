@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/21 23:20:16 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/22 16:37:55 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -327,35 +327,46 @@ int	EuleeHand::checkExcept()
 	return (0);
 }
 
-int	EuleeHand::unchunkResponse()
+int    EuleeHand::unchunkResponse()
 {
-	std::string	output;
-	std::string	header = this->buffer.substr(0, this->buffer.find("\r\n\r\n"));
+    std::string    output;
+    std::string    header = this->buffer.substr(0, this->buffer.find("\r\n\r\n"));
 
-	if (header.find("Transfer-Encoding: chunked") == std::string::npos)
-		return (0);
-	std::string	remaining = this->buffer.substr(this->buffer.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
-	std::string	newBody = "";
+    if (header.find("Transfer-Encoding: chunked") == std::string::npos)
+        return (0);
+    std::string    remaining = this->buffer.substr(this->buffer.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
+    std::string    newBody = "";
 
-	while (1)
-	{
-		size_t		pos = remaining.find("\r\n");
-		if (pos == std::string::npos)
-			break ;
-		std::string	chunkSize = remaining.substr(0, pos);
-		size_t		size = std::stoul(chunkSize, 0, 16);
-		if (size == 0)
-			return (0);
-		if (size > remaining.size() - std::strlen("\r\n"))
+    while (1)
+    {
+        size_t        pos = remaining.find("\r\n");
+        if (pos == std::string::npos)
+            break ;
+        std::string    chunkSize = remaining.substr(0, pos);
+		size_t	size = 0;
+		try
 		{
+			size = std::stoul(chunkSize, 0, 16);
+		}
+		catch(const std::exception& e)
+		{
+			std::cout << RED << "Chunk Error: Hex size is less than chunk size!" << RESET << '\n';
 			this->sendHttp(400, 1);
 			return (1);
 		}
-		newBody += remaining.substr(pos + std::strlen("\r\n"), size);
-		remaining = remaining.substr(pos + size + std::strlen("\r\n\r\n"));
-	}
-	this->buffer = header + "\r\n\r\n" + newBody;
-	return (0);
+        if (size == 0)
+            break ;
+        if (size > remaining.size() - std::strlen("\r\n"))
+        {
+			std::cout << RED << "Chunk Error: Hex size is more than remaining size!" << RESET << '\n';
+            this->sendHttp(400, 1);
+            return (1);
+        }
+        newBody += remaining.substr(pos + std::strlen("\r\n"), size);
+        remaining = remaining.substr(pos + size + std::strlen("\r\n\r\n"));
+    }
+    this->buffer = header + "\r\n\r\n" + newBody;
+    return (0);
 }
 
 void	EuleeHand::convertLocation()

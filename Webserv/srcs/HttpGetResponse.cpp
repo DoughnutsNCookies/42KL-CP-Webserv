@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:20:26 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/21 10:30:30 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/22 15:18:42 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,9 @@ void	HttpGetResponse::handleGet()
 	{
 		std::cerr << RED << "Error opening " << this->_database.methodPath << "!\n" << RESET << std::endl;
 		this->_database.sendHttp(404, 1);
+		/*
+		** If the file is not found, check if the path is a directory.
+		*/
 		return ;
 	}
 

@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/21 22:53:12 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/22 16:08:05 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,8 +116,7 @@ int	WebServer::_receiveRequest()
 		std::cout << GREEN << "Received: " << val << ((val == WS_BUFFER_SIZE) ? "" : "\t") << "\tTotal: " << total << RESET << std::endl;
 		if (val < 0)
 		{
-			std::cout << RED << "Receive Error: Connection interrupted!" << std::endl;
-			close(this->_database.socket);
+			this->_database.sendHttp(400, 1);
 			return (1);
 		}
 		this->_database.buffer.append(readBuffer, val);
@@ -130,8 +129,7 @@ int	WebServer::_handleFavicon()
 {
 	if (this->_database.methodPath != "/favicon.ico") // Ignore favicon
 		return (0);
-	std::string	message = "Go away favicon";
-	std::cout << RED << message << RESET << std::endl;
+	std::cout << RED << "Go away favicon" << RESET << std::endl;
 	this->_database.sendHttp(404, 1);
 	return (1);
 }
@@ -153,18 +151,16 @@ int	WebServer::_handleRedirection()
 
 void	WebServer::_serverLoop()
 {
-	while(1)
+	while (1)
 	{
 		this->_acceptConnection();
 
 		if (this->_receiveRequest())
 			continue ;
+		std::cout << GREEN << "Server received request!" << RESET << std::endl;
 		if (this->_database.unchunkResponse())
 			continue ;
 		std::cout << GREEN << "Finished unchunking" << RESET << std::endl;
-		std::ofstream	uc("unchunked.txt");
-		uc << this->_database.buffer;
-		uc.close();
 
 		std::istringstream	request(this->_database.buffer);
 		request >> this->_database.method >> this->_database.methodPath;
@@ -196,10 +192,6 @@ void	WebServer::_serverLoop()
 		if (this->_database.checkClientBodySize())
 			continue ;
 
-		std::ofstream	uc2("unchunked2.txt");
-		uc2 << this->_database.buffer;
-		uc2.close();
-
 		if (this->_database.isCGI())
 		{
 			std::cout << MAGENTA << "CGI method called" << RESET << std::endl;
@@ -230,7 +222,7 @@ void	WebServer::_serverLoop()
 			HttpDeleteResponse	deleteResponse(this->_database);
 			deleteResponse.handleDelete();
 		}
-		else if (this->_database.method == "GET" && this->_database.methodPath != "/" && this->_database.isCGI() == 0) // Will be determined by the config
+		else if (this->_database.method == "GET")
 		{
 			std::cout << MAGENTA << "Get method called" << RESET << std::endl;
 			HttpGetResponse	getResponse(this->_database);

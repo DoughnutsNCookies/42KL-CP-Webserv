@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigManager.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:55:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/17 14:47:55 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/22 15:11:28 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ void	ConfigManager::printError(std::string str, int i)
 void	ConfigManager::configLibrary(void)
 {
 	const char	*serverlib[11] = {"server", "location", "listen", "root", "index", "server_name", "error_page", "client_max_body_size", "auto_index", "return", "cgi_script"};
-	const char	*locationlib[12] = {"root", "index", "include", "cgi_script", "upload", "error_page", "client_max_body_size", "auto_index", "return", "limit_except", "allow", "deny"};
+	const char	*locationlib[12] = {"root", "index", "include", "cgi_script", "upload", "error_page", "client_max_body_size", "autoindex", "return", "limit_except", "allow", "deny"};
 
 	this->_serverVar = std::vector<std::string>(serverlib, serverlib + 11);
 	this->_locationVar = std::vector<std::string>(locationlib, locationlib + 12);

@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:55:14 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/21 23:16:18 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/22 16:40:06 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,13 +62,8 @@ void    HttpCgiResponse::handleCgi()
     close(outfd2);
     size_t  startPos = output.find("\r\n\r\n") + std::strlen("\r\n\r\n");
     std::string newOutput = output.substr(startPos);
-    if (newOutput.length() > 100000)
-        newOutput.resize(WS_TESTER_SIZE - 58);
-    std::cout << MAGENTA << newOutput.length() << RESET << std::endl;
 
     std::string response = "HTTP/1.1 200 OK\r\n\r\n" + newOutput;
-    std::ofstream   file("temp");
-    file << response;
     this->_database.ft_select(this->_database.socket, &response[0], response.size(), WRITE);
     std::cout << GREEN << "CGI ran successfully!" << std::endl;
     std::remove(WS_TEMP_FILE_IN);
