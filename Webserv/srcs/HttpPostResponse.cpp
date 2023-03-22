@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:27:42 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/21 12:29:00 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/21 21:02:46 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,9 +41,9 @@ void	HttpPostResponse::_normalSave()
 					std::cout << GREEN << "Put to: " << this->_database.methodPath.c_str() + 1 << RESET << std::endl;
 					std::string		toWrite = this->_database.buffer.substr(this->_database.buffer.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
 					if (this->_contentLengthSpecified)
-						locationPath.write(toWrite.c_str(), this->_contentLength);
+						locationPath << toWrite;
 					else
-						locationPath.write(toWrite.c_str(), toWrite.length());
+						locationPath << toWrite;
 					locationPath.close();
 					pathCanUse = 1;
 				}
@@ -57,9 +57,9 @@ void	HttpPostResponse::_normalSave()
 		std::cout << GREEN << "Put to: " << this->_database.methodPath.c_str() + 1 << RESET << std::endl;
 		std::string		toWrite = this->_database.buffer.substr(this->_database.buffer.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
 		if (this->_contentLengthSpecified)
-			originalPath.write(toWrite.c_str(), this->_contentLength);
+			originalPath << toWrite;
 		else
-			originalPath.write(toWrite.c_str(), toWrite.length());
+			originalPath << toWrite;
 		originalPath.close();
 	}
 }
@@ -113,7 +113,7 @@ void	HttpPostResponse::_saveFile()
 		return ;
 	}
 	std::string	toWrite = fileData.substr(fileData.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
-	newFile.write(toWrite.c_str(), toWrite.length());
+	newFile << toWrite;
 	newFile.close();
 }
 

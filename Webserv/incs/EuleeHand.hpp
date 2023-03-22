@@ -6,7 +6,7 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/21 16:39:39 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/22 13:49:13 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 
 # include "EuleePocket.hpp"
 # include "ConfigManager.hpp"
+# define WS_BUFFER_SIZE	100000
+# define WS_TIMEOUT		1
 
 class EuleeHand
 {

@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/21 12:44:47 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/21 22:53:12 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,19 +109,19 @@ int	WebServer::_receiveRequest()
 	size_t		total = 0;
 	char		readBuffer[WS_BUFFER_SIZE];
 	this->_database.buffer.clear();
-	long		valread = this->_database.ft_select(this->_database.socket, readBuffer, WS_BUFFER_SIZE, READ);
-	while (valread > 0)
+	long		val = this->_database.ft_select(this->_database.socket, readBuffer, WS_BUFFER_SIZE, READ);
+	while (val > 0)
 	{
-		total += valread;
-		std::cout << GREEN << "Received: " << valread << "\tTotal: " << total << RESET << std::endl;
-		if (valread < 0)
+		total += val;
+		std::cout << GREEN << "Received: " << val << ((val == WS_BUFFER_SIZE) ? "" : "\t") << "\tTotal: " << total << RESET << std::endl;
+		if (val < 0)
 		{
 			std::cout << RED << "Receive Error: Connection interrupted!" << std::endl;
 			close(this->_database.socket);
 			return (1);
 		}
-		this->_database.buffer.append(readBuffer, valread);
-		valread = this->_database.ft_select(this->_database.socket, readBuffer, WS_BUFFER_SIZE, READ);
+		this->_database.buffer.append(readBuffer, val);
+		val = this->_database.ft_select(this->_database.socket, readBuffer, WS_BUFFER_SIZE, READ);
 	}
 	return (0);
 }
@@ -162,6 +162,9 @@ void	WebServer::_serverLoop()
 		if (this->_database.unchunkResponse())
 			continue ;
 		std::cout << GREEN << "Finished unchunking" << RESET << std::endl;
+		std::ofstream	uc("unchunked.txt");
+		uc << this->_database.buffer;
+		uc.close();
 
 		std::istringstream	request(this->_database.buffer);
 		request >> this->_database.method >> this->_database.methodPath;
@@ -193,18 +196,21 @@ void	WebServer::_serverLoop()
 		if (this->_database.checkClientBodySize())
 			continue ;
 
-		if (this->_database.method == "HEAD")
-		{
-			std::cout << MAGENTA << "Head method called" << RESET << std::endl;
-			HttpHeadResponse	headResponse(this->_database);
-			headResponse.handleHead();
-		}
-		// else if (this->_database.methodPath.find('.') != std::string::npos && (this->_database.method == "POST" && this->_database.methodPath == "/YoupiBanane/youpi.bla"))
-		else if (this->_database.method == "POST" && this->_database.methodPath == "/YoupiBanane/youpi.bla")
+		std::ofstream	uc2("unchunked2.txt");
+		uc2 << this->_database.buffer;
+		uc2.close();
+
+		if (this->_database.isCGI())
 		{
 			std::cout << MAGENTA << "CGI method called" << RESET << std::endl;
 			HttpCgiResponse	cgiResponse(this->_database);
 			cgiResponse.handleCgi();
+		}
+		else if (this->_database.method == "HEAD")
+		{
+			std::cout << MAGENTA << "Head method called" << RESET << std::endl;
+			HttpHeadResponse	headResponse(this->_database);
+			headResponse.handleHead();
 		}
 		else if (this->_database.method == "POST")
 		{
@@ -240,3 +246,4 @@ void	WebServer::_serverLoop()
 }
 
 // Upload to multiple directories
+// 

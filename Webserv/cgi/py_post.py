@@ -14,3 +14,4 @@ except:
 	sys.exit(1)
 
 print("Status code received: ", response.status_code)
+print(response.text, end="")

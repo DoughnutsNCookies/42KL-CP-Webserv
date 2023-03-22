@@ -7,6 +7,7 @@ function compile()
 	g++ cgi_env.cpp -o srcs/cgi_env.cgi
 	g++ cgi_post.cpp -o srcs/cgi_post.cgi
 	g++ cgi_delete.cpp -o srcs/cgi_delete.cgi
+	g++ cgi_toupper.cpp -o srcs/cgi_toupper.cgi
 }
 
 if [ "$1" == "clean" ]

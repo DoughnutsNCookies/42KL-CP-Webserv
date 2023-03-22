@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/21 12:17:39 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/21 22:29:08 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,11 @@
 # include "HttpPutResponse.hpp"
 
 # define WS_BACKLOG				10
-# define WS_BUFFER_SIZE			30000
-# define WS_TIMEOUT				3
+# define WS_BUFFER_SIZE			100000
+# define WS_TESTER_SIZE			100000058
+# define WS_TIMEOUT				1
+# define WS_TEMP_FILE_IN		".tempIn"
+# define WS_TEMP_FILE_OUT		".tempOut"
 # define DEFAULT_CONFIG_PATH	"conf/default.conf"
 
 class WebServer
