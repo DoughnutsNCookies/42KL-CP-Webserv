@@ -6,7 +6,7 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:55:14 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/22 17:34:22 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/22 18:18:05 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,8 @@ void    HttpCgiResponse::handleCgi()
 		close(outFd);
         std::string ext = this->_database.methodPath.substr(this->_database.methodPath.find_last_of("."));
         std::cerr << GREEN << "CGI Path: " << this->_database.cgi[ext].c_str() << RESET << std::endl;
-        char *args[2] = {(char *)this->_database.cgi[ext].c_str(), NULL};
+        char *args[3] = {(char *)this->_database.cgi[ext].c_str(), (char *)this->_database.methodPath.c_str(), NULL};
+        this->_database.addEnv("PATH_INFO=" + this->_database.cgi[ext]);
         execve(args[0], args, this->_database.envp);
         std::remove(WS_TEMP_FILE_IN);
         std::remove(WS_TEMP_FILE_OUT);

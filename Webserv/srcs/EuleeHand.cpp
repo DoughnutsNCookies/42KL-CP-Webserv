@@ -6,7 +6,7 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/22 17:33:28 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/22 18:03:14 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -559,11 +559,28 @@ int	EuleeHand::checkClientBodySize()
 
 size_t	EuleeHand::addEnv(std::string input)
 {
-	this->envp[this->_envpSize] = new char[input.length() + 1];
-
-	int	i = 0;
-	for (; input[i]; ++i)
-		this->envp[this->_envpSize][i] = input[i];
-	this->envp[this->_envpSize][i] = '\0';
-	return (++this->_envpSize);
+	size_t	i = 0;
+	std::string	temp = input.substr(0, input.find('='));
+	for (; i < this->_envpSize; ++i)
+	{
+		std::string	str(this->envp[i]);
+		str = str.substr(0, str.find('='));
+		if (str == temp)
+			break ;
+	}
+	if (i == this->_envpSize)
+	{
+		i = 0;
+		this->envp[this->_envpSize] = new char[10000];
+		std::memset(this->envp[this->_envpSize], 0, 10000);
+		for (; input[i]; ++i)
+			this->envp[this->_envpSize][i] = input[i];
+		this->envp[this->_envpSize][i] = '\0';
+		return (++this->_envpSize);
+	}
+	for (size_t j = 0; this->envp[i][j] != '\0'; ++j)
+		this->envp[i][j] = '\0';
+	for (size_t j = 0; input[j]; ++j)
+		this->envp[i][j] = input[j];
+	return (this->_envpSize);
 }
