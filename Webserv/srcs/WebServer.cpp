@@ -6,7 +6,7 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/22 13:55:52 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/22 17:33:20 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ void	WebServer::runServer()
 	this->_database.parseConfigServer();
 	this->_database.printServers();
 	std::cout << GREEN "Config Server Parsing Done..." RESET << std::endl;
+	this->_database.addEnv("HTTP_X_SECRET_HEADER_FOR_TEST=1");
 	this->_setupServer();
 	this->_serverLoop();
 }

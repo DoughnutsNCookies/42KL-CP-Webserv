@@ -6,16 +6,21 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/22 14:00:08 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/22 17:33:28 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "EuleeHand.hpp"
 #include <cstdlib>
 
-EuleeHand::EuleeHand() : envp(), cgi(), statusList(), server(), serverFd(), serverAddr(), socket(), serverIndex(), useDefaultIndex(), method(), methodPath(), buffer(), locationPath() {}
+EuleeHand::EuleeHand() : envp(), cgi(), statusList(), server(), serverFd(), serverAddr(), socket(), serverIndex(), useDefaultIndex(), method(), methodPath(), buffer(), locationPath(), _envpSize() {}
 
-EuleeHand::EuleeHand(std::string configFilePath, const ConfigManager &configManager, char **envp) : envp(envp), cgi(), statusList(), server(), serverFd(), serverAddr(), socket(), serverIndex(), useDefaultIndex(), method(), methodPath(), buffer(), locationPath(), _configFilePath(configFilePath), _configManager(configManager) {}
+EuleeHand::EuleeHand(std::string configFilePath, const ConfigManager &configManager, char **envp) : envp(), cgi(), statusList(), server(), serverFd(), serverAddr(), socket(), serverIndex(), useDefaultIndex(), method(), methodPath(), buffer(), locationPath(), _envpSize(), _configFilePath(configFilePath), _configManager(configManager)
+{
+	this->envp = new char*[100];
+	for (size_t i = 0; envp[i]; ++i)
+		this->addEnv(envp[i]);
+}
 
 EuleeHand::~EuleeHand() {}
 
@@ -383,7 +388,7 @@ int	EuleeHand::unchunkResponse()
 		std::string	chunkSize = remaining.substr(0, pos);
 		size_t		size = std::stoul(chunkSize, 0, 16);
 		if (size == 0)
-			return (0);
+			break ;
 		if (size > remaining.size() - std::strlen("\r\n"))
 		{
 			this->sendHttp(400, 1);
@@ -550,4 +555,15 @@ int	EuleeHand::checkClientBodySize()
 		return (1);
 	}
 	return (0);
+}
+
+size_t	EuleeHand::addEnv(std::string input)
+{
+	this->envp[this->_envpSize] = new char[input.length() + 1];
+
+	int	i = 0;
+	for (; input[i]; ++i)
+		this->envp[this->_envpSize][i] = input[i];
+	this->envp[this->_envpSize][i] = '\0';
+	return (++this->_envpSize);
 }

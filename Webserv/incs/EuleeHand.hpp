@@ -6,7 +6,7 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/22 13:49:13 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/22 17:33:15 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ class EuleeHand
 		void		convertLocation();
 		std::string	cgiPath();
 		int			checkClientBodySize();
+		size_t		addEnv(std::string input);
 
 		char								**envp;
 		std::map<std::string, std::string>	cgi;
@@ -55,6 +56,7 @@ class EuleeHand
 		std::string							method, methodPath, buffer, locationPath;
 
 	private:
+		size_t			_envpSize;
 		std::string		_configFilePath;
 		ConfigManager	_configManager;
 		size_t			_parseServer(std::vector<Token> &tokens, size_t i);
