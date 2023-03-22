@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:55:14 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/22 18:31:01 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/22 20:57:28 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,11 @@ void    HttpCgiResponse::handleCgi()
         response = "HTTP/1.1 200 OK\r\nX-Secret-Header-For-Test: 1\r\n\r\n" + newOutput;
     else
         response = "HTTP/1.1 200 OK\r\n\r\n" + newOutput;
+    
+    std::ofstream   temp("temp");
+    temp << response;
+    temp.close();
+
     this->_database.ft_select(this->_database.socket, &response[0], response.size(), WRITE);
     std::cout << GREEN << "CGI ran successfully!" << std::endl;
     std::remove(WS_TEMP_FILE_IN);

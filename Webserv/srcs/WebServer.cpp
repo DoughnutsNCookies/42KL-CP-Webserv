@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/22 16:48:32 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/22 20:55:19 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,86 +154,94 @@ void	WebServer::_serverLoop()
 	while (1)
 	{
 		this->_acceptConnection();
-
 		if (this->_receiveRequest())
 			continue ;
 		std::cout << GREEN << "Server received request!" << RESET << std::endl;
-		if (this->_database.unchunkResponse())
-			continue ;
-		std::cout << GREEN << "Finished unchunking" << RESET << std::endl;
+		try
+		{
+			if (this->_database.unchunkResponse())
+				continue ;
+			std::cout << GREEN << "Finished unchunking" << RESET << std::endl;
 
-		std::istringstream	request(this->_database.buffer);
-		request >> this->_database.method >> this->_database.methodPath;
-		if (this->_handleFavicon())
-			continue ;
+			std::istringstream	request(this->_database.buffer);
+			request >> this->_database.method >> this->_database.methodPath;
+			if (this->_handleFavicon())
+				continue ;
 
-		std::cout << BLUE << this->_database.buffer.substr(0, this->_database.buffer.find("\r\n\r\n")) << RESET << std::endl;
-		// std::cout << BLUE << this->_database.buffer << RESET << std::endl;
+			std::cout << BLUE << this->_database.buffer.substr(0, this->_database.buffer.find("\r\n\r\n")) << RESET << std::endl;
+			// std::cout << BLUE << this->_database.buffer << RESET << std::endl;
 
-		/* FOR DEBUGGING: TO DELETE */
-		// std::cout << this->_database.method << " " << this->_database.methodPath << std::endl;
-		// if (this->_database.method == "GET" && this->_database.methodPath == "/google")
-		// {
-		// 	std::cout << "Entered force output!" << std::endl;
-		// 	std::string response = "HTTP/1.1 301 Moved Permanently\r\nLocation: https://www.google.com\r\n\r\n";
-		// 	this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.size(), WRITE);
-		// 	// this->_database.methodPath = "/cgi/srcs/cgi_static.cgi";
-		// 	// HttpGetResponse	getResponse(this->_database);
-		// 	// getResponse.handleGet();
-		// 	close(this->_database.socket);
-		// 	continue ;
-		// }
+			/* FOR DEBUGGING: TO DELETE */
+			// std::cout << this->_database.method << " " << this->_database.methodPath << std::endl;
+			// if (this->_database.method == "GET" && this->_database.methodPath == "/google")
+			// {
+			// 	std::cout << "Entered force output!" << std::endl;
+			// 	std::string response = "HTTP/1.1 301 Moved Permanently\r\nLocation: https://www.google.com\r\n\r\n";
+			// 	this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.size(), WRITE);
+			// 	// this->_database.methodPath = "/cgi/srcs/cgi_static.cgi";
+			// 	// HttpGetResponse	getResponse(this->_database);
+			// 	// getResponse.handleGet();
+			// 	close(this->_database.socket);
+			// 	continue ;
+			// }
 
-		if (this->_handleRedirection())
-			continue ;
-		if (this->_database.checkExcept())
-			continue ;
-		this->_database.convertLocation();
-		if (this->_database.checkClientBodySize())
-			continue ;
+			if (this->_handleRedirection())
+				continue ;
+			if (this->_database.checkExcept())
+				continue ;
+			this->_database.convertLocation();
+			if (this->_database.checkClientBodySize())
+				continue ;
 
-		if (this->_database.isCGI())
-		{
-			std::cout << MAGENTA << "CGI method called" << RESET << std::endl;
-			HttpCgiResponse	cgiResponse(this->_database);
-			cgiResponse.handleCgi();
+			if (this->_database.isCGI())
+			{
+				std::cout << MAGENTA << "CGI method called" << RESET << std::endl;
+				HttpCgiResponse	cgiResponse(this->_database);
+				cgiResponse.handleCgi();
+			}
+			else if (this->_database.method == "HEAD")
+			{
+				std::cout << MAGENTA << "Head method called" << RESET << std::endl;
+				HttpHeadResponse	headResponse(this->_database);
+				headResponse.handleHead();
+			}
+			else if (this->_database.method == "POST")
+			{
+				std::cout << MAGENTA << "Post method called" << RESET << std::endl;
+				HttpPostResponse	postResponse(this->_database);
+				postResponse.handlePost();
+			}
+			else if (this->_database.method == "PUT")
+			{
+				std::cout << MAGENTA << "Put method called" << RESET << std::endl;
+				HttpPutResponse	putResponse(this->_database);
+				putResponse.handlePut();
+			}
+			else if (this->_database.method == "DELETE")
+			{
+				std::cout << MAGENTA << "Delete method called" << RESET << std::endl;
+				HttpDeleteResponse	deleteResponse(this->_database);
+				deleteResponse.handleDelete();
+			}
+			else if (this->_database.method == "GET")
+			{
+				std::cout << MAGENTA << "Get method called" << RESET << std::endl;
+				HttpGetResponse	getResponse(this->_database);
+				getResponse.handleGet();
+			}
+			else
+			{
+				std::cout << MAGENTA << "Default method called" << RESET << std::endl;
+				HttpDefaultResponse	defaultResponse(this->_database);
+				defaultResponse.handleDefault();
+			}
 		}
-		else if (this->_database.method == "HEAD")
+		catch(const std::exception& e)
 		{
-			std::cout << MAGENTA << "Head method called" << RESET << std::endl;
-			HttpHeadResponse	headResponse(this->_database);
-			headResponse.handleHead();
+			std::cout << RED << e.what() << RESET << '\n';
+			this->_database.sendHttp(500, 1);
 		}
-		else if (this->_database.method == "POST")
-		{
-			std::cout << MAGENTA << "Post method called" << RESET << std::endl;
-			HttpPostResponse	postResponse(this->_database);
-			postResponse.handlePost();
-		}
-		else if (this->_database.method == "PUT")
-		{
-			std::cout << MAGENTA << "Put method called" << RESET << std::endl;
-			HttpPutResponse	putResponse(this->_database);
-			putResponse.handlePut();
-		}
-		else if (this->_database.method == "DELETE")
-		{
-			std::cout << MAGENTA << "Delete method called" << RESET << std::endl;
-			HttpDeleteResponse	deleteResponse(this->_database);
-			deleteResponse.handleDelete();
-		}
-		else if (this->_database.method == "GET")
-		{
-			std::cout << MAGENTA << "Get method called" << RESET << std::endl;
-			HttpGetResponse	getResponse(this->_database);
-			getResponse.handleGet();
-		}
-		else
-		{
-			std::cout << MAGENTA << "Default method called" << RESET << std::endl;
-			HttpDefaultResponse	defaultResponse(this->_database);
-			defaultResponse.handleDefault();
-		}
+		
 	}
 }
 

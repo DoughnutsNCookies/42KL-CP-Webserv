@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/22 18:30:18 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/22 20:53:08 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@
 # include "HttpPutResponse.hpp"
 
 # define WS_BACKLOG				10
-# define WS_BUFFER_SIZE			100000
+# define WS_BUFFER_SIZE			10000
 # define WS_TESTER_SIZE			100000
 # define WS_TEMP_FILE_IN		".tempIn"
 # define WS_TEMP_FILE_OUT		".tempOut"

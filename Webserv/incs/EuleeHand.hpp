@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/22 18:30:07 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/22 20:53:09 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@
 # include <dirent.h>
 # include <sys/stat.h>
 
-# define WS_BUFFER_SIZE			100000
-# define WS_TIMEOUT				1
+# define WS_BUFFER_SIZE			10000
+# define WS_TIMEOUT				0
 # define WS_ERROR_PAGE_PATH 	"./html/server_html/error.html"
 # define WS_DEFAULT_PAGE_PATH	"./html/server_html/default.html"
 
