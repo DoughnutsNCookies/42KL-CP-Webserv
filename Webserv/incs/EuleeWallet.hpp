@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   EuleeWallet.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 15:10:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/22 17:46:31 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/22 18:51:05 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ enum	Key
 	AUTO_INDEX,
 	RETURN,
 	CGI,
-	INCLUDE, // NOT USING
 	UPLOAD,
 	LIMIT_EXCEPT
 };

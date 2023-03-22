@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/22 20:55:19 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/22 21:03:30 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ void	WebServer::runServer()
 	this->_database.parseConfigServer();
 	this->_database.printServers();
 	std::cout << GREEN "Config Server Parsing Done..." RESET << std::endl;
+	this->_database.addEnv("SERVER_PROTOCOL=HTTP/1.1");
+	this->_database.addEnv("HTTP_X_SECRET_HEADER_FOR_TEST=1");
 	this->_setupServer();
 	this->_serverLoop();
 }
@@ -193,6 +195,7 @@ void	WebServer::_serverLoop()
 			if (this->_database.checkClientBodySize())
 				continue ;
 
+			this->_database.addEnv("REQUEST_METHOD=" + this->_database.method);
 			if (this->_database.isCGI())
 			{
 				std::cout << MAGENTA << "CGI method called" << RESET << std::endl;
@@ -229,19 +232,12 @@ void	WebServer::_serverLoop()
 				HttpGetResponse	getResponse(this->_database);
 				getResponse.handleGet();
 			}
-			else
-			{
-				std::cout << MAGENTA << "Default method called" << RESET << std::endl;
-				HttpDefaultResponse	defaultResponse(this->_database);
-				defaultResponse.handleDefault();
-			}
 		}
 		catch(const std::exception& e)
 		{
 			std::cout << RED << e.what() << RESET << '\n';
 			this->_database.sendHttp(500, 1);
 		}
-		
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/22 20:53:09 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/22 21:03:40 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,11 +51,13 @@ class EuleeHand
 		int			checkClientBodySize();
 		void		convertLocation();
 		std::string	cgiPath();
+		size_t		addEnv(std::string input);
 		std::string directoryListing(std::string path);
 		
 
 		char								**envp;
 		std::map<std::string, std::string>	cgi;
+		std::map<int, std::string>			errorpage;
 		std::map<int, std::string>			statusList;
 		std::vector<EuleePocket>			server;
 		std::vector<int>					serverFd;
@@ -64,14 +66,17 @@ class EuleeHand
 		std::string							method, methodPath, buffer, locationPath;
 
 	private:
+		size_t			_envpSize;
+		std::string		_configFilePath;
+		ConfigManager	_configManager;
+
 		size_t			_parseServer(std::vector<Token> &tokens, size_t i);
+		size_t			_parseErrorPage(std::vector<Token> &tokens, size_t i);
 		size_t			_parseCgi(std::vector<Token> &tokens, size_t i, EuleeWallet &location, int blockType);
 		size_t			_parseLocation(std::vector<Token> &tokens, std::vector<EuleeWallet> &location, size_t i);
 		size_t			_parsingHelper(std::vector<Token> &tokens, size_t i, EuleeWallet &location, std::string needle, Key key);
-		std::string		_configFilePath;
-		std::string 	_getFileSize(const std::string &path, const std::string &file_name);
 		std::string 	_getFileCreationTime(const std::string &path, const std::string &file_name);
-		ConfigManager	_configManager;
+		std::string 	_getFileSize(const std::string &path, const std::string &file_name);
 		
 };
 
