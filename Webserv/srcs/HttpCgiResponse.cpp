@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpCgiResponse.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:55:14 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/21 23:16:18 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/22 15:22:22 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,12 +25,12 @@ void    HttpCgiResponse::handleCgi()
     pid_t pid = fork();
     if (pid == 0)
     {
-		int outfd = open(WS_TEMP_FILE_OUT, O_CREAT | O_TRUNC | O_RDWR, 0777);
         int inFd = open(WS_TEMP_FILE_IN, O_RDONLY, 0777);
+		int outFd = open(WS_TEMP_FILE_OUT, O_CREAT | O_TRUNC | O_RDWR, 0777);
         dup2(inFd, STDIN_FILENO);
         close(inFd);
-        dup2(outfd, STDOUT_FILENO);
-		close(outfd);
+        dup2(outFd, STDOUT_FILENO);
+		close(outFd);
         std::string ext = this->_database.methodPath.substr(this->_database.methodPath.find_last_of("."));
         std::cerr << GREEN << "CGI Path: " << this->_database.cgi[ext].c_str() << RESET << std::endl;
         char *args[2] = {(char *)this->_database.cgi[ext].c_str(), NULL};
@@ -62,9 +62,9 @@ void    HttpCgiResponse::handleCgi()
     close(outfd2);
     size_t  startPos = output.find("\r\n\r\n") + std::strlen("\r\n\r\n");
     std::string newOutput = output.substr(startPos);
-    if (newOutput.length() > 100000)
-        newOutput.resize(WS_TESTER_SIZE - 58);
-    std::cout << MAGENTA << newOutput.length() << RESET << std::endl;
+    // if (newOutput.length() > 100000)
+    //     newOutput.resize(WS_TESTER_SIZE - 58);
+    std::cout << MAGENTA << "Output length : " << newOutput.length() << RESET << std::endl;
 
     std::string response = "HTTP/1.1 200 OK\r\n\r\n" + newOutput;
     std::ofstream   file("temp");
