@@ -10,7 +10,8 @@ if len(sys.argv) != 2:
 try:
 	headers = {
 		"Transfer-Encoding": "chunked",
-		"Content-Type": "application/octet-stream"
+		"Content-Type": "application/octet-stream",
+		"X-Secret-Header-For-Test": "1"
 	}
 	response = requests.post(sys.argv[1], headers=headers, data="14\r\n12345678901234567890\r\n8\r\n, world!\r\n0\r\n\r\n")
 except:
@@ -18,4 +19,5 @@ except:
 	sys.exit(1)
 
 print("Status code received: ", response.status_code)
+print(response.headers)
 print(response.text, end="")

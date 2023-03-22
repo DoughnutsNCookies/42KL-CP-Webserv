@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:55:14 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/22 16:40:06 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/22 18:31:01 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ HttpCgiResponse::~HttpCgiResponse() {}
 
 void    HttpCgiResponse::handleCgi()
 {
+    int secretHeader = (this->_database.buffer.find("X-Secret-Header-For-Test: 1") != std::string::npos);
     std::ofstream   inFile(WS_TEMP_FILE_IN, std::ios::binary);
     inFile << this->_database.buffer.substr(this->_database.buffer.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
     inFile.close();
@@ -33,7 +34,7 @@ void    HttpCgiResponse::handleCgi()
 		close(outfd);
         std::string ext = this->_database.methodPath.substr(this->_database.methodPath.find_last_of("."));
         std::cerr << GREEN << "CGI Path: " << this->_database.cgi[ext].c_str() << RESET << std::endl;
-        char *args[2] = {(char *)this->_database.cgi[ext].c_str(), NULL};
+        char *args[3] = {(char *)this->_database.cgi[ext].c_str(), NULL};
         execve(args[0], args, this->_database.envp);
         std::remove(WS_TEMP_FILE_IN);
         std::remove(WS_TEMP_FILE_OUT);
@@ -63,7 +64,11 @@ void    HttpCgiResponse::handleCgi()
     size_t  startPos = output.find("\r\n\r\n") + std::strlen("\r\n\r\n");
     std::string newOutput = output.substr(startPos);
 
-    std::string response = "HTTP/1.1 200 OK\r\n\r\n" + newOutput;
+    std::string response;
+    if (secretHeader)
+        response = "HTTP/1.1 200 OK\r\nX-Secret-Header-For-Test: 1\r\n\r\n" + newOutput;
+    else
+        response = "HTTP/1.1 200 OK\r\n\r\n" + newOutput;
     this->_database.ft_select(this->_database.socket, &response[0], response.size(), WRITE);
     std::cout << GREEN << "CGI ran successfully!" << std::endl;
     std::remove(WS_TEMP_FILE_IN);

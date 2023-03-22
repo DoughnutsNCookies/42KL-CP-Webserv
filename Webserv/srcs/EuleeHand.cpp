@@ -6,15 +6,15 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/22 16:37:55 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/22 18:30:14 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "EuleeHand.hpp"
 
-EuleeHand::EuleeHand() : envp(), cgi(), statusList(), server(), serverFd(), serverAddr(), socket(), serverIndex(), useDefaultIndex(), method(), methodPath(), buffer(), locationPath() {}
+EuleeHand::EuleeHand() : envp(), cgi(), statusList(), server(), serverFd(), serverAddr(), socket(), serverIndex(), useDefaultIndex(), useDirectoryListing(), method(), methodPath(), buffer(), locationPath() {}
 
-EuleeHand::EuleeHand(std::string configFilePath, const ConfigManager &configManager, char **envp) : envp(envp), cgi(), statusList(), server(), serverFd(), serverAddr(), socket(), serverIndex(), useDefaultIndex(), method(), methodPath(), buffer(), locationPath(), _configFilePath(configFilePath), _configManager(configManager) {}
+EuleeHand::EuleeHand(std::string configFilePath, const ConfigManager &configManager, char **envp) : envp(envp), cgi(), statusList(), server(), serverFd(), serverAddr(), socket(), serverIndex(), useDefaultIndex(), useDirectoryListing(), method(), methodPath(), buffer(), locationPath(), _configFilePath(configFilePath), _configManager(configManager) {}
 
 EuleeHand::~EuleeHand() {}
 
@@ -146,7 +146,7 @@ size_t	EuleeHand::_parseLocation(std::vector<Token> &tokens, std::vector<EuleeWa
 		i = this->_parsingHelper(tokens, i, loc, "upload", UPLOAD);
 		i = this->_parsingHelper(tokens, i, loc, "include", INCLUDE);
 		i = this->_parsingHelper(tokens, i, loc, "error_page", ERROR_PAGE);
-		i = this->_parsingHelper(tokens, i, loc, "auto_index", AUTO_INDEX);
+		i = this->_parsingHelper(tokens, i, loc, "autoindex", AUTO_INDEX);
 		i = this->_parsingHelper(tokens, i, loc, "limit_except", LIMIT_EXCEPT);
 		i = this->_parsingHelper(tokens, i, loc, "client_max_body_size", CLIENT_MAX_BODY_SIZE);
 		++i;
@@ -170,7 +170,7 @@ size_t	EuleeHand::_parseServer(std::vector<Token> &tokens, size_t i)
 		i = this->_parsingHelper(tokens, i, serv, "return", RETURN);
 		i = this->_parsingHelper(tokens, i, serv, "upload", UPLOAD);
 		i = this->_parsingHelper(tokens, i, serv, "include", INCLUDE);
-		i = this->_parsingHelper(tokens, i, serv, "auto_index", AUTO_INDEX);
+		i = this->_parsingHelper(tokens, i, serv, "autoindex", AUTO_INDEX);
 		i = this->_parsingHelper(tokens, i, serv, "error_page", ERROR_PAGE);
 		i = this->_parsingHelper(tokens, i, serv, "server_name", SERVER_NAME);
 		i = this->_parsingHelper(tokens, i, serv, "limit_except", LIMIT_EXCEPT);
@@ -181,6 +181,77 @@ size_t	EuleeHand::_parseServer(std::vector<Token> &tokens, size_t i)
 	}
 	this->server.push_back(EuleePocket(serv, location));
 	return (++i);
+}
+
+std::string EuleeHand::_getFileSize(const std::string &path, const std::string &file_name)
+{
+	std::string	full_path = path + "/" + file_name;
+  	struct stat result;
+	long		rv = stat(full_path.c_str(), &result);
+    if (rv == 0)
+    	return (std::to_string(result.st_size));
+	else if (rv == -1)
+    	std::cerr << "File {" <<  full_path << "} not found." << std::endl;
+	return ("");
+}
+
+std::string EuleeHand::_getFileCreationTime(const std::string &path, const std::string &file_name)
+{
+	struct stat result;
+
+	std::string	full_path = path + "/" + file_name;
+	int rv = stat((full_path).c_str(), &result);
+	if (rv == 0)
+	{
+    	std::time_t last_modified_time = result.st_mtime;   
+    	std::time_t modified_time = static_cast<std::time_t>(last_modified_time);
+    	// std::cout << "Last modified time: " << std::ctime(&modified_time) << std::endl;
+		return (std::ctime(&modified_time));
+    }
+	else if (rv == -1)
+    	std::cerr << "File {" <<  full_path << "} not found." << std::endl;
+	return ("");
+}
+
+std::string EuleeHand::directoryListing(std::string path)
+{
+    DIR	*dir;
+    struct dirent *ent;
+	
+	std::string lastMod;
+	std::string fileSize;
+
+    std::stringstream content;
+    if ((dir = opendir(path.c_str())) != nullptr)
+	{
+        while ((ent = readdir(dir)) != nullptr)
+		{
+            std::string filename = ent->d_name;
+			// std::cerr << filename << std::endl;
+			lastMod = this->_getFileCreationTime(path, filename);
+			fileSize = this->_getFileSize(path, filename);
+			// std::cerr << "[" << filename << "]" << std::endl;
+            if (filename != "." && filename != "..")
+			{
+                content << "<tr> <td><a href=\"" << filename << "\">" << filename << "</a></td>\n";
+                content << "<td>" << lastMod << " </td>\n";
+				content << "<td>" << fileSize << " bytes </td> </tr>\n";
+			}
+        }
+		content << "</tbody></table></body></html>\n";
+        closedir(dir);
+    }
+	std::stringstream head;
+	std::stringstream style;
+	std::stringstream body;
+    std::stringstream html;
+	
+	head << "<html><head><title>I suck</title></head><body><h1>Directory shizer ";
+	style << "<style>body {	font-family: Arial, sans-serif;	background-color: #f8f8f8;}h1 {	text-align: center;	font-size: 36px;	color: #333;	margin-top: 50px;}table {	margin: 0 auto;	border-collapse: collapse;	width: 80%;	max-width: 800px;	background-color: white;	box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);}th {	font-size: 18px;	font-weight: bold;	background-color: #333;	color: white;	padding: 10px;	text-align: left;	border-bottom: 2px solid white;}td {	font-size: 16px;	padding: 10px;	text-align: left;	border-bottom: 1px solid #ccc;}tr:hover {	background-color: #f5f5f5;}a {	color: #333;	text-decoration: none;}a:hover {	color: #444;	text-decoration: underline;}</style></head>";
+	body << " <body><h1>Index of " << path << "</h1><table><thead><tr><th>File Name</th><th>Last Modified</th><th>File Size</th></tr></thead><tbody>";
+
+    html << head.str() << style.str() << body.str() << content.str();
+    return (html.str());
 }
 
 void	EuleeHand::parseConfigServer()
@@ -418,14 +489,15 @@ void	EuleeHand::convertLocation()
 	if (myServer.location[this->locationPath][INDEX].empty()) // No Trailing File -> Append back and find
 	{
 		std::cout << "Server Root Used" << std::endl;
-		remainingPath = this->methodPath.erase(0, this->locationPath.length());
+		std::cout << "Method Path: " << this->methodPath << std::endl;
+		remainingPath = this->methodPath.substr(this->locationPath.length());
 		indexFile = myServer[INDEX][0];
 		std::cout << "ServerRoot: " << myServer[ROOT][0] << std::endl;
 		std::cout << "LocationPath: " << this->locationPath << std::endl;
 		std::cout << "RemainingPath: " << remainingPath << std::endl;
-		std::cout << "this->method: " << this->method << std::endl;
-		this->methodPath = "/" + myServer[ROOT][0] + this->locationPath + remainingPath + (remainingPath.length() == 0 ? "" : "/") + (this->method == "GET" ? indexFile : ""); 
+		this->methodPath = "/" + myServer[ROOT][0] + this->locationPath + (this->locationPath[this->locationPath.length() - 1] == '/' ? "" : "/") + (this->method == "GET" ? indexFile : ""); 
 		this->useDefaultIndex = 1;
+		this->useDirectoryListing = (this->server[this->serverIndex].location[this->locationPath][AUTO_INDEX].size() != 0);
 	}
 	else // Using Index
 	{
@@ -433,7 +505,6 @@ void	EuleeHand::convertLocation()
 		locationRoot = myServer.location[this->locationPath][ROOT][0];
 		remainingPath = methodPathCopy.erase(0, this->locationPath.length());
 		indexFile = myServer.location[this->locationPath][INDEX][0];
-		// if (remainingPath)
 		this->methodPath = "/" + myServer.location[this->locationPath][ROOT][0] + remainingPath + ((remainingPath[remainingPath.length() - 1] == '/') ? "" : "/") + indexFile;
 	}
 	std::cout << GREEN << "Location Path: " << this->locationPath << RESET << std::endl;
@@ -446,7 +517,8 @@ std::string	EuleeHand::extractHTML(std::string path)
 
 	if (!file.is_open())
 	{
-		std::cerr << "Error: Could not open file" << std::endl;
+		std::cerr << RED << "Error: Could not open html" << RESET << std::endl;
+
 		return ("");
 	}
 	std::string extract;
@@ -467,27 +539,33 @@ int		EuleeHand::sendHttp(int statusCode, int closeSocket, std::string htmlPath)
 	}
 	std::string response = "HTTP/1.1 " + std::to_string(statusCode) + " " + statusList[statusCode] + " \r\n\r\n";
 	if (htmlPath.empty() && statusCode != 200)
-		htmlPath =  "./html/error.html";
+		htmlPath = WS_ERROR_PAGE_PATH;
 	else if (htmlPath.empty())
-		htmlPath =  "./html/index.html";
+		htmlPath = WS_DEFAULT_PAGE_PATH;
 	else
 	{
 		if (this->checkPath(htmlPath, 1, 0) == 0)
 		{
 			statusCode = 404;
-			htmlPath =  "./html/error.html";
+			htmlPath = WS_ERROR_PAGE_PATH;
 		}
 	}
-	response += extractHTML(htmlPath);
-	std::string code = "{{error_code}}";
-	std::string msg = "{{error_message}}";
-
-	if (statusCode != 200)
+	
+	std::string	htmlPage = extractHTML(htmlPath);
+	if (htmlPage.empty() == false)
 	{
-		response.replace(response.find(code), code.length(), std::to_string(statusCode));	
-		response.replace(response.find(code), code.length(), std::to_string(statusCode));	
-		response.replace(response.find(msg), msg.length(), this->statusList[statusCode]);
+		std::string code = "{{error_code}}";
+		std::string msg = "{{error_message}}";
+
+		response += htmlPage;
+		if (statusCode != 200)
+		{
+			response.replace(response.find(code), code.length(), std::to_string(statusCode));	
+			response.replace(response.find(code), code.length(), std::to_string(statusCode));	
+			response.replace(response.find(msg), msg.length(), this->statusList[statusCode]);
+		}
 	}
+	
 	ft_select(this->socket, (void *)response.c_str(), response.length(), WRITE);
 	if (closeSocket)
 		close (this->socket);
