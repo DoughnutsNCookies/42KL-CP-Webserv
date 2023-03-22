@@ -6,7 +6,7 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/22 13:49:12 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/22 14:00:08 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,7 +185,6 @@ size_t	EuleeHand::_parseLocation(std::vector<Token> &tokens, std::vector<EuleeWa
 		i = this->_parsingHelper(tokens, i, loc, "index", INDEX);
 		i = this->_parsingHelper(tokens, i, loc, "return", RETURN);
 		i = this->_parsingHelper(tokens, i, loc, "upload", UPLOAD);
-		i = this->_parsingHelper(tokens, i, loc, "include", INCLUDE);
 		i = this->_parsingHelper(tokens, i, loc, "auto_index", AUTO_INDEX);
 		i = this->_parsingHelper(tokens, i, loc, "limit_except", LIMIT_EXCEPT);
 		i = this->_parsingHelper(tokens, i, loc, "client_max_body_size", CLIENT_MAX_BODY_SIZE);
@@ -210,7 +209,6 @@ size_t	EuleeHand::_parseServer(std::vector<Token> &tokens, size_t i)
 		i = this->_parsingHelper(tokens, i, serv, "listen", LISTEN);
 		i = this->_parsingHelper(tokens, i, serv, "return", RETURN);
 		i = this->_parsingHelper(tokens, i, serv, "upload", UPLOAD);
-		i = this->_parsingHelper(tokens, i, serv, "include", INCLUDE);
 		i = this->_parsingHelper(tokens, i, serv, "auto_index", AUTO_INDEX);
 		i = this->_parsingHelper(tokens, i, serv, "server_name", SERVER_NAME);
 		i = this->_parsingHelper(tokens, i, serv, "limit_except", LIMIT_EXCEPT);

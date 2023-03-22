@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/21 22:53:12 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/22 13:55:52 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,9 +162,9 @@ void	WebServer::_serverLoop()
 		if (this->_database.unchunkResponse())
 			continue ;
 		std::cout << GREEN << "Finished unchunking" << RESET << std::endl;
-		std::ofstream	uc("unchunked.txt");
-		uc << this->_database.buffer;
-		uc.close();
+		// std::ofstream	uc("unchunked.txt");
+		// uc << this->_database.buffer;
+		// uc.close();
 
 		std::istringstream	request(this->_database.buffer);
 		request >> this->_database.method >> this->_database.methodPath;
@@ -196,9 +196,9 @@ void	WebServer::_serverLoop()
 		if (this->_database.checkClientBodySize())
 			continue ;
 
-		std::ofstream	uc2("unchunked2.txt");
-		uc2 << this->_database.buffer;
-		uc2.close();
+		// std::ofstream	uc2("unchunked2.txt");
+		// uc2 << this->_database.buffer;
+		// uc2.close();
 
 		if (this->_database.isCGI())
 		{
