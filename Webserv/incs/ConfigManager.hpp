@@ -34,6 +34,7 @@ class ConfigManager
 		void			configLibrary(void);
 
 		void			checkImportantCheck(int i);
+		bool			checkCompulsories(int i);
 
 		int				checkServerKey(size_t i, int previous, int *braces, int *main_block);
 		int				checkLocationKey(size_t i, int previous, int *braces, int *main_block);
