@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/24 14:43:17 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 15:27:15 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ class WebServer
 		void			_receiveRequest();
 		void			_writeResponse();
 		void			_serverLoop();
+		void			_doRequest();
 		int				_parseRequest();
 		int				_handleFavicon();
 		int				_handleRedirection();

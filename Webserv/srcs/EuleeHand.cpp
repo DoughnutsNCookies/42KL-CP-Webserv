@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/24 15:16:30 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 15:58:03 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -542,7 +542,6 @@ int		EuleeHand::sendHttp(int statusCode, std::string htmlPath)
 			baseResponse.replace(baseResponse.find(msg), msg.length(), this->statusList[statusCode]);
 		}
 	}
-	
 	this->response[this->socket] = baseResponse;
 	std::cout << MAGENTA << "Returned " << statusCode << "!" << RESET << std::endl;
 	return (statusCode);
@@ -616,17 +615,13 @@ int	EuleeHand::parseHeader()
 
 	size_t	transferEncoding = this->buffer[this->socket].find("Transfer-Encoding: chunked");
 	if (transferEncoding != std::string::npos)
-	{
-		std::cout << (this->buffer[this->socket].find("\r\n0\r\n\r\n") != std::string::npos) << std::endl;
 		return (this->buffer[this->socket].find("\r\n0\r\n\r\n") != std::string::npos);
-	}
 
 	size_t	contentLenghtPos = this->buffer[this->socket].find("Content-Length: ");
 	if (contentLenghtPos != std::string::npos)
 	{
 		std::string contentLenghtStr = this->buffer[this->socket].substr(contentLenghtPos + std::strlen("Content-Length: "));
 		size_t	contentLenght = std::stoul(contentLenghtStr.substr(0, contentLenghtStr.find("\r\n")));
-		std::cout << "Content-Length: " << contentLenght << std::endl;
 		std::string	messageBody = this->buffer[this->socket].substr(headerEndPos + std::strlen("\r\n\r\n"));
 		if (messageBody.length() < (size_t)contentLenght)
 			return (0);

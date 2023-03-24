@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:54:29 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/14 15:23:43 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 16:01:44 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,12 @@
 class HttpCgiResponse
 {
 	public:
-		HttpCgiResponse(EuleeHand database);
+		HttpCgiResponse(EuleeHand *database);
 		~HttpCgiResponse();
 		void		handleCgi();
 
 	private:
-		EuleeHand	_database;
+		EuleeHand	*_database;
 };
 
 #endif

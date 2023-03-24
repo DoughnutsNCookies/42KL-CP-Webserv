@@ -6,13 +6,13 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 14:01:49 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/24 15:20:29 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 16:07:05 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/HttpPutResponse.hpp"
 
-HttpPutResponse::HttpPutResponse(EuleeHand database) : _database(database) {}
+HttpPutResponse::HttpPutResponse(EuleeHand *database) : _database(database) {}
 
 HttpPutResponse::~HttpPutResponse() {}
 
@@ -20,35 +20,35 @@ void	HttpPutResponse::handlePut()
 {
 	int		contentLengthSpecified = 0;
 	size_t	contentLength = 0;
-	size_t	contentLengthPos = this->_database.bufferTemp.find("Content-Length: ");
+	size_t	contentLengthPos = this->_database->buffer[this->_database->socket].find("Content-Length: ");
 	if (contentLengthPos != std::string::npos)
 	{
 		contentLengthPos += std::strlen("Content-Length: ");
-		contentLength = std::stoul(this->_database.bufferTemp.substr(contentLengthPos));
+		contentLength = std::stoul(this->_database->buffer[this->_database->socket].substr(contentLengthPos));
 		contentLengthSpecified = 1;
 	}
 
-	std::ofstream	originalPath(this->_database.methodPath.c_str() + 1, std::ios::binary);
+	std::ofstream	originalPath(this->_database->methodPath.c_str() + 1, std::ios::binary);
 	if (originalPath.fail())
 	{
 		std::cout << RED << "Directory not found, using upload from config..." << RESET << std::endl;
-		if (this->_database.server[this->_database.serverIndex].location[this->_database.locationPath][UPLOAD].empty())
+		if (this->_database->server[this->_database->serverIndex].location[this->_database->locationPath][UPLOAD].empty())
 			std::cout << RED << "Upload not set in config, cannot save file..." << RESET << std::endl;
 		else
 		{
 			int	pathCanUse = 0;
-			if (this->_database.methodPath.substr(this->_database.methodPath.find_last_of("/")) == "/")
+			if (this->_database->methodPath.substr(this->_database->methodPath.find_last_of("/")) == "/")
 			{
 				std::cout << RED << "File to save is a directory..." << RESET << std::endl;
 				return ;
 			}
-			for (size_t i = 0; this->_database.server[this->_database.serverIndex].location[this->_database.locationPath][UPLOAD].size() && pathCanUse == 0; i++)
+			for (size_t i = 0; this->_database->server[this->_database->serverIndex].location[this->_database->locationPath][UPLOAD].size() && pathCanUse == 0; i++)
 			{
-				std::ofstream	locationPath(this->_database.server[this->_database.serverIndex].location[this->_database.locationPath][UPLOAD][i] + this->_database.methodPath.substr(this->_database.methodPath.find_last_of("/")));
+				std::ofstream	locationPath(this->_database->server[this->_database->serverIndex].location[this->_database->locationPath][UPLOAD][i] + this->_database->methodPath.substr(this->_database->methodPath.find_last_of("/")));
 				if (locationPath.fail() == false)
 				{
-					std::cout << GREEN << "Put to: " << this->_database.methodPath.c_str() + 1 << RESET << std::endl;
-					std::string		toWrite = this->_database.bufferTemp.substr(this->_database.bufferTemp.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
+					std::cout << GREEN << "Put to: " << this->_database->methodPath.c_str() + 1 << RESET << std::endl;
+					std::string		toWrite = this->_database->buffer[this->_database->socket].substr(this->_database->buffer[this->_database->socket].find("\r\n\r\n") + std::strlen("\r\n\r\n"));
 					if (contentLengthSpecified)
 						locationPath << toWrite;
 					else
@@ -63,13 +63,13 @@ void	HttpPutResponse::handlePut()
 	}
 	else
 	{
-		std::cout << GREEN << "Put to: " << this->_database.methodPath.c_str() + 1 << RESET << std::endl;
-		std::string		toWrite = this->_database.bufferTemp.substr(this->_database.bufferTemp.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
+		std::cout << GREEN << "Put to: " << this->_database->methodPath.c_str() + 1 << RESET << std::endl;
+		std::string		toWrite = this->_database->buffer[this->_database->socket].substr(this->_database->buffer[this->_database->socket].find("\r\n\r\n") + std::strlen("\r\n\r\n"));
 		if (contentLengthSpecified)
 			originalPath << toWrite;
 		else
 			originalPath << toWrite;
 		originalPath.close();
 	}
-	this->_database.sendHttp(200);
+	this->_database->sendHttp(200);
 }
