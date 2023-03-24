@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/24 17:29:11 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 23:31:57 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,8 +92,9 @@ void	WebServer::_acceptConnection()
 		close(this->_database.socket);
 	}
 	// fcntl(this->_database.socket, F_SETFL, O_NONBLOCK);
+	this->_database.bytes_sent[this->_database.socket] = 0;
+	this->_database.parsed[this->_database.socket] = false;
 	FD_SET(this->_database.socket, &this->_database.myReadFds);
-	std::cout << GREEN << "New connection accepted!" << RESET << std::endl;
 }
 
 void	WebServer::_receiveRequest()
@@ -104,21 +105,49 @@ void	WebServer::_receiveRequest()
 	while (recvVal > 0)
 	{
 		this->_database.buffer[this->_database.socket].append(readBuffer, recvVal);
-		std::cout << GREEN << "Total: " << this->_database.buffer[this->_database.socket].size() << RESET << std::endl;
+		std::cout << GREEN << "Receiving total: " << this->_database.buffer[this->_database.socket].size() << "\r" << RESET;
 		recvVal = recv(this->_database.socket, readBuffer, WS_BUFFER_SIZE, 0);
 		if (recvVal < 0)
 			break ;
 	}
 	if (this->_database.parseHeader())
 	{
+		std::cout << std::endl;
 		FD_SET(this->_database.socket, &this->_database.myWriteFds);
 		FD_CLR(this->_database.socket, &this->_database.myReadFds);	
 	}
 }
 
+void	WebServer::_sendResponse()
+{
+	long	total = this->_database.bytes_sent[this->_database.socket];
+	long	sendVal = send(this->_database.socket, this->_database.response[this->_database.socket].c_str() + total, this->_database.response[this->_database.socket].size() - total, 0);
+	if (sendVal < 0)
+	{
+		this->_database.perrorExit("Send Error", 0);
+		return ;
+	}
+	this->_database.bytes_sent[this->_database.socket] += sendVal;
+	std::cout << GREEN << "Sending total: " << this->_database.bytes_sent[this->_database.socket] << RESET << "\r";
+
+	if ((size_t)this->_database.bytes_sent[this->_database.socket] != this->_database.response[this->_database.socket].size())
+		return ;
+	std::cout << std::endl;
+	this->_database.buffer[this->_database.socket].clear();
+	this->_database.response[this->_database.socket].clear();
+	this->_database.parsed[this->_database.socket] = false;
+	close(this->_database.socket);
+	FD_CLR(this->_database.socket, &this->_database.myWriteFds);
+
+	std::cout << CYAN << "Port Accepted: ";
+	for (size_t i = 0; i < this->_database.server.size(); i++)
+		std::cout << this->_database.server[i][LISTEN][this->_database.server[i].portIndex] << " ";
+	std::cout << "\nWaiting for new connections..." << RESET << std::endl;
+}
+
 int	WebServer::_handleFavicon()
 {
-	if (this->_database.methodPath != "/favicon.ico") // Ignore favicon
+	if (this->_database.methodPath != "/favicon.ico")
 		return (0);
 	std::cout << RED << "Go away favicon" << RESET << std::endl;
 	this->_database.sendHttp(404);
@@ -150,7 +179,7 @@ int	WebServer::_parseRequest()
 	if (this->_handleFavicon())
 		return (1);
 
-	std::cout << BLUE << this->_database.buffer[this->_database.socket].substr(0, this->_database.buffer[this->_database.socket].find("\r\n\r\n")) << RESET << std::endl;
+	// std::cout << BLUE << this->_database.buffer[this->_database.socket].substr(0, this->_database.buffer[this->_database.socket].find("\r\n\r\n")) << RESET << std::endl;
 
 	if (this->_handleRedirection())
 		return (1) ;
@@ -214,18 +243,6 @@ void	WebServer::_doRequest()
 	}
 }
 
-void	WebServer::_writeResponse()
-{
-	std::cout << GREEN << "Writing!" << RESET << std::endl;
-	int sendVal = send(this->_database.socket, this->_database.response[this->_database.socket].c_str(), this->_database.response[this->_database.socket].size(), 0);
-	if (sendVal < 0)
-		this->_database.perrorExit("Send Error", 0);
-	this->_database.buffer[this->_database.socket].clear();
-	this->_database.response[this->_database.socket].clear();
-	std::cout << "Sent finished!" << std::endl;
-	close(this->_database.socket);
-}
-
 void	WebServer::_serverLoop()
 {
 	fd_set	readFds, writeFds;
@@ -244,7 +261,7 @@ void	WebServer::_serverLoop()
 	std::cout << CYAN << "Port Accepted: ";
 	for (size_t i = 0; i < this->_database.server.size(); i++)
 		std::cout << this->_database.server[i][LISTEN][this->_database.server[i].portIndex] << " ";
-	std::cout << RESET << std::endl;
+	std::cout << "\nWaiting for new connections..." << RESET << std::endl;
 	while (1)
 	{
 		readFds = this->_database.myReadFds;
@@ -268,16 +285,16 @@ void	WebServer::_serverLoop()
 		{
 			if (!FD_ISSET(fd, &writeFds))
 				continue ;
-			if (this->_parseRequest() == 0)
-				this->_doRequest();
-			this->_writeResponse();
-
-
 			this->_database.socket = fd;
-			FD_CLR(fd, &this->_database.myWriteFds);
+			if (this->_database.parsed[this->_database.socket] == false)
+			{
+				if (this->_parseRequest() == 0)
+					this->_doRequest();
+				this->_database.parsed[this->_database.socket] = true;
+			}
+			if (this->_database.parsed[this->_database.socket])
+				this->_sendResponse();
 		}
 	}
 }
 
-// Upload to multiple directories
-// 

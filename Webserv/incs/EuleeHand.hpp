@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/24 20:00:18 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 23:20:47 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,8 @@
 # include <sys/stat.h>
 
 # define WS_BUFFER_SIZE			100000
-# define BUFFER_SIZE			1000
-# define WS_TIMEOUT				0
+# define WS_UNCHUNK_INFILE		".unchunkInfile"
+# define WS_UNCHUNK_OUTFILE		".unchunkOutfile"
 # define WS_ERROR_PAGE_PATH 	"./html/server_html/error.html"
 # define WS_DEFAULT_PAGE_PATH	"./html/server_html/default.html"
 
@@ -59,6 +59,8 @@ class EuleeHand
 		char								**envp;
 		std::map<std::string, std::string>	cgi;
 		std::map<int, std::string>			errorpage, statusList, buffer, response;
+		std::map<int, long>					bytes_sent;
+		std::map<int, bool>					parsed;
 		std::vector<EuleePocket>			server;
 		std::vector<int>					serverFd;
 		std::vector<sockaddr_in>			serverAddr;

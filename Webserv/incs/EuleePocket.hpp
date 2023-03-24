@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 17:51:51 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/21 22:01:22 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 23:31:05 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ enum	Mode
 	WRITE
 };
 
-// server block
 class EuleePocket
 {
 	public:
@@ -48,11 +47,9 @@ class EuleePocket
 
 		mapped_type	&operator[](key_type key);
 
-		// member function
 		iterator	begin(void);
 		iterator	end(void);
 
-		// member variable
 		std::vector<EuleeWallet>			vectorLocation;
 		std::map<std::string, EuleeWallet>	location;
 		int									portIndex;

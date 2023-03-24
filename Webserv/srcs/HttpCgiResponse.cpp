@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:55:14 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/24 20:00:53 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 23:04:03 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,9 @@ void    HttpCgiResponse::handleCgi()
     }
     waitpid(pid, NULL, 0);
     std::string output = "";
-    int	outfd2 = open(WS_TEMP_FILE_OUT, O_RDWR, 0777);
+    int     outfd2 = open(WS_TEMP_FILE_OUT, O_RDWR, 0777);
     char    *buffer = new char[WS_TESTER_SIZE];
-    long bytes_read = 0, total = 0;
+    long    bytes_read = 0, total = 0;
     while ((bytes_read = read(outfd2, buffer, WS_TESTER_SIZE)) > 0)
     {
         output.append(buffer, bytes_read);
@@ -56,7 +56,7 @@ void    HttpCgiResponse::handleCgi()
     std::string newOutput = output.substr(startPos);
 
     this->_database->response[this->_database->socket] = "HTTP/1.1 200 OK\r\n\r\n" + newOutput;
-    std::cout << GREEN << "CGI ran successfully!" << std::endl;
+    std::cout << GREEN << "CGI ran successfully!" << RESET << std::endl;
     std::remove(WS_TEMP_FILE_IN);
     std::remove(WS_TEMP_FILE_OUT);
 }

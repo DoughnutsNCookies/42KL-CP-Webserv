@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   EuleeWallet.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 15:10:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/22 18:51:05 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/24 23:31:09 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ enum	Key
 	LIMIT_EXCEPT
 };
 
-// location block
 class EuleeWallet
 {
 	public:

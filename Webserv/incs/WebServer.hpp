@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/24 16:17:57 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 22:46:56 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@
 # define WS_TESTER_SIZE			100000
 # define WS_TEMP_FILE_IN		".tempIn"
 # define WS_TEMP_FILE_OUT		".tempOut"
+# define WS_BUFFER_FILE			".buffer"
 # define DEFAULT_CONFIG_PATH	"conf/default.conf"
 
 class WebServer
@@ -56,7 +57,7 @@ class WebServer
 		void			_setupServer();
 		void			_acceptConnection();
 		void			_receiveRequest();
-		void			_writeResponse();
+		void			_sendResponse();
 		void			_serverLoop();
 		void			_doRequest();
 		int				_parseRequest();
