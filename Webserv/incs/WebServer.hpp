@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/24 15:27:15 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 16:17:57 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@
 # include "EuleeHand.hpp"
 # include "EuleeWallet.hpp"
 # include "HttpPostResponse.hpp"
-# include "HttpDefaultResponse.hpp"
 # include "HttpCgiResponse.hpp"
 # include "HttpGetResponse.hpp"
 # include "HttpDeleteResponse.hpp"

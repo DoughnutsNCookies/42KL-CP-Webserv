@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/24 16:06:09 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 16:44:25 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,12 +145,12 @@ int	WebServer::_parseRequest()
 		// continue ;
 	std::cout << GREEN << "Finished unchunking" << RESET << std::endl;
 
-	std::istringstream	request(this->_database.bufferTemp);
+	std::istringstream	request(this->_database.buffer[this->_database.socket]);
 	request >> this->_database.method >> this->_database.methodPath;
 	if (this->_handleFavicon())
 		return (1);
 
-	std::cout << BLUE << this->_database.buffer[this->_database.socket].substr(0, this->_database.buffer[this->_database.socket].find("\r\n\r\n")) << RESET << std::endl;
+	// std::cout << BLUE << this->_database.buffer[this->_database.socket].substr(0, this->_database.buffer[this->_database.socket].find("\r\n\r\n")) << RESET << std::endl;
 
 	if (this->_handleRedirection())
 		return (1) ;
@@ -177,13 +177,13 @@ void	WebServer::_doRequest()
 		else if (this->_database.method == "HEAD")
 		{
 			std::cout << MAGENTA << "Head method called" << RESET << std::endl;
-			HttpHeadResponse	headResponse(this->_database);
+			HttpHeadResponse	headResponse(&this->_database);
 			headResponse.handleHead();
 		}
 		else if (this->_database.method == "POST")
 		{
 			std::cout << MAGENTA << "Post method called" << RESET << std::endl;
-			HttpPostResponse	postResponse(this->_database);
+			HttpPostResponse	postResponse(&this->_database);
 			postResponse.handlePost();
 		}
 		else if (this->_database.method == "PUT")
@@ -195,7 +195,7 @@ void	WebServer::_doRequest()
 		else if (this->_database.method == "DELETE")
 		{
 			std::cout << MAGENTA << "Delete method called" << RESET << std::endl;
-			HttpDeleteResponse	deleteResponse(this->_database);
+			HttpDeleteResponse	deleteResponse(&this->_database);
 			deleteResponse.handleDelete();
 		}
 		else if (this->_database.method == "GET")
@@ -203,7 +203,6 @@ void	WebServer::_doRequest()
 			std::cout << MAGENTA << "Get method called" << RESET << std::endl;
 			HttpGetResponse	getResponse(&this->_database);
 			getResponse.handleGet();
-			std::cout << "Response: " << this->_database.response[this->_database.socket] << std::endl;
 		}
 	}
 	catch(const std::exception& e)
@@ -269,8 +268,8 @@ void	WebServer::_serverLoop()
 		{
 			if (!FD_ISSET(fd, &writeFds))
 				continue ;
-			this->_parseRequest();
-			this->_doRequest();
+			if (this->_parseRequest() == 0)
+				this->_doRequest();
 			this->_writeResponse();
 
 

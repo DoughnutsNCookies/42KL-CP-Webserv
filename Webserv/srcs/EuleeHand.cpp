@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/24 15:58:03 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 16:33:53 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -567,8 +567,8 @@ int	EuleeHand::checkClientBodySize()
 		clientMaxBodySize = std::stoul(this->server[this->serverIndex][CLIENT_MAX_BODY_SIZE][0]);
 	if (this->server[this->serverIndex].location[this->locationPath][CLIENT_MAX_BODY_SIZE].size() != 0)
 		clientMaxBodySize = std::min(clientMaxBodySize, std::stoul(this->server[this->serverIndex].location[this->locationPath][CLIENT_MAX_BODY_SIZE][0]));
-	size_t	startPos = this->bufferTemp.find("\r\n\r\n") + std::strlen("\r\n\r\n");
-	if (this->bufferTemp.length() - startPos > clientMaxBodySize)
+	size_t	startPos = this->buffer[this->socket].find("\r\n\r\n") + std::strlen("\r\n\r\n");
+	if (this->buffer[this->socket].length() - startPos > clientMaxBodySize)
 	{
 		std::cout << RED << "Client Body Size Exceeded!" << RESET << std::endl;
 		this->sendHttp(413);

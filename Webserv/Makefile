@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+         #
+#    By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/28 17:38:48 by jhii              #+#    #+#              #
-#    Updated: 2023/03/17 13:56:38 by jhii             ###   ########.fr        #
+#    Updated: 2023/03/24 16:16:23 by schuah           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,7 +30,6 @@ SRC			=	WebServer.cpp \
 				EuleePocket.cpp \
 				EuleeWallet.cpp \
 				HttpPostResponse.cpp \
-				HttpDefaultResponse.cpp \
 				HttpCgiResponse.cpp \
 				HttpGetResponse.cpp \
 				HttpDeleteResponse.cpp \

@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/24 15:25:38 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 16:23:38 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ class EuleeHand
 		std::vector<int>					serverFd;
 		std::vector<sockaddr_in>			serverAddr;
 		int									socket, serverIndex, useDefaultIndex, useDirectoryListing;
-		std::string							method, methodPath, bufferTemp, locationPath;
+		std::string							method, methodPath, locationPath;
 		fd_set								myReadFds, myWriteFds;
 
 	private:
