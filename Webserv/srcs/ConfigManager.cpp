@@ -310,3 +310,8 @@ void	ConfigManager::errorHandleShit(void)
 	if (this->checkCompulsories(this->_tokens.size() - 1) == false)
 		printError("Server does not have all listen, root and index. ", this->_tokens.size() - 1);
 }
+
+std::vector<Token>	&ConfigManager::getToken(void)
+{
+	return (this->_tokens);
+}
