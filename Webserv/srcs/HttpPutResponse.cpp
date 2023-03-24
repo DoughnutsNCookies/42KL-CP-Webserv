@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 14:01:49 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/21 21:03:04 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 15:20:29 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,11 @@ void	HttpPutResponse::handlePut()
 {
 	int		contentLengthSpecified = 0;
 	size_t	contentLength = 0;
-	size_t	contentLengthPos = this->_database.buffer.find("Content-Length: ");
+	size_t	contentLengthPos = this->_database.bufferTemp.find("Content-Length: ");
 	if (contentLengthPos != std::string::npos)
 	{
 		contentLengthPos += std::strlen("Content-Length: ");
-		contentLength = std::stoul(this->_database.buffer.substr(contentLengthPos));
+		contentLength = std::stoul(this->_database.bufferTemp.substr(contentLengthPos));
 		contentLengthSpecified = 1;
 	}
 
@@ -48,7 +48,7 @@ void	HttpPutResponse::handlePut()
 				if (locationPath.fail() == false)
 				{
 					std::cout << GREEN << "Put to: " << this->_database.methodPath.c_str() + 1 << RESET << std::endl;
-					std::string		toWrite = this->_database.buffer.substr(this->_database.buffer.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
+					std::string		toWrite = this->_database.bufferTemp.substr(this->_database.bufferTemp.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
 					if (contentLengthSpecified)
 						locationPath << toWrite;
 					else
@@ -64,12 +64,12 @@ void	HttpPutResponse::handlePut()
 	else
 	{
 		std::cout << GREEN << "Put to: " << this->_database.methodPath.c_str() + 1 << RESET << std::endl;
-		std::string		toWrite = this->_database.buffer.substr(this->_database.buffer.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
+		std::string		toWrite = this->_database.bufferTemp.substr(this->_database.bufferTemp.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
 		if (contentLengthSpecified)
 			originalPath << toWrite;
 		else
 			originalPath << toWrite;
 		originalPath.close();
 	}
-	this->_database.sendHttp(200, 1);
+	this->_database.sendHttp(200);
 }

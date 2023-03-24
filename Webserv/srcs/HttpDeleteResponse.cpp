@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/13 16:22:48 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/20 15:31:35 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 15:17:22 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	HttpDeleteResponse::handleDelete()
 	if (result != 0)
 	{
 		std::cerr << RED << "Error: " << filePath << " cannot be deleted" << RESET << std::endl;
-		this->_database.sendHttp(404, 1);
+		this->_database.sendHttp(404);
 		return ;
 	}
 	std::cout << GREEN << filePath << " has been deleted!" << RESET << std::endl;

@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:55:14 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/22 21:02:30 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 15:19:37 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ HttpCgiResponse::~HttpCgiResponse() {}
 void    HttpCgiResponse::handleCgi()
 {
     std::ofstream   inFile(WS_TEMP_FILE_IN, std::ios::binary);
-    inFile << this->_database.buffer.substr(this->_database.buffer.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
+    inFile << this->_database.bufferTemp.substr(this->_database.bufferTemp.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
     inFile.close();
 
     pid_t pid = fork();
@@ -44,11 +44,6 @@ void    HttpCgiResponse::handleCgi()
     waitpid(pid, NULL, 0);
     std::string output = "";
     int	outfd2 = open(WS_TEMP_FILE_OUT, O_RDWR, 0777);
-    if (outfd2 < 0)
-    {
-        this->_database.sendHttp(500, 1);
-        return ;
-    }
     char    *buffer = new char[WS_TESTER_SIZE];
     std::memset(buffer, 0, WS_TESTER_SIZE);
     long bytes_read = 0, total = 0;
@@ -63,10 +58,23 @@ void    HttpCgiResponse::handleCgi()
     close(outfd2);
     size_t  startPos = output.find("\r\n\r\n") + std::strlen("\r\n\r\n");
     std::string newOutput = output.substr(startPos);
-    std::cout << MAGENTA << "Output length : " << newOutput.length() << RESET << std::endl;
 
     std::string response = "HTTP/1.1 200 OK\r\n\r\n" + newOutput;
-    this->_database.ft_select(this->_database.socket, &response[0], response.size(), WRITE);
+    
+    // size_t  totalSent = 0;
+    // long    val = this->_database.ft_select(this->_database.socket, &response[0], response.size() - totalSent, WRITE);
+    // while (val > 0)
+    // {
+    //     totalSent += val;
+	// 	std::cout << GREEN << "Sent: " << val << "\t\tTotal: " << totalSent << RESET << "\r";
+    //     val = this->_database.ft_select(this->_database.socket, &response[totalSent], response.size() - totalSent, WRITE);
+    //     if (val < 0)
+    //     {
+    //         std::cout << RED << "VAL ERROR" << std::endl;
+    //         break ;
+    //     }
+    // }
+    
     std::cout << GREEN << "CGI ran successfully!" << std::endl;
     std::remove(WS_TEMP_FILE_IN);
     std::remove(WS_TEMP_FILE_OUT);

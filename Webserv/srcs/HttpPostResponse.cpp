@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:27:42 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/21 21:02:46 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 15:16:48 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void	HttpPostResponse::_normalSave()
 				if (locationPath.fail() == false)
 				{
 					std::cout << GREEN << "Put to: " << this->_database.methodPath.c_str() + 1 << RESET << std::endl;
-					std::string		toWrite = this->_database.buffer.substr(this->_database.buffer.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
+					std::string		toWrite = this->_database.bufferTemp.substr(this->_database.bufferTemp.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
 					if (this->_contentLengthSpecified)
 						locationPath << toWrite;
 					else
@@ -55,7 +55,7 @@ void	HttpPostResponse::_normalSave()
 	else
 	{
 		std::cout << GREEN << "Put to: " << this->_database.methodPath.c_str() + 1 << RESET << std::endl;
-		std::string		toWrite = this->_database.buffer.substr(this->_database.buffer.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
+		std::string		toWrite = this->_database.bufferTemp.substr(this->_database.bufferTemp.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
 		if (this->_contentLengthSpecified)
 			originalPath << toWrite;
 		else
@@ -66,7 +66,7 @@ void	HttpPostResponse::_normalSave()
 
 void	HttpPostResponse::_saveFile()
 {
-	size_t	boundaryPos = this->_database.buffer.find("boundary=");
+	size_t	boundaryPos = this->_database.bufferTemp.find("boundary=");
 	if (boundaryPos == std::string::npos)
 	{
 		std::cerr << RED << "No boundary found!" << RESET << std::endl;
@@ -75,15 +75,15 @@ void	HttpPostResponse::_saveFile()
 		return ;
 	}
 	boundaryPos += std::strlen("boundary=");
-	std::string	boundary = this->_database.buffer.substr(boundaryPos, this->_database.buffer.find("\r\n", boundaryPos) - boundaryPos);
-	boundaryPos = this->_database.buffer.find(boundary, boundaryPos + boundary.length());
+	std::string	boundary = this->_database.bufferTemp.substr(boundaryPos, this->_database.bufferTemp.find("\r\n", boundaryPos) - boundaryPos);
+	boundaryPos = this->_database.bufferTemp.find(boundary, boundaryPos + boundary.length());
 	
-	if (this->_contentLengthSpecified && this->_database.buffer.substr(boundaryPos).length() + std::strlen("\r\n") != this->_contentLength)
+	if (this->_contentLengthSpecified && this->_database.bufferTemp.substr(boundaryPos).length() + std::strlen("\r\n") != this->_contentLength)
 	{
 		std::cerr << RED << "Error: Content-Length does not match actual content length!" << RESET << std::endl;
 		return ;
 	}
-	size_t		namePos = this->_database.buffer.find("filename=\"");
+	size_t		namePos = this->_database.bufferTemp.find("filename=\"");
 	std::string	fileName;
 	if (namePos == std::string::npos)
 	{
@@ -93,18 +93,18 @@ void	HttpPostResponse::_saveFile()
 	else
 	{
 		namePos += std::strlen("filename=\"");
-		fileName = this->_database.buffer.substr(namePos, this->_database.buffer.find("\"", namePos) - namePos);
+		fileName = this->_database.bufferTemp.substr(namePos, this->_database.bufferTemp.find("\"", namePos) - namePos);
 	}
 	std::cout << GREEN << "File name to be saved as: " << fileName << std::endl;
 
-	size_t		boundaryEndPos = this->_database.buffer.find("--" + boundary + "--");
+	size_t		boundaryEndPos = this->_database.bufferTemp.find("--" + boundary + "--");
 	if (boundaryEndPos == std::string::npos)
 	{
 		std::cerr << RED << "No end boundary found!" << RESET << std::endl;
 		return ;
 	}
 	size_t		dataLength = boundaryEndPos - (boundaryPos + boundary.length());
-	std::string	fileData = this->_database.buffer.substr(boundaryPos + boundary.length(), dataLength - std::strlen("\r\n"));
+	std::string	fileData = this->_database.bufferTemp.substr(boundaryPos + boundary.length(), dataLength - std::strlen("\r\n"));
 
 	std::ofstream	newFile(fileName, std::ios::binary);
 	if (newFile.is_open() == false)
@@ -119,14 +119,14 @@ void	HttpPostResponse::_saveFile()
 
 void	HttpPostResponse::handlePost()
 {
-	size_t	contentLengthPos = this->_database.buffer.find("Content-Length: ");
+	size_t	contentLengthPos = this->_database.bufferTemp.find("Content-Length: ");
 	if (contentLengthPos != std::string::npos)
 	{
 		contentLengthPos += std::strlen("Content-Length: ");
-		this->_contentLength = std::stoul(this->_database.buffer.substr(contentLengthPos));
+		this->_contentLength = std::stoul(this->_database.bufferTemp.substr(contentLengthPos));
 		this->_contentLengthSpecified = 1;
 	}
 
 	this->_saveFile();
-	this->_database.sendHttp(200, 1);
+	this->_database.sendHttp(200);
 }

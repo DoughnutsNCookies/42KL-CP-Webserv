@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/13 17:44:45 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/20 15:33:44 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 15:18:25 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,12 @@ void	HttpHeadResponse::handleHead()
 	if (file.fail() && this->_database.methodPath != "/")
 	{
 		std::cerr << RED << "Error opening " << this->_database.methodPath << "!" << RESET << std::endl;
-		this->_database.sendHttp(404, 1);
+		this->_database.sendHttp(404);
 	}
 	else
 	{
 		std::cout << GREEN << "File " << this->_database.methodPath << " found!" << RESET << std::endl;
-		this->_database.sendHttp(200, 1);
+		this->_database.sendHttp(200);
 	}
 	file.close();
 }

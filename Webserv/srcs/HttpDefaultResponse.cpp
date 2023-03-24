@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:39:08 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/20 15:28:19 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 15:17:14 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,5 @@ void	HttpDefaultResponse::handleDefault()
 	std::string content_length_str = "Content-Length: " + std::to_string(message.length()) + "\r\n\r\n";
 	std::string output = http + content_length_str + message;
 
-	this->_database.ft_select(this->_database.socket, (void *)output.c_str(), output.length(), WRITE);
-	close(this->_database.socket);
+	this->_database.buffer[this->_database.socket] = output;
 }

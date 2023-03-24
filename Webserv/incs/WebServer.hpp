@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/22 20:53:08 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 14:43:17 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@
 # include "HttpPutResponse.hpp"
 
 # define WS_BACKLOG				10
-# define WS_BUFFER_SIZE			10000
+# define WS_BUFFER_SIZE			100000
 # define WS_TESTER_SIZE			100000
 # define WS_TEMP_FILE_IN		".tempIn"
 # define WS_TEMP_FILE_OUT		".tempOut"
@@ -56,10 +56,12 @@ class WebServer
 	private:
 		void			_setupServer();
 		void			_acceptConnection();
-		int				_receiveRequest();
+		void			_receiveRequest();
+		void			_writeResponse();
+		void			_serverLoop();
+		int				_parseRequest();
 		int				_handleFavicon();
 		int				_handleRedirection();
-		void			_serverLoop();
 
 		ConfigManager	_configManager;
 		EuleeHand		_database;

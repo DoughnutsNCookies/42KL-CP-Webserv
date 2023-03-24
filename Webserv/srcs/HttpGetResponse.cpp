@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:20:26 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/22 17:55:22 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 15:20:10 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	HttpGetResponse::handleGet()
 	if (this->_database.checkPath(this->_database.methodPath.c_str() + 1, 0, 0))
 	{
 		std::cerr << RED << "Error opening " << this->_database.methodPath << "!\n" << RESET << std::endl;
-		this->_database.sendHttp(404, 1);
+		this->_database.sendHttp(404);
 		return ;
 	}
 
@@ -42,21 +42,17 @@ void	HttpGetResponse::handleGet()
 		std::cerr << RED << "Error reading " << this->_database.methodPath << "!" << RESET << std::endl;
 		if (this->_database.useDirectoryListing)
 		{
-			std::string	directoryListingResponse = "HTTP/1.1 200 OK\r\n\r\n" + this->_database.directoryListing(this->_database.methodPath);
-			this->_database.ft_select(this->_database.socket, &directoryListingResponse[0], directoryListingResponse.size(), WRITE);
+			this->_database.buffer[this->_database.socket] = "HTTP/1.1 200 OK\r\n\r\n" + this->_database.directoryListing(this->_database.methodPath);
 			std::cout << GREEN << "Autoindex is set on, directory listing sent!" << RESET << std::endl;
-			close(this->_database.socket);
 		}
 		else if (this->_database.checkPath(this->_database.methodPath.c_str() + 1, 0, 1) || this->_database.useDefaultIndex)
-			this->_database.sendHttp(200, 1);
+			this->_database.sendHttp(200);
 		else
-			this->_database.sendHttp(404, 1);
+			this->_database.sendHttp(404);
 		file.close();
 		return ;
 	}
 	file.close();
 
-	std::string	httpResponse = "HTTP/1.1 200 OK\r\nContent-Type: */*\r\nContent-Length: " + std::to_string(file_size) + "\r\n\r\n" + fileContents;
-	this->_database.ft_select(this->_database.socket, &httpResponse[0], httpResponse.size(), WRITE);
-	close(this->_database.socket);
+	this->_database.buffer[this->_database.socket] = "HTTP/1.1 200 OK\r\nContent-Type: */*\r\nContent-Length: " + std::to_string(file_size) + "\r\n\r\n" + fileContents;
 }
