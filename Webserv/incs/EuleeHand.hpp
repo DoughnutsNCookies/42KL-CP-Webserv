@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/24 16:23:38 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 20:00:18 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,12 @@
 
 # include <iostream>
 # include <sstream>
+# include <fcntl.h>
 # include <dirent.h>
 # include <sys/stat.h>
 
 # define WS_BUFFER_SIZE			100000
+# define BUFFER_SIZE			1000
 # define WS_TIMEOUT				0
 # define WS_ERROR_PAGE_PATH 	"./html/server_html/error.html"
 # define WS_DEFAULT_PAGE_PATH	"./html/server_html/default.html"
@@ -37,9 +39,9 @@ class EuleeHand
 		int			sendHttp(int statusCode, std::string htmlPath = "");
 		int			isCGI();
 		int			checkExcept();
-		// int			unchunkResponse();
 		int			checkClientBodySize();
 		int			parseHeader();
+		int			unchunkResponse();
 		void		printTokens();
 		void		parseConfigFile();
 		void		configLibrary();
@@ -69,6 +71,9 @@ class EuleeHand
 		std::string		_configFilePath;
 		ConfigManager	_configManager;
 
+
+		int				_unchunkIntofile(int fd, std::string buffer, int isHeader);
+		size_t			_readFile(std::string *buffer1, std::string *buffer2, int infile, char *temp, long bytes_read, int type, int *count);
 		size_t			_parseServer(std::vector<Token> &tokens, size_t i);
 		size_t			_parseErrorPage(std::vector<Token> &tokens, size_t i);
 		size_t			_parseCgi(std::vector<Token> &tokens, size_t i, EuleeWallet &location, int blockType);

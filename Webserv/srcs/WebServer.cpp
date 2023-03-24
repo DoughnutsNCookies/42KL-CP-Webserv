@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/24 16:44:25 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 17:29:11 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,8 +141,8 @@ int	WebServer::_handleRedirection()
 
 int	WebServer::_parseRequest()
 {
-	// if (this->_database.unchunkResponse())
-		// continue ;
+	if (this->_database.unchunkResponse())
+		return (1);
 	std::cout << GREEN << "Finished unchunking" << RESET << std::endl;
 
 	std::istringstream	request(this->_database.buffer[this->_database.socket]);
@@ -150,7 +150,7 @@ int	WebServer::_parseRequest()
 	if (this->_handleFavicon())
 		return (1);
 
-	// std::cout << BLUE << this->_database.buffer[this->_database.socket].substr(0, this->_database.buffer[this->_database.socket].find("\r\n\r\n")) << RESET << std::endl;
+	std::cout << BLUE << this->_database.buffer[this->_database.socket].substr(0, this->_database.buffer[this->_database.socket].find("\r\n\r\n")) << RESET << std::endl;
 
 	if (this->_handleRedirection())
 		return (1) ;
