@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/24 23:32:07 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/25 13:21:12 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -464,7 +464,6 @@ int	EuleeHand::unchunkResponse()
 {
 	if (this->buffer[this->socket].find("Transfer-Encoding: chunked") == std::string::npos)
 		return (0);
-	std::cout << MAGENTA << "Unchunking..." << RESET << std::endl;
 	std::vector<std::string>	bufferVector(10, "");
 	long		bytes_read = 0;
 	int			infile = open(WS_UNCHUNK_INFILE, O_RDWR | O_CREAT | O_TRUNC, 0777);
@@ -523,7 +522,10 @@ int	EuleeHand::unchunkResponse()
 
 	int	outfile = open(WS_UNCHUNK_OUTFILE, O_CREAT | O_TRUNC | O_RDWR, 0777);
 	for (size_t i = 0; i < bufferVector.size(); i++)
+	{
 		this->_unchunkIntofile(outfile, bufferVector[i], (i == 0));
+		std::cout << MAGENTA << "Unchunking: " << i + 1 / bufferVector.size() << "0%\r" << RESET;
+	}
 	close(outfile);
 
 	infile = open(WS_UNCHUNK_OUTFILE, O_RDONLY, 0777);
@@ -731,8 +733,7 @@ int	EuleeHand::parseHeader()
 		std::string contentLenghtStr = this->buffer[this->socket].substr(contentLenghtPos + std::strlen("Content-Length: "));
 		size_t	contentLenght = std::stoul(contentLenghtStr.substr(0, contentLenghtStr.find("\r\n")));
 		std::string	messageBody = this->buffer[this->socket].substr(headerEndPos + std::strlen("\r\n\r\n"));
-		if (messageBody.length() < (size_t)contentLenght)
-			return (0);
+		return (messageBody.length() >= (size_t)contentLenght);
 	}
 	return (1);
 }

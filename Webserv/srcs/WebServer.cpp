@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/24 23:31:57 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/25 20:15:14 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,10 @@ WebServer::WebServer(std::string configFilePath, char **envp)
 {
 	this->_database = EuleeHand(configFilePath, ConfigManager(configFilePath), envp);
 	this->_configManager = ConfigManager(configFilePath);
+	std::remove(WS_TEMP_FILE_IN);
+	std::remove(WS_TEMP_FILE_OUT);
+	std::remove(WS_UNCHUNK_INFILE);
+	std::remove(WS_UNCHUNK_OUTFILE);
 }
 
 WebServer::~WebServer() {}
@@ -83,15 +87,17 @@ void	WebServer::_setupServer()
 	}
 }
 
-void	WebServer::_acceptConnection()
+void	WebServer::_acceptConnection(int fd)
 {
-	this->_database.socket = accept(this->_database.serverFd[0], NULL, NULL);
+	struct sockaddr_in	client_addr;
+	int					client_addr_len;
+
+	client_addr_len = sizeof(client_addr);
+	this->_database.socket = accept(fd, (struct sockaddr *)&client_addr, (socklen_t *)&client_addr_len);
+	// this->_database.socket = accept(fd, NULL, NULL);
 	if (this->_database.socket == -1)
-	{
 		this->_database.perrorExit("Accept Error", 0);
-		close(this->_database.socket);
-	}
-	// fcntl(this->_database.socket, F_SETFL, O_NONBLOCK);
+	fcntl(this->_database.socket, F_SETFL, O_NONBLOCK);
 	this->_database.bytes_sent[this->_database.socket] = 0;
 	this->_database.parsed[this->_database.socket] = false;
 	FD_SET(this->_database.socket, &this->_database.myReadFds);
@@ -114,12 +120,13 @@ void	WebServer::_receiveRequest()
 	{
 		std::cout << std::endl;
 		FD_SET(this->_database.socket, &this->_database.myWriteFds);
-		FD_CLR(this->_database.socket, &this->_database.myReadFds);	
+		FD_CLR(this->_database.socket, &this->_database.myReadFds);
 	}
 }
 
 void	WebServer::_sendResponse()
 {
+	static int countOut = 0;
 	long	total = this->_database.bytes_sent[this->_database.socket];
 	long	sendVal = send(this->_database.socket, this->_database.response[this->_database.socket].c_str() + total, this->_database.response[this->_database.socket].size() - total, 0);
 	if (sendVal < 0)
@@ -132,12 +139,15 @@ void	WebServer::_sendResponse()
 
 	if ((size_t)this->_database.bytes_sent[this->_database.socket] != this->_database.response[this->_database.socket].size())
 		return ;
+
 	std::cout << std::endl;
+	this->_database.bytes_sent[this->_database.socket] = 0;
 	this->_database.buffer[this->_database.socket].clear();
 	this->_database.response[this->_database.socket].clear();
-	this->_database.parsed[this->_database.socket] = false;
+	this->_database.parsed.erase(this->_database.socket);
 	close(this->_database.socket);
 	FD_CLR(this->_database.socket, &this->_database.myWriteFds);
+	std::cout << YELLOW << "Replied back to " << countOut++ << " connections!" << std::endl;
 
 	std::cout << CYAN << "Port Accepted: ";
 	for (size_t i = 0; i < this->_database.server.size(); i++)
@@ -179,7 +189,7 @@ int	WebServer::_parseRequest()
 	if (this->_handleFavicon())
 		return (1);
 
-	// std::cout << BLUE << this->_database.buffer[this->_database.socket].substr(0, this->_database.buffer[this->_database.socket].find("\r\n\r\n")) << RESET << std::endl;
+	std::cout << BLUE << this->_database.buffer[this->_database.socket].substr(0, this->_database.buffer[this->_database.socket].find("\r\n\r\n")) << RESET << std::endl;
 
 	if (this->_handleRedirection())
 		return (1) ;
@@ -254,34 +264,42 @@ void	WebServer::_serverLoop()
 	FD_ZERO(&this->_database.myWriteFds);
 	for (size_t i = 0; i < this->_database.serverFd.size(); i++)
 	{
+		this->_database.parsed[this->_database.serverFd[i]] = false;
 		FD_SET(this->_database.serverFd[i], &this->_database.myReadFds);
-		fcntl(this->_database.serverFd[i], F_SETFL, O_NONBLOCK);
 	}
 	this->_database.socket = 0;
 	std::cout << CYAN << "Port Accepted: ";
 	for (size_t i = 0; i < this->_database.server.size(); i++)
 		std::cout << this->_database.server[i][LISTEN][this->_database.server[i].portIndex] << " ";
 	std::cout << "\nWaiting for new connections..." << RESET << std::endl;
+	static int countIn = 0;
 	while (1)
 	{
-		readFds = this->_database.myReadFds;
-		writeFds = this->_database.myWriteFds;
+		usleep(2500);
+		memcpy(&readFds, &this->_database.myReadFds, sizeof(this->_database.myReadFds));
+		memcpy(&writeFds, &this->_database.myWriteFds, sizeof(this->_database.myWriteFds));
 		int	selectVal = select(FD_SETSIZE, &readFds, &writeFds, NULL, &timeout);
 		if (selectVal == 0)
 			continue ;
-		for (int fd = 3; fd < FD_SETSIZE; fd++)
+		for (int fd = 0; fd < FD_SETSIZE; fd++) // Reading
 		{
 			if (!FD_ISSET(fd, &readFds))
 				continue ;
-			if (fd == this->_database.serverFd[0])
-				this->_acceptConnection();
+			int	isServerFd = 0;
+			for (size_t i = 0; i < this->_database.serverFd.size(); i++)
+				isServerFd += (fd == this->_database.serverFd[i]);
+			if (isServerFd)
+			{
+				this->_acceptConnection(fd);
+				std::cout << YELLOW << "Accepted " << countIn++ << " connections!" << std::endl;
+			}
 			else
 			{
 				this->_database.socket = fd;
 				this->_receiveRequest();
 			}
 		}
-		for (int fd = 3; fd < FD_SETSIZE; fd++)
+		for (int fd = 0; fd < FD_SETSIZE; fd++) // Writing
 		{
 			if (!FD_ISSET(fd, &writeFds))
 				continue ;
@@ -297,4 +315,3 @@ void	WebServer::_serverLoop()
 		}
 	}
 }
-

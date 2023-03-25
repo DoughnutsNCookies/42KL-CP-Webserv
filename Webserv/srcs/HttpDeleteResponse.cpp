@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/13 16:22:48 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/24 16:23:19 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/25 14:43:13 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,5 +27,5 @@ void	HttpDeleteResponse::handleDelete()
 		return ;
 	}
 	std::cout << GREEN << filePath << " has been deleted!" << RESET << std::endl;
-	close(this->_database->socket);
+	this->_database->sendHttp(200);
 }
