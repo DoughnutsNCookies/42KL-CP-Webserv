@@ -201,8 +201,7 @@ int		ConfigManager::checkLocationKey(size_t i, int previous, int *braces, int *m
 	{
 		if (*main_block == 1)
 		{
-			if (!(std::find(this->_locationVar.begin(), this->_locationVar.end(),
-				this->_tokens[i].token) != this->_locationVar.end())) // server
+			if (!(std::find(this->_locationVar.begin(), this->_locationVar.end(), this->_tokens[i].token) != this->_locationVar.end())) // server
 				printError("Not a valid string for Location block. ", i);
 		}
 

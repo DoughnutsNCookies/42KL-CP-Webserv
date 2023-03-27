@@ -17,6 +17,7 @@
 # include <fstream>
 # include <vector>
 # include <iostream>
+# include <algorithm>
 
 # include "Token.hpp"
 

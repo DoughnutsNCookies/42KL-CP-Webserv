@@ -246,9 +246,10 @@ std::string EuleeHand::_getFileCreationTime(const std::string &path, const std::
 	int rv = stat((full_path).c_str(), &result);
 	if (rv == 0)
 	{
-    	std::time_t last_modified_time = result.st_mtime;   
-    	std::time_t modified_time = static_cast<std::time_t>(last_modified_time);
-		return (std::ctime(&modified_time));
+		// joel - wsl (removed std from std::time_t and std::ctime)
+    	time_t last_modified_time = result.st_mtime;   
+    	time_t modified_time = static_cast<time_t>(last_modified_time);
+		return (ctime(&modified_time));
     }
 	else if (rv == -1)
     	std::cerr << "File {" <<  full_path << "} not found." << std::endl;
@@ -340,7 +341,9 @@ int	EuleeHand::checkPath(std::string path, int isFile, int isDirectory)
 {
     std::ifstream   temp(path + "/");
     if (temp.good() && isFile == 1 && isDirectory == 0)
-        return (0);
+	{
+    	return (0);
+	}
 	std::ifstream	file(path);
 	if (file.good()) // is a directory and a file
 	{
@@ -404,7 +407,7 @@ size_t	EuleeHand::_readFile(std::string *buffer1, std::string *buffer2, int infi
 			while (pos == std::string::npos)
 			{
 				*buffer1 += str;
-				std::memset(temp, 0, WS_BUFFER_SIZE);
+				memset(temp, 0, WS_BUFFER_SIZE);
 				bytes_read = read(infile, temp, WS_BUFFER_SIZE);
 				current_size += bytes_read;
 				std::string	next(temp);
@@ -451,11 +454,11 @@ int	EuleeHand::_unchunkIntofile(int fd, std::string bufferIn, int isHeader)
 		}
 		if (size == 0)
 			break ;
-		if (size > remaining.size() - std::strlen("\r\n"))
+		if (size > remaining.size() - strlen("\r\n"))
 			std::cout << "Chunk Error: Hex size is more than remaining size!" << std::endl;
-		std::string	tmp = remaining.substr(pos + std::strlen("\r\n"), size);
+		std::string	tmp = remaining.substr(pos + strlen("\r\n"), size);
 		write(fd, tmp.c_str(), tmp.size());
-		remaining = remaining.substr(pos + size + std::strlen("\r\n\r\n"));
+		remaining = remaining.substr(pos + size + strlen("\r\n\r\n"));
 	}
 	return (0);
 }
@@ -472,7 +475,7 @@ int	EuleeHand::unchunkResponse()
 
 	infile = open(WS_UNCHUNK_INFILE, O_RDONLY, 0777);
 	char		*temp = new char[WS_BUFFER_SIZE + 1];
-    std::memset(temp, 0, WS_BUFFER_SIZE + 1);
+    memset(temp, 0, WS_BUFFER_SIZE + 1);
 
 	std::ifstream	countSize(WS_UNCHUNK_INFILE);
 	countSize.seekg(0, std::ios::end);
@@ -486,7 +489,7 @@ int	EuleeHand::unchunkResponse()
 		while ((bytes_read = read(infile, temp, WS_BUFFER_SIZE)) > 0)
 		{
 			bufferVector[0].append(temp, bytes_read);
-			std::memset(temp, 0, WS_BUFFER_SIZE + 1);
+			memset(temp, 0, WS_BUFFER_SIZE + 1);
 		}
 	}
 	else
@@ -515,7 +518,7 @@ int	EuleeHand::unchunkResponse()
 				current_size += this->_readFile(&bufferVector[7], &bufferVector[8], infile, temp, bytes_read, 7, &count);
 			else
 				current_size += this->_readFile(&bufferVector[8], &bufferVector[9], infile, temp, bytes_read, 8, &count);
-			std::memset(temp, 0, WS_BUFFER_SIZE + 1);
+			memset(temp, 0, WS_BUFFER_SIZE + 1);
 		}
 	}
 	close(infile);
@@ -533,7 +536,7 @@ int	EuleeHand::unchunkResponse()
 	while ((bytes_read = read(infile, temp, WS_BUFFER_SIZE)) > 0)
 	{
 		this->buffer[this->socket].append(temp, bytes_read);
-		std::memset(temp, 0, WS_BUFFER_SIZE + 1);
+		memset(temp, 0, WS_BUFFER_SIZE + 1);
 	}
 	close(infile);
 	std::remove(WS_UNCHUNK_INFILE);
@@ -677,7 +680,7 @@ int	EuleeHand::checkClientBodySize()
 		clientMaxBodySize = std::stoul(this->server[this->serverIndex][CLIENT_MAX_BODY_SIZE][0]);
 	if (this->server[this->serverIndex].location[this->locationPath][CLIENT_MAX_BODY_SIZE].size() != 0)
 		clientMaxBodySize = std::min(clientMaxBodySize, std::stoul(this->server[this->serverIndex].location[this->locationPath][CLIENT_MAX_BODY_SIZE][0]));
-	size_t	startPos = this->buffer[this->socket].find("\r\n\r\n") + std::strlen("\r\n\r\n");
+	size_t	startPos = this->buffer[this->socket].find("\r\n\r\n") + strlen("\r\n\r\n");
 	if (this->buffer[this->socket].length() - startPos > clientMaxBodySize)
 	{
 		std::cout << RED << "Client Body Size Exceeded!" << RESET << std::endl;
@@ -702,7 +705,7 @@ size_t	EuleeHand::addEnv(std::string input)
 	{
 		i = 0;
 		this->envp[this->_envpSize] = new char[10000];
-		std::memset(this->envp[this->_envpSize], 0, 10000);
+		memset(this->envp[this->_envpSize], 0, 10000);
 		for (; input[i]; ++i)
 			this->envp[this->_envpSize][i] = input[i];
 		this->envp[this->_envpSize][i] = '\0';
@@ -730,9 +733,9 @@ int	EuleeHand::parseHeader()
 	size_t	contentLenghtPos = this->buffer[this->socket].find("Content-Length: ");
 	if (contentLenghtPos != std::string::npos)
 	{
-		std::string contentLenghtStr = this->buffer[this->socket].substr(contentLenghtPos + std::strlen("Content-Length: "));
+		std::string contentLenghtStr = this->buffer[this->socket].substr(contentLenghtPos + strlen("Content-Length: "));
 		size_t	contentLenght = std::stoul(contentLenghtStr.substr(0, contentLenghtStr.find("\r\n")));
-		std::string	messageBody = this->buffer[this->socket].substr(headerEndPos + std::strlen("\r\n\r\n"));
+		std::string	messageBody = this->buffer[this->socket].substr(headerEndPos + strlen("\r\n\r\n"));
 		return (messageBody.length() >= (size_t)contentLenght);
 	}
 	return (1);

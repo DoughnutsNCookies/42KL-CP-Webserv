@@ -11,8 +11,10 @@
 # **************************************************************************** #
 
 NAME		=	webserv
-CXX			=	g++
-CXXFLAGS	=	-Wall -Wextra -Werror -Wshadow -std=c++98 -pedantic
+# joel - wsl
+CXX			=	clang++ #g++
+# joel - std::stoi is c++11, srcs/WebServer.cpp:77:56 srcs/WebServer.cpp:177:90
+CXXFLAGS	=	-Wall -Wextra -Werror -Wshadow #-std=c++98 -pedantic
 ifeq ($(DB), 1)
     CXXFLAGS += -fsanitize=thread -g3
 endif
