@@ -13,24 +13,10 @@
 #ifndef WEBSERVER_HPP
 # define WEBSERVER_HPP
 
-# include <filesystem>
-# include <iostream>
-# include <sstream>
-# include <fstream>
-# include <cstring>
-# include <string>
-# include <limits>
-# include <vector>
-# include <map>
-# include <sys/socket.h>
-# include <unistd.h>
-# include <netdb.h>
-# include <fcntl.h>
-
 # include "webserv.hpp"
-# include "ConfigManager.hpp"
 # include "EuleeHand.hpp"
 # include "EuleeWallet.hpp"
+# include "ConfigManager.hpp"
 # include "HttpPostResponse.hpp"
 # include "HttpCgiResponse.hpp"
 # include "HttpGetResponse.hpp"

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../incs/webserv.hpp"
+#include "../incs/WebServer.hpp"
 
 int	main(int ac, char **av, char **envp)
 {

@@ -16,14 +16,6 @@
 # include "EuleePocket.hpp"
 # include "ConfigManager.hpp"
 
-# include <string.h>
-# include <iostream>
-# include <sstream>
-# include <fcntl.h>
-# include <dirent.h>
-# include <sys/stat.h>
-# include <sys/wait.h>
-
 # define WS_BUFFER_SIZE			100000
 # define WS_UNCHUNK_INFILE		".unchunkInfile"
 # define WS_UNCHUNK_OUTFILE		".unchunkOutfile"

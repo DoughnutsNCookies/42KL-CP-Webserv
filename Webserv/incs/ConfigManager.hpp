@@ -13,12 +13,6 @@
 #ifndef CONFIGMANAGER_HPP
 # define CONFIGMANAGER_HPP
 
-# include <string>
-# include <fstream>
-# include <vector>
-# include <iostream>
-# include <algorithm>
-
 # include "Token.hpp"
 
 class ConfigManager

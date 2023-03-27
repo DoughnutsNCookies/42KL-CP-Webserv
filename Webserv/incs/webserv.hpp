@@ -23,8 +23,25 @@
 # define CYAN		"\033[1;36m"
 # define WHITE		"\033[1;37m"
 
-# include "WebServer.hpp"
-# include "ConfigManager.hpp"
-# include "EuleeHand.hpp"
+# include <map>
+# include <vector>
+# include <string>
+# include <limits>
+# include <netdb.h>
+# include <sstream>
+# include <fstream>
+# include <cstring>
+# include <iostream>
+# include <algorithm>
+# include <filesystem>
+# include <fcntl.h>
+# include <dirent.h>
+# include <unistd.h>
+# include <sys/stat.h>
+# include <sys/wait.h>
+# include <sys/socket.h>
+# include <sys/select.h>
+# include <netinet/in.h>
+
 
 #endif
