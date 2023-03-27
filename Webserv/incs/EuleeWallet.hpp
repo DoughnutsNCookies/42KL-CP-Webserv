@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 15:10:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/20 14:22:00 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 23:31:09 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,22 +20,20 @@
 
 enum	Key
 {
-	LOCATION_READ_PATH, //USING
-	LISTEN, //USING
-	ROOT, //USING
-	INDEX, //USING
-	SERVER_NAME, //USING
+	LOCATION_READ_PATH,
+	LISTEN,
+	ROOT,
+	INDEX,
+	SERVER_NAME,
 	ERROR_PAGE,
 	CLIENT_MAX_BODY_SIZE,
 	AUTO_INDEX,
-	RETURN, //TBR
+	RETURN,
 	CGI,
-	INCLUDE,
-	UPLOAD, //USING
-	LIMIT_EXCEPT //USING
+	UPLOAD,
+	LIMIT_EXCEPT
 };
 
-// location block
 class EuleeWallet
 {
 	public:

@@ -6,64 +6,57 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:55:14 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/16 20:18:52 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 23:04:03 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/HttpCgiResponse.hpp"
 
-HttpCgiResponse::HttpCgiResponse(EuleeHand database) : _database(database) {}
+HttpCgiResponse::HttpCgiResponse(EuleeHand *database) : _database(database) {}
 
 HttpCgiResponse::~HttpCgiResponse() {}
 
-void	HttpCgiResponse::handleCgi()
+void    HttpCgiResponse::handleCgi()
 {
-	int		cgiInput[2], cgiOutput[2], status;
-	pid_t	pid;
+    std::ofstream   inFile(WS_TEMP_FILE_IN, std::ios::binary);
+    inFile << this->_database->buffer[this->_database->socket].substr(this->_database->buffer[this->_database->socket].find("\r\n\r\n") + std::strlen("\r\n\r\n"));
+    inFile.close();
 
-    if (pipe(cgiInput) < 0 || pipe(cgiOutput) < 0)
-        this->_database.perrorExit("Pipe Error");
-    if ((pid = fork()) < 0)
-        this->_database.perrorExit("Fork Error");
-    std::cout << &this->_database.envp << std::endl;
-    if (pid == 0)	// child process
-	{
-        close(cgiInput[1]);
-        close(cgiOutput[0]);
-
-        dup2(cgiInput[0], STDIN_FILENO);
-        dup2(cgiOutput[1], STDOUT_FILENO);
-
-		// setenv("REQUEST_METHOD", method, 1);
-        // setenv("SCRIPT_NAME", path, 1);
-        // setenv("QUERY_STRING", query_string, 1);
-        // setenv("CONTENT_TYPE", content_type, 1);
-        // setenv("CONTENT_LENGTH", std::to_string(contentLength.c_str(), 1);
-		// setenv("CONTENT_LENGTH", "69", 1);
-
-		// char	*cmds[2] = {(char *)(this->_database.methodPath.c_str() + 1), NULL};
-		char	*cmds[2] = {(char *)("/Users/schuah/42KL-CP-Webserv/Webserv/cgi_tester"), NULL};
-		execve(cmds[0], cmds, this->_database.envp);
-		std::cerr << RED << "Failed to execve CGI: " << strerror(errno) << RESET << std::endl;
-        std::cout << "HTTP/1.1 200 OK\r\n\r\n" << std::endl;
-        exit(EXIT_FAILURE);
+    pid_t pid = fork();
+    if (pid == 0)
+    {
+        int inFd = open(WS_TEMP_FILE_IN, O_RDONLY, 0777);
+		int outFd = open(WS_TEMP_FILE_OUT, O_CREAT | O_TRUNC | O_RDWR, 0777);
+        dup2(inFd, STDIN_FILENO);
+        close(inFd);
+        dup2(outFd, STDOUT_FILENO);
+		close(outFd);
+        std::string ext = this->_database->methodPath.substr(this->_database->methodPath.find_last_of("."));
+        std::cerr << GREEN << "CGI Path: " << this->_database->cgi[ext].c_str() << RESET << std::endl;
+        char *args[3] = {(char *)this->_database->cgi[ext].c_str(), (char *)this->_database->methodPath.c_str(), NULL};
+        this->_database->addEnv("PATH_INFO=" + this->_database->cgi[ext]);
+        execve(args[0], args, this->_database->envp);
+        std::remove(WS_TEMP_FILE_IN);
+        std::remove(WS_TEMP_FILE_OUT);
+        std::cerr << RED << "Execve failed..." << RESET << std::endl;
+        exit(1);
     }
-	else	// parent process
-	{
-        close(cgiInput[0]);
-        close(cgiOutput[1]);
-
-		std::string	buffer(WS_BUFFER_SIZE, '\0');
-        int n = read(cgiOutput[0], &buffer[0], WS_BUFFER_SIZE);
-        while (n > 0)
-		{
-			this->_database.ft_select(this->_database.socket, &buffer[0], n, WRITE);
-			n = read(cgiOutput[0], &buffer[0], WS_BUFFER_SIZE);
-        }
-
-        close(cgiInput[1]);
-        close(cgiOutput[0]);
-        waitpid(pid, &status, 0);
-		close(this->_database.socket);
+    waitpid(pid, NULL, 0);
+    std::string output = "";
+    int     outfd2 = open(WS_TEMP_FILE_OUT, O_RDWR, 0777);
+    char    *buffer = new char[WS_TESTER_SIZE];
+    long    bytes_read = 0, total = 0;
+    while ((bytes_read = read(outfd2, buffer, WS_TESTER_SIZE)) > 0)
+    {
+        output.append(buffer, bytes_read);
+        total += bytes_read;
     }
+    close(outfd2);
+    size_t  startPos = output.find("\r\n\r\n") + std::strlen("\r\n\r\n");
+    std::string newOutput = output.substr(startPos);
+
+    this->_database->response[this->_database->socket] = "HTTP/1.1 200 OK\r\n\r\n" + newOutput;
+    std::cout << GREEN << "CGI ran successfully!" << RESET << std::endl;
+    std::remove(WS_TEMP_FILE_IN);
+    std::remove(WS_TEMP_FILE_OUT);
 }

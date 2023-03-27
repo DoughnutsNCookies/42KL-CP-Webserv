@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:22:30 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/16 13:14:00 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 16:18:42 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 class HttpPostResponse
 {
 	public:
-		HttpPostResponse(EuleeHand database);
+		HttpPostResponse(EuleeHand *database);
 		~HttpPostResponse();
 		void		handlePost();
 
@@ -26,7 +26,7 @@ class HttpPostResponse
 		void		_normalSave();
 		void		_saveFile();
 
-		EuleeHand	_database;
+		EuleeHand	*_database;
 		size_t		_contentLength;
 		int 		_contentLengthSpecified;
 };

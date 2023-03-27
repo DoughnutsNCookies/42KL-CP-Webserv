@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 14:00:35 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/16 12:31:12 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 16:06:27 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,12 @@
 class HttpPutResponse
 {
 	public:
-		HttpPutResponse(EuleeHand database);
+		HttpPutResponse(EuleeHand *database);
 		~HttpPutResponse();
 		void		handlePut();
 
 	private:
-		EuleeHand	_database;
+		EuleeHand	*_database;
 };
 
 #endif

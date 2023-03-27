@@ -6,22 +6,43 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/20 14:24:54 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/25 20:15:14 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/WebServer.hpp"
 
-/* Class constructor that takes in configFilePath string */
+fd_set	readFds_cpy, writeFds_cpy;
+
 WebServer::WebServer(std::string configFilePath, char **envp)
 {
 	this->_database = EuleeHand(configFilePath, ConfigManager(configFilePath), envp);
 	this->_configManager = ConfigManager(configFilePath);
+	std::remove(WS_TEMP_FILE_IN);
+	std::remove(WS_TEMP_FILE_OUT);
+	std::remove(WS_UNCHUNK_INFILE);
+	std::remove(WS_UNCHUNK_OUTFILE);
 }
 
-WebServer::~WebServer(void) {}
+WebServer::~WebServer() {}
 
-void	WebServer::_setupServer(void)
+void	WebServer::runServer()
+{
+	this->_database.parseConfigFile();
+	std::cout << GREEN "Config File Parsing Done..." RESET << std::endl;
+	this->_database.configLibrary();
+	this->_database.errorHandleShit();
+	std::cout << GREEN "Error Handling File Done..." RESET << std::endl;
+	this->_database.parseConfigServer();
+	this->_database.printServers();
+	std::cout << GREEN "Config Server Parsing Done..." RESET << std::endl;
+	this->_database.addEnv("SERVER_PROTOCOL=HTTP/1.1");
+	this->_database.addEnv("HTTP_X_SECRET_HEADER_FOR_TEST=1");
+	this->_setupServer();
+	this->_serverLoop();
+}
+
+void	WebServer::_setupServer()
 {
 	addrinfo	hints, *res;
 
@@ -39,7 +60,7 @@ void	WebServer::_setupServer(void)
 			this->_database.perrorExit("Socket Error");
 
 		int	optval = 1;
-		if (setsockopt(this->_database.serverFd[i], SOL_SOCKET, SO_NOSIGPIPE, &optval, sizeof(optval)) == -1) //Done to keep socket alive even after Broken Pipe
+		if (setsockopt(this->_database.serverFd[i], SOL_SOCKET, SO_NOSIGPIPE, &optval, sizeof(optval)) == -1)
 			this->_database.perrorExit("Setsockopt Error");
 
 		this->_database.server[i][SERVER_NAME].push_back("localhost");
@@ -61,146 +82,236 @@ void	WebServer::_setupServer(void)
 		if (this->_database.server[i].portIndex == -1)
 			this->_database.perrorExit("Bind Error");
 		
-		if (listen(this->_database.serverFd[i], WS_BACKLOG) < 0)
+		if (listen(this->_database.serverFd[i], SOMAXCONN) < 0)
 			this->_database.perrorExit("Listen Error");
 	}
 }
 
-void	WebServer::_serverLoop(void)
+void	WebServer::_acceptConnection(int fd)
 {
-	while(1)
+	struct sockaddr_in	client_addr;
+	int					client_addr_len;
+
+	client_addr_len = sizeof(client_addr);
+	this->_database.socket = accept(fd, (struct sockaddr *)&client_addr, (socklen_t *)&client_addr_len);
+	// this->_database.socket = accept(fd, NULL, NULL);
+	if (this->_database.socket == -1)
+		this->_database.perrorExit("Accept Error", 0);
+	fcntl(this->_database.socket, F_SETFL, O_NONBLOCK);
+	this->_database.bytes_sent[this->_database.socket] = 0;
+	this->_database.parsed[this->_database.socket] = false;
+	FD_SET(this->_database.socket, &this->_database.myReadFds);
+}
+
+void	WebServer::_receiveRequest()
+{
+	char	readBuffer[WS_BUFFER_SIZE];
+
+	long	recvVal = recv(this->_database.socket, readBuffer, WS_BUFFER_SIZE, 0);
+	while (recvVal > 0)
 	{
-		std::cout << CYAN << "Port Accepted: ";
-		for (size_t i = 0; i < this->_database.server.size(); i++)
-			std::cout << this->_database.server[i][LISTEN][this->_database.server[i].portIndex] << " ";
-		std::cout << "\nWaiting for new connection..." << RESET << std::endl;
-		this->_database.socket = 0;
-		for (size_t i = 0; i < this->_database.server.size(); i++)
-			fcntl(this->_database.serverFd[i], F_SETFL, O_NONBLOCK);
-		while (this->_database.socket <= 0)
-		{
-			for (size_t i = 0; i < this->_database.server.size(); i++)
-			{
-				this->_database.socket = accept(this->_database.serverFd[i], NULL, NULL);
-				if (this->_database.socket != -1)
-				{
-					this->_database.serverIndex = i;
-					break ;
-				}
-			}
-		}
-		if (this->_database.socket < 0)
-			this->_database.perrorExit("Accept Error");
+		this->_database.buffer[this->_database.socket].append(readBuffer, recvVal);
+		std::cout << GREEN << "Receiving total: " << this->_database.buffer[this->_database.socket].size() << "\r" << RESET;
+		recvVal = recv(this->_database.socket, readBuffer, WS_BUFFER_SIZE, 0);
+		if (recvVal < 0)
+			break ;
+	}
+	if (this->_database.parseHeader())
+	{
+		std::cout << std::endl;
+		FD_SET(this->_database.socket, &this->_database.myWriteFds);
+		FD_CLR(this->_database.socket, &this->_database.myReadFds);
+	}
+}
 
-		size_t		total = 0;
-		char		readBuffer[WS_BUFFER_SIZE];
-		this->_database.buffer.clear();
-		long		valread = this->_database.ft_select(this->_database.socket, readBuffer, WS_BUFFER_SIZE, READ);
-		while (valread > 0)
-		{
-			total += valread;
-			std::cout << GREEN << "Received: " << valread << "\tTotal: " << total << RESET << std::endl;
-			if (valread < 0)
-			{
-				close(this->_database.socket);
-				return ;
-			}
-			this->_database.buffer.append(readBuffer, valread);
-			valread = this->_database.ft_select(this->_database.socket, readBuffer, WS_BUFFER_SIZE, READ);
-		}
+void	WebServer::_sendResponse()
+{
+	static int countOut = 0;
+	long	total = this->_database.bytes_sent[this->_database.socket];
+	long	sendVal = send(this->_database.socket, this->_database.response[this->_database.socket].c_str() + total, this->_database.response[this->_database.socket].size() - total, 0);
+	if (sendVal < 0)
+	{
+		this->_database.perrorExit("Send Error", 0);
+		return ;
+	}
+	this->_database.bytes_sent[this->_database.socket] += sendVal;
+	std::cout << GREEN << "Sending total: " << this->_database.bytes_sent[this->_database.socket] << RESET << "\r";
 
-		if (this->_database.unchunkResponse() == -1)
-		{
-			close(this->_database.socket);
-			continue ;
-		}
-		std::cout << GREEN << "Finished unchunking" << RESET << std::endl;
+	if ((size_t)this->_database.bytes_sent[this->_database.socket] != this->_database.response[this->_database.socket].size())
+		return ;
 
-		std::istringstream	request(this->_database.buffer);
-		
-		request >> this->_database.method >> this->_database.methodPath;
-		if (this->_database.methodPath == "/favicon.ico") // Ignore favicon
-		{
-			std::string	message = "Go away favicon";
-			std::cout << RED << message << RESET << std::endl;
-			std::string response = "HTTP/1.1 404 Not Found\r\n\r\n" + message;
-			this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.length(), WRITE);
-			close(this->_database.socket);
-			continue;
-		}
-		std::cout << BLUE << this->_database.buffer.substr(0, this->_database.buffer.find("\r\n\r\n")) << RESET << std::endl;
-		// std::cout << BLUE << this->_database.buffer << RESET << std::endl;
+	std::cout << std::endl;
+	this->_database.bytes_sent[this->_database.socket] = 0;
+	this->_database.buffer[this->_database.socket].clear();
+	this->_database.response[this->_database.socket].clear();
+	this->_database.parsed.erase(this->_database.socket);
+	close(this->_database.socket);
+	FD_CLR(this->_database.socket, &this->_database.myWriteFds);
+	std::cout << YELLOW << "Replied back to " << countOut++ << " connections!" << std::endl;
 
-		/* FOR DEBUGGING: TO DELETE */
-		// if (this->_database.method == "POST" && this->_database.methodPath == "/directory/youpi.bla")
-		// {
-		// 	std::cout << "Entered force output!" << std::endl;
-		// 	std::string response = "HTTP/1.1 200 OK\r\n\r\n";
-		// 	this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.size(), WRITE);
-		// 	close(this->_database.socket);
-		// 	continue ;
-		// }
+	std::cout << CYAN << "Port Accepted: ";
+	for (size_t i = 0; i < this->_database.server.size(); i++)
+		std::cout << this->_database.server[i][LISTEN][this->_database.server[i].portIndex] << " ";
+	std::cout << "\nWaiting for new connections..." << RESET << std::endl;
+}
 
-		if (this->_database.checkExcept())
-			continue ;
-		this->_database.convertLocation();
+int	WebServer::_handleFavicon()
+{
+	if (this->_database.methodPath != "/favicon.ico")
+		return (0);
+	std::cout << RED << "Go away favicon" << RESET << std::endl;
+	this->_database.sendHttp(404);
+	return (1);
+}
 
-		if (this->_database.method == "HEAD")
-		{
-			std::cout << MAGENTA << "Head method called" << RESET << std::endl;
-			HttpHeadResponse	headResponse(this->_database);
-			headResponse.handleHead();
-		}
-		// else if (this->_database.methodPath.find('.') != std::string::npos && (this->_database.method == "POST" && this->_database.methodPath == "/YoupiBanane/youpi.bla"))
-		else if (this->_database.method == "POST" && this->_database.methodPath == "/YoupiBanane/youpi.bla")
+int	WebServer::_handleRedirection()
+{
+	if (this->_database.server[this->_database.serverIndex].location.find(this->_database.methodPath) == this->_database.server[this->_database.serverIndex].location.end())
+		return (0);
+	if (this->_database.server[this->_database.serverIndex].location[this->_database.methodPath][RETURN].empty())
+		return (0);
+	std::string	statusCode = this->_database.server[this->_database.serverIndex].location[this->_database.methodPath][RETURN][0];
+	std::string	redirectionPath = this->_database.server[this->_database.serverIndex].location[this->_database.methodPath][RETURN][1];
+	std::string response = "HTTP/1.1 " + statusCode + " " + this->_database.statusList[std::stoi(statusCode)] + "\r\nLocation: " + redirectionPath + "\r\n\r\n";
+	this->_database.response[this->_database.socket] = response;
+	std::cout << GREEN << "Redirected with status code " + statusCode + " to: " + redirectionPath << RESET << std::endl;
+	return (1);
+}
+
+int	WebServer::_parseRequest()
+{
+	if (this->_database.unchunkResponse())
+		return (1);
+	std::cout << GREEN << "Finished unchunking" << RESET << std::endl;
+
+	std::istringstream	request(this->_database.buffer[this->_database.socket]);
+	request >> this->_database.method >> this->_database.methodPath;
+	if (this->_handleFavicon())
+		return (1);
+
+	std::cout << BLUE << this->_database.buffer[this->_database.socket].substr(0, this->_database.buffer[this->_database.socket].find("\r\n\r\n")) << RESET << std::endl;
+
+	if (this->_handleRedirection())
+		return (1) ;
+	if (this->_database.checkExcept())
+		return (1) ;
+	this->_database.convertLocation();
+	if (this->_database.checkClientBodySize())
+		return (1) ;
+
+	this->_database.addEnv("REQUEST_METHOD=" + this->_database.method);
+	return (0);
+}
+
+void	WebServer::_doRequest()
+{
+	try
+	{
+		if (this->_database.isCGI())
 		{
 			std::cout << MAGENTA << "CGI method called" << RESET << std::endl;
-			HttpCgiResponse	cgiResponse(this->_database);
+			HttpCgiResponse	cgiResponse(&this->_database);
 			cgiResponse.handleCgi();
+		}
+		else if (this->_database.method == "HEAD")
+		{
+			std::cout << MAGENTA << "Head method called" << RESET << std::endl;
+			HttpHeadResponse	headResponse(&this->_database);
+			headResponse.handleHead();
 		}
 		else if (this->_database.method == "POST")
 		{
 			std::cout << MAGENTA << "Post method called" << RESET << std::endl;
-			HttpPostResponse	postResponse(this->_database);
+			HttpPostResponse	postResponse(&this->_database);
 			postResponse.handlePost();
 		}
 		else if (this->_database.method == "PUT")
 		{
 			std::cout << MAGENTA << "Put method called" << RESET << std::endl;
-			HttpPutResponse	putResponse(this->_database);
+			HttpPutResponse	putResponse(&this->_database);
 			putResponse.handlePut();
 		}
 		else if (this->_database.method == "DELETE")
 		{
 			std::cout << MAGENTA << "Delete method called" << RESET << std::endl;
-			HttpDeleteResponse	deleteResponse(this->_database);
+			HttpDeleteResponse	deleteResponse(&this->_database);
 			deleteResponse.handleDelete();
 		}
-		else if (this->_database.method == "GET" && this->_database.methodPath != "/" && this->_database.isCGI() == 0) // Will be determined by the config
+		else if (this->_database.method == "GET")
 		{
 			std::cout << MAGENTA << "Get method called" << RESET << std::endl;
-			HttpGetResponse	getResponse(this->_database);
+			HttpGetResponse	getResponse(&this->_database);
 			getResponse.handleGet();
 		}
-		else
-		{
-			std::cout << MAGENTA << "Default method called" << RESET << std::endl;
-			HttpDefaultResponse	defaultResponse(this->_database);
-			defaultResponse.handleDefault();
-		}
+	}
+	catch(const std::exception& e)
+	{
+		std::cout << RED << e.what() << RESET << '\n';
+		std::remove(WS_TEMP_FILE_IN);
+		std::remove(WS_TEMP_FILE_OUT);
+		this->_database.sendHttp(500);
 	}
 }
 
-void	WebServer::runServer()
+void	WebServer::_serverLoop()
 {
-	this->_database.parseConfigFile();
-	std::cout << GREEN "Config File Parsing Done..." RESET << std::endl;
-	this->_database.configLibrary();
-	this->_database.errorHandleShit();
-	std::cout << GREEN "Error Handling File Done..." RESET << std::endl;
-	this->_database.parseConfigServer();
-	this->_database.printServers();
-	std::cout << GREEN "Config Server Parsing Done..." RESET << std::endl;
-	this->_setupServer();
-	this->_serverLoop();
+	fd_set	readFds, writeFds;
+	timeval	timeout;
+	
+	timeout.tv_sec = 1;
+	timeout.tv_usec = 0;
+	FD_ZERO(&this->_database.myReadFds);
+	FD_ZERO(&this->_database.myWriteFds);
+	for (size_t i = 0; i < this->_database.serverFd.size(); i++)
+	{
+		this->_database.parsed[this->_database.serverFd[i]] = false;
+		FD_SET(this->_database.serverFd[i], &this->_database.myReadFds);
+	}
+	this->_database.socket = 0;
+	std::cout << CYAN << "Port Accepted: ";
+	for (size_t i = 0; i < this->_database.server.size(); i++)
+		std::cout << this->_database.server[i][LISTEN][this->_database.server[i].portIndex] << " ";
+	std::cout << "\nWaiting for new connections..." << RESET << std::endl;
+	static int countIn = 0;
+	while (1)
+	{
+		usleep(2500);
+		memcpy(&readFds, &this->_database.myReadFds, sizeof(this->_database.myReadFds));
+		memcpy(&writeFds, &this->_database.myWriteFds, sizeof(this->_database.myWriteFds));
+		int	selectVal = select(FD_SETSIZE, &readFds, &writeFds, NULL, &timeout);
+		if (selectVal == 0)
+			continue ;
+		for (int fd = 0; fd < FD_SETSIZE; fd++) // Reading
+		{
+			if (!FD_ISSET(fd, &readFds))
+				continue ;
+			int	isServerFd = 0;
+			for (size_t i = 0; i < this->_database.serverFd.size(); i++)
+				isServerFd += (fd == this->_database.serverFd[i]);
+			if (isServerFd)
+			{
+				this->_acceptConnection(fd);
+				std::cout << YELLOW << "Accepted " << countIn++ << " connections!" << std::endl;
+			}
+			else
+			{
+				this->_database.socket = fd;
+				this->_receiveRequest();
+			}
+		}
+		for (int fd = 0; fd < FD_SETSIZE; fd++) // Writing
+		{
+			if (!FD_ISSET(fd, &writeFds))
+				continue ;
+			this->_database.socket = fd;
+			if (this->_database.parsed[this->_database.socket] == false)
+			{
+				if (this->_parseRequest() == 0)
+					this->_doRequest();
+				this->_database.parsed[this->_database.socket] = true;
+			}
+			if (this->_database.parsed[this->_database.socket])
+				this->_sendResponse();
+		}
+	}
 }

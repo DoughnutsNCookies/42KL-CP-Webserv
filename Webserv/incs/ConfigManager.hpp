@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:49:34 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/14 19:21:38 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 23:30:56 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ class ConfigManager
 		void			configLibrary(void);
 
 		void			checkImportantCheck(int i);
+		bool			checkCompulsories(int i);
 
 		int				checkServerKey(size_t i, int previous, int *braces, int *main_block);
 		int				checkLocationKey(size_t i, int previous, int *braces, int *main_block);
@@ -45,7 +46,6 @@ class ConfigManager
 		int				locationBlock(size_t i);
 		void			errorHandleShit(void);
 
-		// Utils
 		void				printError(std::string str, int i);
 		std::vector<Token>	&getToken(void);
 

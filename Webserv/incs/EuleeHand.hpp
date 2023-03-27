@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/20 14:26:10 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/25 20:15:38 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,18 @@
 # include "EuleePocket.hpp"
 # include "ConfigManager.hpp"
 
+# include <iostream>
+# include <sstream>
+# include <fcntl.h>
+# include <dirent.h>
+# include <sys/stat.h>
+
+# define WS_BUFFER_SIZE			100000
+# define WS_UNCHUNK_INFILE		".unchunkInfile"
+# define WS_UNCHUNK_OUTFILE		".unchunkOutfile"
+# define WS_ERROR_PAGE_PATH 	"./html/server_html/error.html"
+# define WS_DEFAULT_PAGE_PATH	"./html/server_html/default.html"
+
 class EuleeHand
 {
 	public:
@@ -23,6 +35,13 @@ class EuleeHand
 		EuleeHand(std::string configFilePath, const ConfigManager &configManager, char **envp);
 		~EuleeHand();
 
+		int			checkPath(std::string path, int	isFile, int isDirectory);
+		int			sendHttp(int statusCode, std::string htmlPath = "");
+		int			isCGI();
+		int			checkExcept();
+		int			checkClientBodySize();
+		int			parseHeader();
+		int			unchunkResponse();
 		void		printTokens();
 		void		parseConfigFile();
 		void		configLibrary();
@@ -30,34 +49,41 @@ class EuleeHand
 		void		printServers();
 		void		parseConfigServer();
 		void		perrorExit(std::string msg, int exitTrue = 1);
-		long		ft_select(int fd, void *buff, size_t size, Mode mode);
-		int			checkPath(std::string path, int	isFile, int isDirectory);
-		std::string	extractHTML(std::string path);
-		int			sendHttp(int statusCode, std::string path);
-
-
-		int			isCGI();
-		int			checkExcept();
-		int			unchunkResponse();
 		void		convertLocation();
+		size_t		addEnv(std::string input);
 		std::string	cgiPath();
+		std::string	extractHTML(std::string path);
+		std::string directoryListing(std::string path);
+		
 
 		char								**envp;
 		std::map<std::string, std::string>	cgi;
-		std::map<int, std::string>			statusList;
+		std::map<int, std::string>			errorpage, statusList, buffer, response;
+		std::map<int, long>					bytes_sent;
+		std::map<int, bool>					parsed;
 		std::vector<EuleePocket>			server;
 		std::vector<int>					serverFd;
 		std::vector<sockaddr_in>			serverAddr;
-		int									socket, serverIndex, useDefaultIndex;
-		std::string							method, methodPath, buffer, locationPath;
+		int									socket, serverIndex, useDefaultIndex, useDirectoryListing;
+		std::string							method, methodPath, locationPath;
+		fd_set								myReadFds, myWriteFds;
 
 	private:
+		size_t			_envpSize;
 		std::string		_configFilePath;
 		ConfigManager	_configManager;
+
+
+		int				_unchunkIntofile(int fd, std::string buffer, int isHeader);
+		size_t			_readFile(std::string *buffer1, std::string *buffer2, int infile, char *temp, long bytes_read, int type, int *count);
 		size_t			_parseServer(std::vector<Token> &tokens, size_t i);
+		size_t			_parseErrorPage(std::vector<Token> &tokens, size_t i);
 		size_t			_parseCgi(std::vector<Token> &tokens, size_t i, EuleeWallet &location, int blockType);
 		size_t			_parseLocation(std::vector<Token> &tokens, std::vector<EuleeWallet> &location, size_t i);
 		size_t			_parsingHelper(std::vector<Token> &tokens, size_t i, EuleeWallet &location, std::string needle, Key key);
+		std::string 	_getFileCreationTime(const std::string &path, const std::string &file_name);
+		std::string 	_getFileSize(const std::string &path, const std::string &file_name);
+		
 };
 
 #endif

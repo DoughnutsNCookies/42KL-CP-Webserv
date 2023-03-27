@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:20:41 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/14 18:59:07 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/24 15:45:14 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,12 @@
 class HttpGetResponse
 {
 	public:
-		HttpGetResponse(EuleeHand database);
+		HttpGetResponse(EuleeHand *database);
 		~HttpGetResponse();
 		void		handleGet();
 
 	private:
-		EuleeHand	_database;
+		EuleeHand	*_database;
 };
 
 #endif

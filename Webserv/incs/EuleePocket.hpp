@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   EuleePocket.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 17:51:51 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/17 14:03:07 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/24 23:31:05 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@
 # define CYAN		"\033[1;36m"
 # define BLUENORM	"\033[34m"
 # define CYANNORM	"\033[36m"
-# define WS_TIMEOUT	3
 
 enum	Mode
 {
@@ -34,7 +33,6 @@ enum	Mode
 	WRITE
 };
 
-// server block
 class EuleePocket
 {
 	public:
@@ -49,11 +47,9 @@ class EuleePocket
 
 		mapped_type	&operator[](key_type key);
 
-		// member function
 		iterator	begin(void);
 		iterator	end(void);
 
-		// member variable
 		std::vector<EuleeWallet>			vectorLocation;
 		std::map<std::string, EuleeWallet>	location;
 		int									portIndex;
