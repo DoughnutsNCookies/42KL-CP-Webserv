@@ -3,25 +3,26 @@
 /*                                                        :::      ::::::::   */
 /*   EuleeHand.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/28 19:06:51 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/28 21:00:29 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "EuleeHand.hpp"
 
-EuleeHand::EuleeHand() : envp(), cgi(), statusList(), buffer(), server(), serverFd(), serverAddr(), socket(), _envpSize() {}
+EuleeHand::EuleeHand() : envp(), cgi(), statusList(), buffer(), server(), serverFd(), serverAddr(), socket(), connectionCount(), _envpSize() {}
 
-EuleeHand::EuleeHand(std::string configFilePath, const ConfigManager &configManager) : envp(), cgi(), statusList(), buffer(), server(), serverFd(), serverAddr(), socket(), _envpSize(), _configFilePath(configFilePath), _configManager(configManager)
+EuleeHand::EuleeHand(std::string configFilePath, const ConfigManager &configManager) : envp(), cgi(), statusList(), buffer(), server(), serverFd(), serverAddr(), socket(), connectionCount(), _envpSize(), _configFilePath(configFilePath), _configManager(configManager)
 {
-	this->envp = new char*[15];
+	this->envp = new char*[16];
 	for (size_t i = 0; i < 15; ++i)
 	{
 		this->envp[i] = new char[1000];
 		std::memset(this->envp[i], 0, 1000);
 	}
+	this->envp[16] = NULL;
 }
 
 EuleeHand::~EuleeHand() {}

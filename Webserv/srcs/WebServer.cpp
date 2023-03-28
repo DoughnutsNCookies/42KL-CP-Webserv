@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/28 19:44:35 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/28 21:07:29 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,7 @@ void	WebServer::_acceptConnection(int fd)
 	}
 	this->_database.bytes_sent[this->_database.socket] = 0;
 	this->_database.parsed[this->_database.socket] = false;
+	this->_database.connectionCount++;
 	FD_SET(this->_database.socket, &this->_database.myReadFds);
 }
 
@@ -152,11 +153,13 @@ void	WebServer::_sendResponse()
 
 	std::cout << std::endl;
 	this->_database.bytes_sent[this->_database.socket] = 0;
-	this->_database.buffer[this->_database.socket].clear();
-	this->_database.response[this->_database.socket].clear();
-	std::cout << "Sent Socket[" << this->_database.socket << "] size: " << this->_database.buffer[this->_database.socket].size() << std::endl;
-
+	this->_database.bytes_sent.erase(this->_database.socket);
+	this->_database.buffer.erase(this->_database.socket);
+	this->_database.response.erase(this->_database.socket);
 	this->_database.parsed.erase(this->_database.socket);
+	this->_database.connectionCount--;
+
+	std::cout << "Sent Socket[" << this->_database.socket << "] size: " << this->_database.buffer[this->_database.socket].size() << std::endl;
 	close(this->_database.socket);
 	FD_CLR(this->_database.socket, &this->_database.myWriteFds);
 	std::cout << YELLOW << "Replied back to " << ++countOut << " connections!" << std::endl;
@@ -301,8 +304,12 @@ void	WebServer::_serverLoop()
 				isServerFd += (fd == this->_database.serverFd[i]);
 			if (isServerFd)
 			{
-				this->_acceptConnection(fd);
-				std::cout << YELLOW << "Accepted " << ++countIn << " connections!" << std::endl;
+				std::cout << this->_database.connectionCount << std::endl;
+				if (this->_database.connectionCount <= 25)
+				{
+					this->_acceptConnection(fd);
+					std::cout << YELLOW << "Accepted " << ++countIn << " connections!" << std::endl;
+				}
 			}
 			else
 			{
@@ -317,7 +324,7 @@ void	WebServer::_serverLoop()
 			this->_database.socket = fd;
 			int	oneIsParsed = 0;
 			for (size_t i = 0; i < FD_SETSIZE; i++)
-				oneIsParsed += (this->_database.parsed[i] == true);
+				oneIsParsed += this->_database.parsed[i];
 			if (this->_database.parsed[this->_database.socket] == false && oneIsParsed == 0)
 			{
 				if (this->_parseRequest() == 0)

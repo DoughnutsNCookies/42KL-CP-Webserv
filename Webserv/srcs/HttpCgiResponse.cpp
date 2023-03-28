@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpCgiResponse.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:55:14 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/28 19:32:43 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/28 20:43:28 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,10 @@ HttpCgiResponse::~HttpCgiResponse() {}
 
 void    HttpCgiResponse::handleCgi()
 {
-	std::cout << "CGI Socket[" << this->_database->socket << "] size: " << this->_database->buffer[this->_database->socket].size() << std::endl;
 	static int count = 0;
+	std::cout << count << ": CGI Socket[" << this->_database->socket << "] size: " << this->_database->buffer[this->_database->socket].size() << std::endl;
 	std::string		inFileName = WS_TEMP_FILE_IN + std::to_string(count);
 	std::string		outFileName = WS_TEMP_FILE_OUT + std::to_string(count);
-	std::cout << this->_database->buffer[this->_database->socket].find("\r\n\r\n") << std::endl;
 	std::string		toWrite = this->_database->buffer[this->_database->socket].substr(this->_database->buffer[this->_database->socket].find("\r\n\r\n") + std::strlen("\r\n\r\n"));
 	std::remove(inFileName.c_str());
 	int tempFd = open(inFileName.c_str(), O_CREAT | O_TRUNC | O_RDWR, 0777);
@@ -49,8 +48,8 @@ void    HttpCgiResponse::handleCgi()
 	this->_database->addEnv("SERVER_SOFTWARE=webserv");
 	this->_database->addEnv("SERVER_PORT=" + this->_database->server[this->_database->serverIndex[this->_database->socket]][LISTEN][this->_database->server[this->_database->serverIndex[this->_database->socket]].portIndex]);
 
-	for (size_t i = 0; this->_database->envp[i]; i++)
-		std::cerr << "Envp: " << this->_database->envp[i] << std::endl;
+	// for (size_t i = 0; this->_database->envp[i]; i++)
+		// std::cerr << "Envp: " << this->_database->envp[i] << std::endl;
 	std::cout << GREEN << "CGI Path: " << this->_database->cgi[ext].c_str() << RESET << std::endl;
 	std::cerr << "Socket: " << this->_database->socket << std::endl;
 
