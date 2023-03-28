@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/13 16:22:48 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/25 14:43:13 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/28 13:38:41 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ HttpDeleteResponse::~HttpDeleteResponse() {}
 
 void	HttpDeleteResponse::handleDelete()
 {
-	std::string	filePath = "." + this->_database->methodPath;
+	std::string	filePath = "." + this->_database->methodPath[this->_database->socket];
 	int	result = std::remove(filePath.c_str());
 	if (result != 0)
 	{
