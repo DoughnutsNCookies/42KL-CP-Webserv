@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:20:26 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/28 13:38:53 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/28 13:54:26 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,12 +40,12 @@ void	HttpGetResponse::handleGet()
 	if (file.read(&fileContents[0], file_size).fail())
 	{
 		std::cerr << RED << "Error reading " << this->_database->methodPath[this->_database->socket] << "!" << RESET << std::endl;
-		if (this->_database->useDirectoryListing)
+		if (this->_database->useDirectoryListing[this->_database->socket])
 		{
 			this->_database->buffer[this->_database->socket] = "HTTP/1.1 200 OK\r\n\r\n" + this->_database->directoryListing(this->_database->methodPath[this->_database->socket]);
 			std::cout << GREEN << "Autoindex is set on, directory listing sent!" << RESET << std::endl;
 		}
-		else if (this->_database->checkPath(this->_database->methodPath[this->_database->socket].c_str() + 1, 0, 1) || this->_database->useDefaultIndex)
+		else if (this->_database->checkPath(this->_database->methodPath[this->_database->socket].c_str() + 1, 0, 1) || this->_database->useDefaultIndex[this->_database->socket])
 			this->_database->sendHttp(200);
 		else
 			this->_database->sendHttp(404);
