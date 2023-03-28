@@ -6,13 +6,13 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/07 18:13:23 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/16 20:19:45 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/28 18:27:12 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/webserv.hpp"
 
-int	main(int ac, char **av, char **envp)
+int	main(int ac, char **av)
 {
 	std::string configFile = DEFAULT_CONFIG_PATH;
 
@@ -25,7 +25,7 @@ int	main(int ac, char **av, char **envp)
 		configFile = av[1];
 	std::cout << GREEN "Reading config file : " CYAN << configFile << RESET << std::endl;
 	try {
-		WebServer	webserver(configFile, envp);
+		WebServer	webserver(configFile);
 		webserver.runServer();
 	}
 	catch (std::exception &e) {

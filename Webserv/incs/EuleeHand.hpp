@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/28 13:53:57 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/28 18:32:36 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ class EuleeHand
 {
 	public:
 		EuleeHand();
-		EuleeHand(std::string configFilePath, const ConfigManager &configManager, char **envp);
+		EuleeHand(std::string configFilePath, const ConfigManager &configManager);
 		~EuleeHand();
 
 		int			checkPath(std::string path, int	isFile, int isDirectory);
@@ -51,10 +51,10 @@ class EuleeHand
 		void		perrorExit(std::string msg, int exitTrue = 1);
 		void		convertLocation();
 		size_t		addEnv(std::string input);
+		size_t		clearEnv();
 		std::string	cgiPath();
 		std::string	extractHTML(std::string path);
 		std::string directoryListing(std::string path);
-		
 
 		char								**envp;
 		std::map<std::string, std::string>	cgi;
@@ -71,7 +71,6 @@ class EuleeHand
 		size_t			_envpSize;
 		std::string		_configFilePath;
 		ConfigManager	_configManager;
-
 
 		int				_unchunkIntofile(int fd, std::string buffer, int isHeader);
 		size_t			_readFile(std::string *buffer1, std::string *buffer2, int infile, char *temp, long bytes_read, int type, int *count);
