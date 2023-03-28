@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpCgiResponse.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:55:14 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/28 20:43:28 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/28 23:34:36 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,15 +19,13 @@ HttpCgiResponse::~HttpCgiResponse() {}
 void    HttpCgiResponse::handleCgi()
 {
 	static int count = 0;
-	std::cout << count << ": CGI Socket[" << this->_database->socket << "] size: " << this->_database->buffer[this->_database->socket].size() << std::endl;
+	std::cout << "CGI count: " << count << std::endl;
 	std::string		inFileName = WS_TEMP_FILE_IN + std::to_string(count);
 	std::string		outFileName = WS_TEMP_FILE_OUT + std::to_string(count);
 	std::string		toWrite = this->_database->buffer[this->_database->socket].substr(this->_database->buffer[this->_database->socket].find("\r\n\r\n") + std::strlen("\r\n\r\n"));
 	std::remove(inFileName.c_str());
 	int tempFd = open(inFileName.c_str(), O_CREAT | O_TRUNC | O_RDWR, 0777);
-	
-	std::cerr << "Writing size: " << toWrite.size() << std::endl;
-	std::cerr << "Wrote: " << write(tempFd, toWrite.c_str(), toWrite.size()) << std::endl;
+	write(tempFd, toWrite.c_str(), toWrite.size());
 	close(tempFd);
 
 	std::string ext = this->_database->methodPath[this->_database->socket].substr(this->_database->methodPath[this->_database->socket].find_last_of("."));
@@ -48,10 +46,7 @@ void    HttpCgiResponse::handleCgi()
 	this->_database->addEnv("SERVER_SOFTWARE=webserv");
 	this->_database->addEnv("SERVER_PORT=" + this->_database->server[this->_database->serverIndex[this->_database->socket]][LISTEN][this->_database->server[this->_database->serverIndex[this->_database->socket]].portIndex]);
 
-	// for (size_t i = 0; this->_database->envp[i]; i++)
-		// std::cerr << "Envp: " << this->_database->envp[i] << std::endl;
 	std::cout << GREEN << "CGI Path: " << this->_database->cgi[ext].c_str() << RESET << std::endl;
-	std::cerr << "Socket: " << this->_database->socket << std::endl;
 
 	std::remove(outFileName.c_str());
 	int	stdinFd = dup(STDIN_FILENO);
@@ -61,9 +56,9 @@ void    HttpCgiResponse::handleCgi()
 	{
 		int inFd = open(inFileName.c_str(), O_RDONLY, 0777);
 		int outFd = open(outFileName.c_str(), O_CREAT | O_TRUNC | O_RDWR, 0777);
-		std::cerr << "DUP1 IN return: " << dup2(inFd, STDIN_FILENO) << std::endl;
+		dup2(inFd, STDIN_FILENO);
 		close(inFd);
-		std::cerr << "DUP2 OUT return: " << dup2(outFd, STDOUT_FILENO) << std::endl;
+		dup2(outFd, STDOUT_FILENO);
 		close(outFd);
 		char *args[3] = {(char *)this->_database->cgi[ext].c_str(), (char *)this->_database->methodPath[this->_database->socket].c_str(), NULL};
 		execve(args[0], args, this->_database->envp);
@@ -87,10 +82,8 @@ void    HttpCgiResponse::handleCgi()
 		std::memset(buffer, 0, WS_BUFFER_SIZE + 1);
 		total += bytesRead;
 	}
-	std::cerr << "Output size: " << total << " Actual: " << output.length() << std::endl;
 	close(outfd2);
 	size_t  startPos = output.find("\r\n\r\n") + std::strlen("\r\n\r\n");
-	std::cout << "startPos: " << startPos << std::endl;
 	std::string newOutput = output.substr(startPos);
 
 	this->_database->response[this->_database->socket] = "HTTP/1.1 200 OK\r\n\r\n" + newOutput;

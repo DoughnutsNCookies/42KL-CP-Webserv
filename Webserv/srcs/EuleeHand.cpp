@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   EuleeHand.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/28 21:00:29 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/28 23:04:44 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -474,16 +474,15 @@ int	EuleeHand::unchunkResponse()
 	write(infile, this->buffer[this->socket].c_str(), this->buffer[this->socket].size());
 	close(infile);
 
-	infile = open(WS_UNCHUNK_INFILE, O_RDONLY, 0777);
-	char		*temp = new char[WS_BUFFER_SIZE + 1];
-    std::memset(temp, 0, WS_BUFFER_SIZE + 1);
-
 	std::ifstream	countSize(WS_UNCHUNK_INFILE);
 	countSize.seekg(0, std::ios::end);
 	size_t	total = countSize.tellg();
 	countSize.seekg(0, std::ios::beg);
 	countSize.close();
-	size_t	current_size = 0;
+
+	size_t		current_size = 0;
+	char		*temp = new char[WS_BUFFER_SIZE + 1];
+    std::memset(temp, 0, WS_BUFFER_SIZE + 1);
 	infile = open(WS_UNCHUNK_INFILE, O_RDONLY, 0777);
 	if (total <= 25000000)
 	{
