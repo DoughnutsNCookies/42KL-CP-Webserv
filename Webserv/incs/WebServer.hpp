@@ -6,15 +6,19 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:25:05 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/29 12:47:28 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/29 13:26:29 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef WEBSERVER_HPP
 # define WEBSERVER_HPP
 
-# include "http.hpp"
-# include "EuleeHand.hpp"
+# include "HttpPostResponse.hpp"
+# include "HttpCgiResponse.hpp"
+# include "HttpGetResponse.hpp"
+# include "HttpDeleteResponse.hpp"
+# include "HttpHeadResponse.hpp"
+# include "HttpPutResponse.hpp"
 
 class WebServer
 {

@@ -6,7 +6,7 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/29 12:17:03 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/29 13:27:20 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -454,7 +454,7 @@ int	EuleeHand::_unchunkIntofile(int fd, std::string bufferIn, int isHeader)
 		}
 		catch(const std::exception& e)
 		{
-			std::cout << "Chunk Error: Hex size is less than chunk size!" << std::endl;
+			std::cerr << RED << "Chunk Error: Hex size is less than chunk size!" << RESET << std::endl;
 			this->sendHttp(400);
 			return (1);
 		}
@@ -462,7 +462,7 @@ int	EuleeHand::_unchunkIntofile(int fd, std::string bufferIn, int isHeader)
 			break ;
 		if (size > remaining.size() - strlen("\r\n"))
 		{
-			std::cout << "Chunk Error: Hex size is more than remaining size!" << std::endl;
+			std::cerr << RED << "Chunk Error: Hex size is more than remaining size!" << RESET << std::endl;
 			this->sendHttp(400);
 			return (1);
 		}
