@@ -607,7 +607,6 @@ std::string	EuleeHand::extractHTML(std::string path)
 	if (!file.is_open())
 	{
 		std::cerr << RED << "Error: Could not open html" << RESET << std::endl;
-
 		return ("");
 	}
 	std::string extract;
@@ -620,39 +619,51 @@ std::string	EuleeHand::extractHTML(std::string path)
 
 int		EuleeHand::sendHttp(int statusCode, std::string htmlPath)
 {
-	if (this->statusList.find(statusCode) == this->statusList.end())
-	{
-		std::cerr << RED << "Cannot find status code!" << RESET << std::endl;
-		std::cout << MAGENTA << "Returned " << statusCode << "!" << RESET << std::endl;
-		return (statusCode);
-	}
+	// if (statusCode == 200)
+	// {
+	// 	std::cout << CYAN << "Testing Client Cookie..." << RESET << std::endl;
+	// 	if (this->_cookiesDB.checkClientCookie(this->_cookiesDB.clientCookieName, this->_cookiesDB.clientCookieHash))
+	// 	{
+	// 		this->_cookiesDB.insertCookie("temp");
+	// 	}
+	// 	else if (statusCode == 200)
+		
+	// 		std::cout << RED << "Cookie doesnt exist!, sending one to client now." << RESET << std::endl;
+	// 	else
+	// 		this->_cookiesDB.insertCookie("temp");
+	// }
+	(void)htmlPath;
 	std::string baseResponse = "HTTP/1.1 " + std::to_string(statusCode) + " " + statusList[statusCode] + " \r\n\r\n";
-	if (htmlPath.empty() && statusCode != 200)
-		htmlPath = WS_ERROR_PAGE_PATH;
-	else if (htmlPath.empty())
-		htmlPath = WS_DEFAULT_PAGE_PATH;
-	else
-	{
-		if (this->checkPath(htmlPath, 1, 0) == 0)
-		{
-			statusCode = 404;
-			htmlPath = WS_ERROR_PAGE_PATH;
-		}
-	}
-	
-	std::string	htmlPage = extractHTML(htmlPath);
-	if (htmlPage.empty() == false)
-	{
-		std::string code = "{{error_code}}";
-		std::string msg = "{{error_message}}";
 
-		baseResponse += htmlPage;
-		if (statusCode != 200)
+	if (this->errorpage.find(statusCode) != this->errorpage.end())
+	{
+		if (this->checkPath(this->errorpage[statusCode], 1, 0) == 0)
 		{
+			std::cout << RED << "Error page is not found! Default is used. " << RESET <<std::endl;
+
+			std::string code = "{{error_code}}";
+			std::string msg = "{{error_message}}";
+			baseResponse += extractHTML(WS_ERROR_PAGE_PATH);
+		
 			baseResponse.replace(baseResponse.find(code), code.length(), std::to_string(statusCode));	
 			baseResponse.replace(baseResponse.find(code), code.length(), std::to_string(statusCode));	
 			baseResponse.replace(baseResponse.find(msg), msg.length(), this->statusList[statusCode]);
 		}
+		else
+		{
+			std::cout << GREEN << "Error HTML page is found!" << RESET << std::endl;
+			baseResponse += extractHTML(this->errorpage[statusCode]); // use client page
+		}
+	}
+	else
+	{
+		if (this->checkPath(this->errorpage[statusCode], 1, 0) == 0)
+		{
+			baseResponse += extractHTML(WS_DEFAULT_PAGE_PATH);
+		}
+		else
+			baseResponse += extractHTML(methodPath[this->socket]);
+
 	}
 	this->response[this->socket] = baseResponse;
 	std::cout << MAGENTA << "Returned " << statusCode << "!" << RESET << std::endl;

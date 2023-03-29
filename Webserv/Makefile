@@ -26,6 +26,7 @@ MAIN		=	srcs/main.cpp
 SRC			=	WebServer.cpp \
 				ConfigManager.cpp \
 				Token.cpp \
+				Cookies.cpp \
 				EuleeHand.cpp \
 				EuleePocket.cpp \
 				EuleeWallet.cpp \

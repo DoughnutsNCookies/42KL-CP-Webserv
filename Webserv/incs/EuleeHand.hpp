@@ -15,6 +15,7 @@
 
 # include "EuleePocket.hpp"
 # include "ConfigManager.hpp"
+# include "Cookies.hpp"
 
 # include <iostream>
 # include <sstream>
@@ -71,6 +72,7 @@ class EuleeHand
 		size_t			_envpSize;
 		std::string		_configFilePath;
 		ConfigManager	_configManager;
+		CookieJar		_cookiesDB;
 
 
 		int				_unchunkIntofile(int fd, std::string buffer, int isHeader);
