@@ -6,7 +6,7 @@
 #    By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/28 17:38:48 by jhii              #+#    #+#              #
-#    Updated: 2023/03/29 16:20:14 by schuah           ###   ########.fr        #
+#    Updated: 2023/03/29 21:01:55 by schuah           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -41,7 +41,6 @@ OBJ			=	${addprefix ${OBJ_PATH}/, ${SRC:.cpp=.o}}
 all: 
 	${MKDIR} ${OBJ_PATH}
 	make ${NAME}
-	./${NAME}
 
 ${NAME}: ${OBJ} $(MAIN)
 	${CXX} ${CXXFLAGS} ${INCLUDES} ${MAIN} ${OBJ} -o ${NAME}
