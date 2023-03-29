@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   EuleeHand.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/29 13:27:20 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/29 14:26:27 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -636,7 +636,7 @@ std::string	EuleeHand::extractHTML(std::string path)
 	return (extract);
 }
 
-int		EuleeHand::sendHttp(int statusCode, std::string htmlPath)
+int		EuleeHand::sendHttp(int statusCode, std::string responseBody)
 {
 	// if (statusCode == 200)
 	// {
@@ -647,18 +647,22 @@ int		EuleeHand::sendHttp(int statusCode, std::string htmlPath)
 	// 	}
 	// 	else if (statusCode == 200)
 		
-	// 		std::cout << RED << "Cookie doesnt exist!, sending one to client now." << RESET << std::endl;
+	// 		std::cerr << RED << "Cookie doesnt exist!, sending one to client now." << RESET << std::endl;
 	// 	else
 	// 		this->_cookiesDB.insertCookie("temp");
 	// }
-	(void)htmlPath;
 	std::string baseResponse = "HTTP/1.1 " + std::to_string(statusCode) + " " + statusList[statusCode] + " \r\n\r\n";
+	if (responseBody.empty() == false)
+	{
+		this->response[this->socket] = baseResponse + responseBody;
+		return (statusCode);
+	}
 
 	if (this->errorpage.find(statusCode) != this->errorpage.end())
 	{
 		if (this->checkPath(this->errorpage[statusCode], 1, 0) == 0)
 		{
-			std::cout << RED << "Error page is not found! Default is used. " << RESET <<std::endl;
+			std::cerr << RED << "Error page is not found! Default is used. " << RESET <<std::endl;
 
 			std::string code = "{{error_code}}";
 			std::string msg = "{{error_message}}";
@@ -677,9 +681,7 @@ int		EuleeHand::sendHttp(int statusCode, std::string htmlPath)
 	else
 	{
 		if (this->checkPath(this->errorpage[statusCode], 1, 0) == 0)
-		{
 			baseResponse += extractHTML(WS_DEFAULT_PAGE_PATH);
-		}
 		else
 			baseResponse += extractHTML(methodPath[this->socket]);
 
@@ -712,7 +714,7 @@ int	EuleeHand::checkClientBodySize()
 	size_t	startPos = this->buffer[this->socket].find("\r\n\r\n") + std::strlen("\r\n\r\n");
 	if (this->buffer[this->socket].length() - startPos > clientMaxBodySize)
 	{
-		std::cout << RED << "Client Body Size Exceeded!" << RESET << std::endl;
+		std::cerr << RED << "Client Body Size Exceeded!" << RESET << std::endl;
 		this->sendHttp(413);
 		return (1);
 	}

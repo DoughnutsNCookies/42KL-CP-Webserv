@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:20:26 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/28 13:54:26 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 14:23:18 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,5 +54,5 @@ void	HttpGetResponse::handleGet()
 	}
 	file.close();
 
-	this->_database->response[this->_database->socket] = "HTTP/1.1 200 OK\r\nContent-Type: */*\r\nContent-Length: " + std::to_string(file_size) + "\r\n\r\n" + fileContents;
+	this->_database->sendHttp(200, fileContents);
 }

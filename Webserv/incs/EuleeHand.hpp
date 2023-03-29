@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   EuleeHand.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/29 12:30:59 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/29 14:22:17 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ class EuleeHand
 		~EuleeHand();
 
 		int			checkPath(std::string path, int	isFile, int isDirectory);
-		int			sendHttp(int statusCode, std::string htmlPath = "");
+		int			sendHttp(int statusCode, std::string responseBody = "");
 		int			isCGI();
 		int			checkExcept();
 		int			checkClientBodySize();

@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:55:14 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/28 23:34:36 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 14:30:31 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ void    HttpCgiResponse::handleCgi()
 	size_t  startPos = output.find("\r\n\r\n") + std::strlen("\r\n\r\n");
 	std::string newOutput = output.substr(startPos);
 
-	this->_database->response[this->_database->socket] = "HTTP/1.1 200 OK\r\n\r\n" + newOutput;
+	this->_database->sendHttp(200, newOutput);
 	std::cout << GREEN << "CGI ran successfully!" << RESET << std::endl;
 	std::remove(inFileName.c_str());
 	std::remove(outFileName.c_str());

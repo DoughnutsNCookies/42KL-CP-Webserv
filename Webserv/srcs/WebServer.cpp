@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/29 12:47:18 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/29 14:25:13 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,7 +169,7 @@ int	WebServer::_handleFavicon()
 {
 	if (this->_database.methodPath[this->_database.socket] != "/favicon.ico")
 		return (0);
-	std::cout << RED << "Go away favicon" << RESET << std::endl;
+	std::cerr << RED << "Go away favicon" << RESET << std::endl;
 	this->_database.sendHttp(404);
 	return (1);
 }
@@ -253,7 +253,7 @@ void	WebServer::_doRequest()
 	}
 	catch(const std::exception& e)
 	{
-		std::cout << RED << e.what() << RESET << '\n';
+		std::cerr << RED << e.what() << RESET << '\n';
 		std::remove(WS_TEMP_FILE_IN);
 		std::remove(WS_TEMP_FILE_OUT);
 		this->_database.sendHttp(500);
