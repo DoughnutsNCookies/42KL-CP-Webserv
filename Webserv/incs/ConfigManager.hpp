@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:49:34 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/24 23:30:56 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 15:54:37 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,15 +18,15 @@
 class ConfigManager
 {
 	public:
-		ConfigManager(void);
+		ConfigManager();
 		ConfigManager(std::string configFilePath);
-		~ConfigManager(void);
+		~ConfigManager();
 
 		ConfigManager		&operator=(const ConfigManager &ref);
 
-		void			parseConfigFile(void);
-		void			printTokens(void);
-		void			configLibrary(void);
+		void			parseConfigFile();
+		void			printTokens();
+		void			configLibrary();
 
 		void			checkImportantCheck(int i);
 		bool			checkCompulsories(int i);
@@ -39,10 +39,10 @@ class ConfigManager
 		int				checkCloseBrace(int i, int previous, int *braces, int *main_block);
 
 		int				locationBlock(size_t i);
-		void			errorHandleShit(void);
+		void			errorHandleShit();
 
 		void				printError(std::string str, int i);
-		std::vector<Token>	&getToken(void);
+		std::vector<Token>	&getToken();
 
 	private:
 		void						_lexLine(std::string line, int lineNum);

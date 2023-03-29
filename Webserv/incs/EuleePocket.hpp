@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 17:51:51 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/24 23:31:05 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 15:54:37 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,14 +38,14 @@ class EuleePocket
 		typedef std::map<key_type, mapped_type>	value_type;
 		typedef	value_type::iterator			iterator;
 
-		EuleePocket(void);
+		EuleePocket();
 		EuleePocket(EuleeWallet server, std::vector<EuleeWallet> vectorLocation);
-		~EuleePocket(void);
+		~EuleePocket();
 
 		mapped_type	&operator[](key_type key);
 
-		iterator	begin(void);
-		iterator	end(void);
+		iterator	begin();
+		iterator	end();
 
 		std::vector<EuleeWallet>			vectorLocation;
 		std::map<std::string, EuleeWallet>	location;

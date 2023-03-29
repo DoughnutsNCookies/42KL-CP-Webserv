@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cgi_toupper.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 21:19:35 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/22 13:49:41 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/29 15:54:37 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 
 # define WS_BUFFER_SIZE 100000000
 
-int    main(void)
+int    main()
 {
     char	*buffer = new char[WS_BUFFER_SIZE];
 	std::cin.getline(buffer, WS_BUFFER_SIZE);

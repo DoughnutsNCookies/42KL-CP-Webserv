@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 15:10:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/24 23:31:09 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 15:54:37 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,14 +40,14 @@ class EuleeWallet
 		typedef std::map<std::string, std::string>	cgi_type;
 		typedef	value_type::iterator				iterator;
 
-		EuleeWallet(void);
+		EuleeWallet();
 		EuleeWallet(value_type location);
-		~EuleeWallet(void);
+		~EuleeWallet();
 
 		mapped_type	&operator[](const key_type &key);
 
-		iterator	begin(void);
-		iterator	end(void);
+		iterator	begin();
+		iterator	end();
 
 		cgi_type	cgi;
 

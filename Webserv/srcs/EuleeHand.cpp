@@ -6,15 +6,15 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/29 14:26:27 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 16:24:07 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "EuleeHand.hpp"
 
-EuleeHand::EuleeHand() : envp(), cgi(), statusList(), buffer(), server(), serverFd(), serverAddr(), socket(), connectionCount(), _envpSize() {}
+EuleeHand::EuleeHand() : envp(), cgi(), statusList(), buffer(), server(), serverFd(), serverAddr(), socket(), connectionCount(), cookieJar(), _envpSize() {}
 
-EuleeHand::EuleeHand(std::string configFilePath, const ConfigManager &configManager) : envp(), cgi(), statusList(), buffer(), server(), serverFd(), serverAddr(), socket(), connectionCount(), _envpSize(), _configFilePath(configFilePath), _configManager(configManager)
+EuleeHand::EuleeHand(std::string configFilePath, const ConfigManager &configManager) : envp(), cgi(), statusList(), buffer(), server(), serverFd(), serverAddr(), socket(), connectionCount(), cookieJar(), _envpSize(), _configFilePath(configFilePath), _configManager(configManager)
 {
 	this->envp = new char*[16];
 	for (size_t i = 0; i < 15; ++i)
@@ -638,20 +638,15 @@ std::string	EuleeHand::extractHTML(std::string path)
 
 int		EuleeHand::sendHttp(int statusCode, std::string responseBody)
 {
-	// if (statusCode == 200)
-	// {
-	// 	std::cout << CYAN << "Testing Client Cookie..." << RESET << std::endl;
-	// 	if (this->_cookiesDB.checkClientCookie(this->_cookiesDB.clientCookieName, this->_cookiesDB.clientCookieHash))
-	// 	{
-	// 		this->_cookiesDB.insertCookie("temp");
-	// 	}
-	// 	else if (statusCode == 200)
-		
-	// 		std::cerr << RED << "Cookie doesnt exist!, sending one to client now." << RESET << std::endl;
-	// 	else
-	// 		this->_cookiesDB.insertCookie("temp");
-	// }
-	std::string baseResponse = "HTTP/1.1 " + std::to_string(statusCode) + " " + statusList[statusCode] + " \r\n\r\n";
+	std::string baseResponse = "HTTP/1.1 " + std::to_string(statusCode) + " " + statusList[statusCode] + "\r\n";
+	if (statusCode == 200)
+	{
+		std::cout << GREEN << "Sending Cookie..." << RESET << std::endl;
+		this->cookieJar.generateCookie(this->socket);
+		Cookie	cookie = this->cookieJar[this->socket];
+		baseResponse += "Set-Cookie: " + cookie.key + "=" + cookie.value + "; Expires=" + cookie.expireDate + "\r\n";
+	}
+	baseResponse += "\r\n\r\n";
 	if (responseBody.empty() == false)
 	{
 		this->response[this->socket] = baseResponse + responseBody;

@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+         #
+#    By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/28 17:38:48 by jhii              #+#    #+#              #
-#    Updated: 2023/03/29 12:12:26 by jhii             ###   ########.fr        #
+#    Updated: 2023/03/29 16:20:14 by schuah           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,19 +23,19 @@ SRC_PATH	=	srcs
 OBJ_PATH	=	objs
 ANNOYING	=	*.dSYM ../.vscode
 MAIN		=	srcs/main.cpp
-SRC			=	WebServer.cpp \
-				ConfigManager.cpp \
-				Token.cpp \
-				Cookies.cpp \
+SRC			=	Token.cpp \
+				CookieJar.cpp \
+				WebServer.cpp \
 				EuleeHand.cpp \
-				EuleePocket.cpp \
 				EuleeWallet.cpp \
-				HttpPostResponse.cpp \
+				EuleePocket.cpp \
+				ConfigManager.cpp \
 				HttpCgiResponse.cpp \
 				HttpGetResponse.cpp \
-				HttpDeleteResponse.cpp \
+				HttpPutResponse.cpp \
+				HttpPostResponse.cpp \
 				HttpHeadResponse.cpp \
-				HttpPutResponse.cpp
+				HttpDeleteResponse.cpp
 OBJ			=	${addprefix ${OBJ_PATH}/, ${SRC:.cpp=.o}}
 
 all: 

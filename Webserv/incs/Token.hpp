@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Token.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/03 10:18:53 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/10 17:37:32 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/29 15:53:53 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ enum Type
 struct Token
 {
 	Token(std::string context, Type type, int lineNum);
-	~Token(void);
+	~Token();
 
 	Type		type;
 	std::string	token;

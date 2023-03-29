@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/29 14:22:17 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 16:05:16 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 # include "EuleePocket.hpp"
 # include "ConfigManager.hpp"
-# include "Cookies.hpp"
+# include "CookieJar.hpp"
 
 class EuleeHand
 {
@@ -55,12 +55,12 @@ class EuleeHand
 		std::vector<sockaddr_in>			serverAddr;
 		int									socket, connectionCount;
 		fd_set								myReadFds, myWriteFds;
+		CookieJar							cookieJar;
 
 	private:
 		size_t			_envpSize;
 		std::string		_configFilePath;
 		ConfigManager	_configManager;
-		CookieJar		_cookiesDB;
 
 		int				_unchunkIntofile(int fd, std::string buffer, int isHeader);
 		size_t			_readFile(std::string *buffer1, std::string *buffer2, int infile, char *temp, long bytes_read, int type, int *count);

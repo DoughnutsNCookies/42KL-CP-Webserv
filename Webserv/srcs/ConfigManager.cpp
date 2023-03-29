@@ -6,13 +6,13 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:55:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/22 15:11:28 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 15:54:37 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/ConfigManager.hpp"
 
-ConfigManager::ConfigManager(void): _configFilePath() {}
+ConfigManager::ConfigManager(): _configFilePath() {}
 
 ConfigManager::ConfigManager(std::string configFilePath): _configFilePath(configFilePath) {}
 
@@ -87,7 +87,7 @@ void	ConfigManager::parseConfigFile()
 	file.close();
 }
 
-void	ConfigManager::printTokens(void)
+void	ConfigManager::printTokens()
 {
 	for (size_t i = 0; i < this->_tokens.size(); i++)
 		std::cout << "Token: |" << this->_tokens[i].token << "| Type: |" << this->_tokens[i].type << "| Line: |" << this->_tokens[i].lineNum << "|" << std::endl;
@@ -118,7 +118,7 @@ bool	ConfigManager::checkCompulsories(int i)
 	return (false);
 }
 
-void	ConfigManager::configLibrary(void)
+void	ConfigManager::configLibrary()
 {
 	const char	*serverlib[11] = {"server", "location", "listen", "root", "index", "server_name", "error_page", "client_max_body_size", "auto_index", "return", "cgi_script"};
 	const char	*locationlib[12] = {"root", "index", "include", "cgi_script", "upload", "error_page", "client_max_body_size", "autoindex", "return", "limit_except", "allow", "deny"};
@@ -279,7 +279,7 @@ int	ConfigManager::locationBlock(size_t i)
 	}
 	return (i);
 }
-void	ConfigManager::errorHandleShit(void)
+void	ConfigManager::errorHandleShit()
 {
 	size_t	i = 0;
 	int		main_block = 0;
@@ -310,7 +310,7 @@ void	ConfigManager::errorHandleShit(void)
 		printError("Server does not have all listen, root and index. ", this->_tokens.size() - 1);
 }
 
-std::vector<Token>	&ConfigManager::getToken(void)
+std::vector<Token>	&ConfigManager::getToken()
 {
 	return (this->_tokens);
 }

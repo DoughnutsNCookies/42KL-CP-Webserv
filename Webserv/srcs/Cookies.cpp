@@ -1,4 +1,3 @@
-#include "../incs/Cookies.hpp"
 
 
 void Cookie::setName(const std::string& name)
@@ -37,7 +36,7 @@ std::string Cookie::getExpiresStr() const
 	return (this->_expiresStr);
 }
 
-time_t		Cookie::getExpiresTime(void) const
+time_t		Cookie::getExpiresTime() const
 {
 	return (this->_expiresTime);
 }
@@ -74,8 +73,6 @@ std::string	CookieJar::generateHash()
 	return (hash);
 }
 
-
-
 void CookieJar::insertCookie(const std::string& name)
 {
     Cookie	newCookie(name);
@@ -85,80 +82,75 @@ void CookieJar::insertCookie(const std::string& name)
     this->_cookieDB[name] = newCookie;
 }
 
-std::string CookieJar::generateExpirationStr(time_t time)
+std::string CookieJar::generateExpirationStr(tm *expiryTime)
 {
-    std::ostringstream	outputStream;
-	char				expiry_buf[32];
+	char	expiryBuf[32];
 
- 	tm*	expiry_time = gmtime(&time);
-    strftime(expiry_buf, sizeof(expiry_buf), "%a, %d-%b-%Y %H:%M:%S GMT", expiry_time);
-    outputStream << expiry_buf;
-    return (outputStream.str());
+	std::memset(expiryBuf, 0, sizeof(expiryBuf));
+    strftime(expiryBuf, sizeof(expiryBuf), "%a, %d %b %Y %H:%M:%S GMT", expiryTime);
+    return (std::string(expiryBuf));
 }
 
-time_t CookieJar::generateExpirationTime()
+tm *CookieJar::generateExpirationTime(int expireTimeSeconds)
 {
-	time_t curr_time;
-	curr_time = time(NULL);
+    time_t currTime;
+    currTime = time(NULL);
 
-	tm *local_time = localtime(&curr_time);
-	time_t local_time_t = mktime(local_time);
-	tm *gmt_time = gmtime(&local_time_t);
-
-	gmt_time->tm_sec += 60; // set expiration time here
-
- 	time_t	expiry_time_t = mktime(gmt_time);
-	return(expiry_time_t);
+    time_t expiryTime = currTime + expireTimeSeconds;
+    tm *output = gmtime(&expiryTime);
+	return (output);
 }
 
-bool	CookieJar::checkExpiration(time_t cookieTime) const
-{
-	time_t curr_time;
-	curr_time = time(NULL);
+// bool	CookieJar::checkExpiration(time_t cookieTime) const
+// {
+// 	time_t curr_time;
+// 	curr_time = time(NULL);
 
-	tm *gmt_time = gmtime(&curr_time);
-	// gmt_time->tm_sec += 24 * 60 * 50; // debug
-	time_t	gmt_time_t = mktime(gmt_time);
+// 	tm *gmt_time = gmtime(&curr_time);
+// 	// gmt_time->tm_sec += 24 * 60 * 50; // debug
+// 	time_t	gmt_time_t = mktime(gmt_time);
 	
-	if (cookieTime >= gmt_time_t)
-	{
-		std::cout << "Not expired" << std::endl;
-		return (0);
-	}
-	std::cout << "Expired" << std::endl;
-	return (1);
-}
+// 	if (cookieTime >= gmt_time_t)
+// 	{
+// 		std::cout << "Not expired" << std::endl;
+// 		return (0);
+// 	}
+// 	std::cout << "Expired" << std::endl;
+// 	return (1);
+// }
 
-std::string CookieJar::sendCookie() const
-{
-    std::string cookieStr;
-    std::unordered_map<std::string, Cookie>::const_iterator it;
+// std::string CookieJar::sendCookie() const
+// {
+//     std::string cookieStr;
+//     std::unordered_map<std::string, Cookie>::const_iterator it;
 
-	cookieStr += "Set-Cookie: ";
-    for (it = this->_cookieDB.begin(); it != this->_cookieDB.end(); ++it) 
-    {
-        cookieStr += it->second.getName() + "=" + it->second.getValue();
-        if (!it->second.getExpiresStr().empty())
-			cookieStr += "; expires=" + it->second.getExpiresStr();
-        cookieStr += "; ";
-    }
-    return (cookieStr);
-}
+// 	cookieStr += "Set-Cookie: ";
+//     for (it = this->_cookieDB.begin(); it != this->_cookieDB.end(); ++it) 
+//     {
+//         cookieStr += it->second.getName() + "=" + it->second.getValue();
+//         if (!it->second.getExpiresStr().empty())
+// 			cookieStr += "; expires=" + it->second.getExpiresStr();
+//         cookieStr += "; ";
+//     }
+//     return (cookieStr);
+// }
 
-bool	CookieJar::checkClientCookie(std::string key, std::string value)
-{
-	std::unordered_map<std::string, Cookie>::iterator it;
+// bool	CookieJar::checkClientCookie(std::string key, std::string value)
+// {
+// 	std::unordered_map<std::string, Cookie>::iterator it;
 
-	it = this->_cookieDB.find(key);
-	if (it != this->_cookieDB.end())
-	{
-		if (value == it->second.getValue())
-		{
-			if (this->checkExpiration(it->second.getExpiresTime()))
-				this->sendCookie();
-			return (0);
-		}
-		return(1);
-	}
-	return (0);
-}
+// 	it = this->_cookieDB.find(key);
+// 	if (it != this->_cookieDB.end())
+// 	{
+// 		if (value == it->second.getValue())
+// 		{
+// 			if (this->checkExpiration(it->second.getExpiresTime()))
+// 				this->sendCookie();
+// 			return (0);
+// 		}
+// 		return(1);
+// 	}
+// 	return (0);
+// }
+
+// map<int, Cookie> Hash
