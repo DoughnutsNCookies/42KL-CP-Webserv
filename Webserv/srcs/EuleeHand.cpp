@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/29 17:10:41 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 17:22:40 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -659,19 +659,17 @@ int		EuleeHand::sendHttp(int statusCode, std::string responseBody)
 		{
 			std::cerr << RED << "Error page is not found! Default is used. " << RESET <<std::endl;
 
-			std::string code = "{{error_code}}";
-			std::string msg = "{{error_message}}";
+			std::string codeHolder = "{{error_code}}";
+			std::string msgHolder = "{{error_message}}";
 			baseResponse += extractHTML(WS_ERROR_PAGE_PATH);
-		
-			baseResponse.replace(baseResponse.find(code), code.length(), std::to_string(statusCode));	
-			baseResponse.replace(baseResponse.find(code), code.length(), std::to_string(statusCode));	
-			baseResponse.replace(baseResponse.find(msg), msg.length(), this->statusList[statusCode]);
+			baseResponse.replace(baseResponse.find(codeHolder), codeHolder.length(), std::to_string(statusCode));
+			baseResponse.replace(baseResponse.find(codeHolder), codeHolder.length(), std::to_string(statusCode));	
+			baseResponse.replace(baseResponse.find(msgHolder), msgHolder.length(), this->statusList[statusCode]);
 		}
 		else
 		{
 			std::cout << GREEN << "Error HTML page is found!" << RESET << std::endl;
 			baseResponse += extractHTML(this->errorpage[statusCode]); // use client page
-			std::cout << (this->errorpage.find(statusCode) != this->errorpage.end()) << std::endl;
 		}
 	}
 	else
@@ -679,7 +677,11 @@ int		EuleeHand::sendHttp(int statusCode, std::string responseBody)
 		if (this->checkPath(this->errorpage[statusCode], 1, 0) == 0)
 		{
 			if (this->cookieExist[this->socket])
+			{
+				std::string	cookieHolder = "{{cookie}}";
 				baseResponse += extractHTML(WS_COOKIE_PAGE_PATH);
+				baseResponse.replace(baseResponse.find(cookieHolder), cookieHolder.length(), this->cookieJar[this->socket].key + "=" + this->cookieJar[this->socket].value);
+			}
 			else
 				baseResponse += extractHTML(WS_DEFAULT_PAGE_PATH);
 		}
