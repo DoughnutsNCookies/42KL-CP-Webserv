@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/29 16:54:36 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 19:00:27 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,10 @@ void	WebServer::_acceptConnection(int fd)
 {
 	this->_database.socket = accept(fd, NULL, NULL);
 	if (this->_database.socket == -1)
+	{
 		this->_database.perrorExit("Accept Error", 0);
+		return ;
+	}
 	fcntl(this->_database.socket, F_SETFL, O_NONBLOCK);
 	for (size_t i = 0; i < this->_database.serverFd.size(); i++)
 	{
@@ -107,6 +110,17 @@ void	WebServer::_receiveRequest()
 
 	std::memset(readBuffer, 0, WS_BUFFER_SIZE + 1);
 	long	recvVal = recv(this->_database.socket, readBuffer, WS_BUFFER_SIZE, 0);
+	if (recvVal <= 0)
+	{
+		this->_database.perrorExit("Recv Error", 0);
+		this->_database.bytes_sent[this->_database.socket] = 0;
+		this->_database.buffer[this->_database.socket].clear();
+		this->_database.response[this->_database.socket].clear();
+		this->_database.parsed.erase(this->_database.socket);
+		close(this->_database.socket);
+		FD_CLR(this->_database.socket, &this->_database.myReadFds);
+		return ;
+	}
 	while (recvVal > 0)
 	{
 		this->_database.buffer[this->_database.socket].append(readBuffer, recvVal);
@@ -114,7 +128,7 @@ void	WebServer::_receiveRequest()
 		std::cout.flush();
 		std::memset(readBuffer, 0, WS_BUFFER_SIZE + 1);
 		recvVal = recv(this->_database.socket, readBuffer, WS_BUFFER_SIZE, 0);
-		if (recvVal < 0)
+		if (recvVal <= 0)
 			break ;
 	}
 	if (this->_database.parseHeader())
@@ -130,7 +144,7 @@ void	WebServer::_sendResponse()
 	static int countOut = 0;
 	long	total = this->_database.bytes_sent[this->_database.socket];
 	long	sendVal = send(this->_database.socket, this->_database.response[this->_database.socket].c_str() + total, this->_database.response[this->_database.socket].size() - total, 0);
-	if (sendVal < 0)
+	if (sendVal <= 0)
 	{
 		this->_database.perrorExit("Send Error", 0);
 		this->_database.bytes_sent[this->_database.socket] = 0;

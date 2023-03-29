@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:55:14 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/29 14:30:31 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 18:34:30 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,5 @@ void    HttpCgiResponse::handleCgi()
 	close(stdinFd);
 	dup2(stdoutFd, STDOUT_FILENO);
 	close(stdoutFd);
-	std::cerr << count << ": Socket: " << this->_database->socket << " done" << std::endl;
 	count++;
 }
