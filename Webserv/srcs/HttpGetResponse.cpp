@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:20:26 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/29 16:58:52 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 17:58:03 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,8 @@ void	HttpGetResponse::handleGet()
 		std::cerr << RED << "Error reading " << this->_database->methodPath[this->_database->socket] << "!" << RESET << std::endl;
 		if (this->_database->useDirectoryListing[this->_database->socket])
 		{
-			this->_database->buffer[this->_database->socket] = "HTTP/1.1 200 OK\r\n\r\n" + this->_database->directoryListing(this->_database->methodPath[this->_database->socket]);
+			std::string	directoryPath = this->_database->methodPath[this->_database->socket].substr(1, this->_database->methodPath[this->_database->socket].find_last_of('/'));
+			this->_database->response[this->_database->socket] = "HTTP/1.1 200 OK\r\nContent-type: text/html\r\n\r\n" + this->_database->directoryListing(directoryPath);
 			std::cout << GREEN << "Autoindex is set on, directory listing sent!" << RESET << std::endl;
 		}
 		else if (this->_database->checkPath(this->_database->methodPath[this->_database->socket].c_str() + 1, 0, 1) || this->_database->useDefaultIndex[this->_database->socket])

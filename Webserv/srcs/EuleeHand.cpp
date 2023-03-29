@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/29 17:22:40 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 18:06:01 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -278,7 +278,7 @@ std::string EuleeHand::directoryListing(std::string path)
 			fileSize = this->_getFileSize(path, filename);
             if (filename != "." && filename != "..")
 			{
-                content << "<tr> <td><a href=\"" << filename << "\">" << filename << "</a></td>\n";
+                content << "<tr> <td><a href=\"" << path + filename << "\">" << filename << "</a></td>\n";
                 content << "<td>" << lastMod << " </td>\n";
 				content << "<td>" << fileSize << " bytes </td> </tr>\n";
 			}
@@ -639,6 +639,7 @@ std::string	EuleeHand::extractHTML(std::string path)
 int		EuleeHand::sendHttp(int statusCode, std::string responseBody)
 {
 	std::string baseResponse = "HTTP/1.1 " + std::to_string(statusCode) + " " + statusList[statusCode] + "\r\n";
+	baseResponse += "Content-Type: text/html\r\n";
 	if (statusCode == 200 && this->cookieExist[this->socket] == false)
 	{
 		std::cout << GREEN << "Sending Cookie..." << RESET << std::endl;
