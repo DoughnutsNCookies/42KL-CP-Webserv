@@ -13,7 +13,7 @@
 #ifndef TOKEN_HPP
 # define TOKEN_HPP
 
-# include <string>
+# include "webserv.hpp"
 
 enum Type
 {

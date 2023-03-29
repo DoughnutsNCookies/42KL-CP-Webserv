@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   HttpHeadResponse.hpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/13 17:41:20 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/24 16:19:41 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 12:28:53 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef HTTPHEADRESPONE_HPP
 # define HTTPHEADRESPONE_HPP
 
-# include "WebServer.hpp"
+# include "EuleeHand.hpp"
 
 class HttpHeadResponse
 {

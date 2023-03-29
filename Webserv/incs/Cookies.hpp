@@ -1,12 +1,7 @@
 #ifndef COOKIE_HPP
 # define COOKIE_HPP
 
-#include <iostream>
-#include <string>
-#include <random>
-#include <sstream>
-#include <unordered_map>
-
+# include "webserv.hpp"
 class Cookie 
 {
 	public:

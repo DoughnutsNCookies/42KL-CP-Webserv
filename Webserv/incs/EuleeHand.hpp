@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   EuleeHand.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/28 13:53:57 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 12:30:59 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,23 +17,11 @@
 # include "ConfigManager.hpp"
 # include "Cookies.hpp"
 
-# include <iostream>
-# include <sstream>
-# include <fcntl.h>
-# include <dirent.h>
-# include <sys/stat.h>
-
-# define WS_BUFFER_SIZE			100000
-# define WS_UNCHUNK_INFILE		".unchunkInfile"
-# define WS_UNCHUNK_OUTFILE		".unchunkOutfile"
-# define WS_ERROR_PAGE_PATH 	"./html/server_html/error.html"
-# define WS_DEFAULT_PAGE_PATH	"./html/server_html/default.html"
-
 class EuleeHand
 {
 	public:
 		EuleeHand();
-		EuleeHand(std::string configFilePath, const ConfigManager &configManager, char **envp);
+		EuleeHand(std::string configFilePath, const ConfigManager &configManager);
 		~EuleeHand();
 
 		int			checkPath(std::string path, int	isFile, int isDirectory);
@@ -52,10 +40,10 @@ class EuleeHand
 		void		perrorExit(std::string msg, int exitTrue = 1);
 		void		convertLocation();
 		size_t		addEnv(std::string input);
+		size_t		clearEnv();
 		std::string	cgiPath();
 		std::string	extractHTML(std::string path);
 		std::string directoryListing(std::string path);
-		
 
 		char								**envp;
 		std::map<std::string, std::string>	cgi;
@@ -65,7 +53,7 @@ class EuleeHand
 		std::vector<EuleePocket>			server;
 		std::vector<int>					serverFd;
 		std::vector<sockaddr_in>			serverAddr;
-		int									socket;
+		int									socket, connectionCount;
 		fd_set								myReadFds, myWriteFds;
 
 	private:
@@ -73,7 +61,6 @@ class EuleeHand
 		std::string		_configFilePath;
 		ConfigManager	_configManager;
 		CookieJar		_cookiesDB;
-
 
 		int				_unchunkIntofile(int fd, std::string buffer, int isHeader);
 		size_t			_readFile(std::string *buffer1, std::string *buffer2, int infile, char *temp, long bytes_read, int type, int *count);

@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   HttpDeleteResponse.hpp                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/13 16:22:15 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/24 16:22:07 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 12:28:42 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef HTTPDELETERESPONSE_HPP
 # define HTTPDELETERESPONSE_HPP
 
-# include "WebServer.hpp"
+# include "EuleeHand.hpp"
 
 class HttpDeleteResponse
 {

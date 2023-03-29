@@ -13,9 +13,6 @@
 #ifndef EULEEPOCKET_HPP
 # define EULEEPOCKET_HPP
 
-# include <unistd.h>
-# include <sys/select.h>
-# include <netinet/in.h>
 # include "EuleeWallet.hpp"
 
 # define RESET		"\033[0m"

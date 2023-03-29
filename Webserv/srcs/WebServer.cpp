@@ -3,21 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/28 13:51:32 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 12:47:18 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/WebServer.hpp"
 
-fd_set	readFds_cpy, writeFds_cpy;
-
-WebServer::WebServer(std::string configFilePath, char **envp)
+WebServer::WebServer(std::string configFilePath)
 {
-	this->_database = EuleeHand(configFilePath, ConfigManager(configFilePath), envp);
-	this->_configManager = ConfigManager(configFilePath);
+	this->_database = EuleeHand(configFilePath, ConfigManager(configFilePath));
 	std::remove(WS_TEMP_FILE_IN);
 	std::remove(WS_TEMP_FILE_OUT);
 	std::remove(WS_UNCHUNK_INFILE);
@@ -36,8 +33,6 @@ void	WebServer::runServer()
 	this->_database.parseConfigServer();
 	this->_database.printServers();
 	std::cout << GREEN "Config Server Parsing Done..." RESET << std::endl;
-	this->_database.addEnv("SERVER_PROTOCOL=HTTP/1.1");
-	this->_database.addEnv("HTTP_X_SECRET_HEADER_FOR_TEST=1");
 	this->_setupServer();
 	this->_serverLoop();
 }
@@ -53,7 +48,6 @@ void	WebServer::_setupServer()
 
 	this->_database.serverAddr.resize(this->_database.server.size());
 	this->_database.serverFd.resize(this->_database.server.size()); 
-	
 	for (size_t i = 0; i < this->_database.server.size(); i++)
 	{
 		if ((this->_database.serverFd[i] = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -103,19 +97,22 @@ void	WebServer::_acceptConnection(int fd)
 	}
 	this->_database.bytes_sent[this->_database.socket] = 0;
 	this->_database.parsed[this->_database.socket] = false;
+	this->_database.connectionCount++;
 	FD_SET(this->_database.socket, &this->_database.myReadFds);
 }
 
 void	WebServer::_receiveRequest()
 {
-	char	readBuffer[WS_BUFFER_SIZE];
+	char	readBuffer[WS_BUFFER_SIZE + 1];
 
+	std::memset(readBuffer, 0, WS_BUFFER_SIZE + 1);
 	long	recvVal = recv(this->_database.socket, readBuffer, WS_BUFFER_SIZE, 0);
 	while (recvVal > 0)
 	{
 		this->_database.buffer[this->_database.socket].append(readBuffer, recvVal);
 		std::cout << GREEN << "Receiving total: " << this->_database.buffer[this->_database.socket].size() << "\r" << RESET;
 		std::cout.flush();
+		std::memset(readBuffer, 0, WS_BUFFER_SIZE + 1);
 		recvVal = recv(this->_database.socket, readBuffer, WS_BUFFER_SIZE, 0);
 		if (recvVal < 0)
 			break ;
@@ -152,10 +149,11 @@ void	WebServer::_sendResponse()
 		return ;
 
 	std::cout << std::endl;
-	this->_database.bytes_sent[this->_database.socket] = 0;
-	this->_database.buffer[this->_database.socket].clear();
-	this->_database.response[this->_database.socket].clear();
+	this->_database.bytes_sent.erase(this->_database.socket);
+	this->_database.buffer.erase(this->_database.socket);
+	this->_database.response.erase(this->_database.socket);
 	this->_database.parsed.erase(this->_database.socket);
+
 	close(this->_database.socket);
 	FD_CLR(this->_database.socket, &this->_database.myWriteFds);
 	std::cout << YELLOW << "Replied back to " << ++countOut << " connections!" << std::endl;
@@ -195,7 +193,6 @@ int	WebServer::_parseRequest()
 	if (this->_database.unchunkResponse())
 		return (1);
 	std::cout << GREEN << "Finished unchunking" << RESET << std::endl;
-
 	std::istringstream	request(this->_database.buffer[this->_database.socket]);
 	request >> this->_database.method[this->_database.socket] >> this->_database.methodPath[this->_database.socket];
 	if (this->_handleFavicon())
@@ -210,8 +207,6 @@ int	WebServer::_parseRequest()
 	this->_database.convertLocation();
 	if (this->_database.checkClientBodySize())
 		return (1) ;
-
-	this->_database.addEnv("REQUEST_METHOD=" + this->_database.method[this->_database.socket]);
 	return (0);
 }
 
@@ -316,7 +311,10 @@ void	WebServer::_serverLoop()
 			if (!FD_ISSET(fd, &writeFds))
 				continue ;
 			this->_database.socket = fd;
-			if (this->_database.parsed[this->_database.socket] == false)
+			int	oneIsParsed = 0;
+			for (size_t i = 0; i < FD_SETSIZE; i++)
+				oneIsParsed += this->_database.parsed[i];
+			if (this->_database.parsed[this->_database.socket] == false && oneIsParsed == 0)
 			{
 				if (this->_parseRequest() == 0)
 					this->_doRequest();

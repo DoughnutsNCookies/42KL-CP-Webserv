@@ -13,10 +13,7 @@
 #ifndef EULEEWALLET_HPP
 # define EULEEWALLET_HPP
 
-# include <map>
-# include <vector>
-# include <string>
-# include <iostream>
+# include "webserv.hpp"
 
 enum	Key
 {

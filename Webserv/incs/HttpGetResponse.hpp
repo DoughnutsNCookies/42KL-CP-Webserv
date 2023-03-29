@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   HttpGetResponse.hpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:20:41 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/24 15:45:14 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 12:28:47 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef HTTPGETRESPONSE_HPP
 # define HTTPGETRESPONSE_HPP
 
-# include "WebServer.hpp"
+# include "EuleeHand.hpp"
 
 class HttpGetResponse
 {
