@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   EuleeHand.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/25 20:15:38 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/28 21:00:06 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ class EuleeHand
 {
 	public:
 		EuleeHand();
-		EuleeHand(std::string configFilePath, const ConfigManager &configManager, char **envp);
+		EuleeHand(std::string configFilePath, const ConfigManager &configManager);
 		~EuleeHand();
 
 		int			checkPath(std::string path, int	isFile, int isDirectory);
@@ -45,28 +45,26 @@ class EuleeHand
 		void		perrorExit(std::string msg, int exitTrue = 1);
 		void		convertLocation();
 		size_t		addEnv(std::string input);
+		size_t		clearEnv();
 		std::string	cgiPath();
 		std::string	extractHTML(std::string path);
 		std::string directoryListing(std::string path);
-		
 
 		char								**envp;
 		std::map<std::string, std::string>	cgi;
-		std::map<int, std::string>			errorpage, statusList, buffer, response;
-		std::map<int, long>					bytes_sent;
+		std::map<int, std::string>			errorpage, statusList, buffer, response, method, methodPath, locationPath;
+		std::map<int, long>					bytes_sent, serverIndex, useDefaultIndex, useDirectoryListing;
 		std::map<int, bool>					parsed;
 		std::vector<EuleePocket>			server;
 		std::vector<int>					serverFd;
 		std::vector<sockaddr_in>			serverAddr;
-		int									socket, serverIndex, useDefaultIndex, useDirectoryListing;
-		std::string							method, methodPath, locationPath;
+		int									socket, connectionCount;
 		fd_set								myReadFds, myWriteFds;
 
 	private:
 		size_t			_envpSize;
 		std::string		_configFilePath;
 		ConfigManager	_configManager;
-
 
 		int				_unchunkIntofile(int fd, std::string buffer, int isHeader);
 		size_t			_readFile(std::string *buffer1, std::string *buffer2, int infile, char *temp, long bytes_read, int type, int *count);

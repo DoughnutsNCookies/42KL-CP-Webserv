@@ -3,18 +3,16 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+         #
+#    By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/28 17:38:48 by jhii              #+#    #+#              #
-#    Updated: 2023/03/24 16:16:23 by schuah           ###   ########.fr        #
+#    Updated: 2023/03/29 12:12:26 by jhii             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		=	webserv
-# joel - wsl
-CXX			=	clang++ #g++
-# joel - std::stoi is c++11, srcs/WebServer.cpp:77:56 srcs/WebServer.cpp:177:90
-CXXFLAGS	=	-Wall -Wextra -Werror -Wshadow #-std=c++98 -pedantic
+CXX			=	g++
+CXXFLAGS	=	-Wall -Wextra -Werror -Wshadow -std=c++98 -pedantic
 ifeq ($(DB), 1)
     CXXFLAGS += -fsanitize=thread -g3
 endif
