@@ -6,11 +6,10 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/29 12:43:04 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/29 12:47:18 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../incs/http.hpp"
 #include "../incs/WebServer.hpp"
 
 WebServer::WebServer(std::string configFilePath)
