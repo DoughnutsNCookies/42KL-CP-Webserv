@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/29 15:47:57 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/29 16:24:57 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 16:47:17 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,9 @@ class CookieJar
 		CookieJar();
 		~CookieJar();
 
-		Cookie		generateCookie(int socket);
 		Cookie		&operator[](int socket);
+		Cookie		generateCookie(int socket);
+		bool		checkCookie(std::string cookieRequest);
 
 	private:
 		tm 			*_generateExpirationTime(int expireTimeSeconds);

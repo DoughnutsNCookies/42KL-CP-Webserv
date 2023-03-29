@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/29 14:25:13 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 16:54:36 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -198,16 +198,16 @@ int	WebServer::_parseRequest()
 	if (this->_handleFavicon())
 		return (1);
 
-	std::cout << BLUE << this->_database.buffer[this->_database.socket].substr(0, this->_database.buffer[this->_database.socket].find("\r\n\r\n")) << RESET << std::endl;
+	std::string	requestHeader = this->_database.buffer[this->_database.socket].substr(0, this->_database.buffer[this->_database.socket].find("\r\n\r\n"));
+	std::cout << BLUE << requestHeader << RESET << std::endl;
+	this->_database.cookieExist[this->_database.socket] = this->_database.cookieJar.checkCookie(requestHeader);
 
 	if (this->_handleRedirection())
 		return (1) ;
 	if (this->_database.checkExcept())
 		return (1) ;
 	this->_database.convertLocation();
-	if (this->_database.checkClientBodySize())
-		return (1) ;
-	return (0);
+	return (this->_database.checkClientBodySize());
 }
 
 void	WebServer::_doRequest()

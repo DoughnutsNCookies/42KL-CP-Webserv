@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 14:32:49 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/29 16:16:33 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 16:53:41 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@
 # define WS_UNCHUNK_OUTFILE		".unchunkOutfile"
 # define WS_ERROR_PAGE_PATH 	"./html/server_html/error.html"
 # define WS_DEFAULT_PAGE_PATH	"./html/server_html/default.html"
+# define WS_COOKIE_PAGE_PATH	"./html/server_html/cookie.html"
 # define DEFAULT_CONFIG_PATH	"conf/default.conf"
 
 # include <map>

@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/29 16:24:07 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 17:10:41 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -639,7 +639,7 @@ std::string	EuleeHand::extractHTML(std::string path)
 int		EuleeHand::sendHttp(int statusCode, std::string responseBody)
 {
 	std::string baseResponse = "HTTP/1.1 " + std::to_string(statusCode) + " " + statusList[statusCode] + "\r\n";
-	if (statusCode == 200)
+	if (statusCode == 200 && this->cookieExist[this->socket] == false)
 	{
 		std::cout << GREEN << "Sending Cookie..." << RESET << std::endl;
 		this->cookieJar.generateCookie(this->socket);
@@ -653,7 +653,7 @@ int		EuleeHand::sendHttp(int statusCode, std::string responseBody)
 		return (statusCode);
 	}
 
-	if (this->errorpage.find(statusCode) != this->errorpage.end())
+	if (this->errorpage.find(statusCode) != this->errorpage.end() && statusCode != 200)
 	{
 		if (this->checkPath(this->errorpage[statusCode], 1, 0) == 0)
 		{
@@ -671,12 +671,18 @@ int		EuleeHand::sendHttp(int statusCode, std::string responseBody)
 		{
 			std::cout << GREEN << "Error HTML page is found!" << RESET << std::endl;
 			baseResponse += extractHTML(this->errorpage[statusCode]); // use client page
+			std::cout << (this->errorpage.find(statusCode) != this->errorpage.end()) << std::endl;
 		}
 	}
 	else
 	{
 		if (this->checkPath(this->errorpage[statusCode], 1, 0) == 0)
-			baseResponse += extractHTML(WS_DEFAULT_PAGE_PATH);
+		{
+			if (this->cookieExist[this->socket])
+				baseResponse += extractHTML(WS_COOKIE_PAGE_PATH);
+			else
+				baseResponse += extractHTML(WS_DEFAULT_PAGE_PATH);
+		}
 		else
 			baseResponse += extractHTML(methodPath[this->socket]);
 

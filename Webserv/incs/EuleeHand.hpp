@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/29 16:05:16 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 16:54:36 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ class EuleeHand
 		std::map<std::string, std::string>	cgi;
 		std::map<int, std::string>			errorpage, statusList, buffer, response, method, methodPath, locationPath;
 		std::map<int, long>					bytes_sent, serverIndex, useDefaultIndex, useDirectoryListing;
-		std::map<int, bool>					parsed;
+		std::map<int, bool>					parsed, cookieExist;
 		std::vector<EuleePocket>			server;
 		std::vector<int>					serverFd;
 		std::vector<sockaddr_in>			serverAddr;
