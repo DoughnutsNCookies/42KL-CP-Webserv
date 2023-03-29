@@ -6,7 +6,7 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:12:48 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/28 21:00:06 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/29 12:30:59 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,6 @@
 
 # include "EuleePocket.hpp"
 # include "ConfigManager.hpp"
-
-# define WS_BUFFER_SIZE			100000
-# define WS_UNCHUNK_INFILE		".unchunkInfile"
-# define WS_UNCHUNK_OUTFILE		".unchunkOutfile"
-# define WS_ERROR_PAGE_PATH 	"./html/server_html/error.html"
-# define WS_DEFAULT_PAGE_PATH	"./html/server_html/default.html"
 
 class EuleeHand
 {

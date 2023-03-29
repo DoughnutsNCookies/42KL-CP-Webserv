@@ -1,29 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HttpGetResponse.hpp                                :+:      :+:    :+:   */
+/*   http.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/03/08 15:20:41 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/29 12:28:47 by jhii             ###   ########.fr       */
+/*   Created: 2023/03/29 12:38:19 by jhii              #+#    #+#             */
+/*   Updated: 2023/03/29 12:42:19 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HTTPGETRESPONSE_HPP
-# define HTTPGETRESPONSE_HPP
+#ifndef HTTP_HPP
+# define HTTP_HPP
 
-# include "EuleeHand.hpp"
-
-class HttpGetResponse
-{
-	public:
-		HttpGetResponse(EuleeHand *database);
-		~HttpGetResponse();
-		void		handleGet();
-
-	private:
-		EuleeHand	*_database;
-};
+# include "HttpPostResponse.hpp"
+# include "HttpCgiResponse.hpp"
+# include "HttpGetResponse.hpp"
+# include "HttpDeleteResponse.hpp"
+# include "HttpHeadResponse.hpp"
+# include "HttpPutResponse.hpp"
 
 #endif

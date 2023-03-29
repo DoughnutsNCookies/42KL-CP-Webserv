@@ -6,16 +6,16 @@
 /*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/29 12:12:16 by jhii             ###   ########.fr       */
+/*   Updated: 2023/03/29 12:43:04 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../incs/http.hpp"
 #include "../incs/WebServer.hpp"
 
 WebServer::WebServer(std::string configFilePath)
 {
 	this->_database = EuleeHand(configFilePath, ConfigManager(configFilePath));
-	this->_configManager = ConfigManager(configFilePath);
 	std::remove(WS_TEMP_FILE_IN);
 	std::remove(WS_TEMP_FILE_OUT);
 	std::remove(WS_UNCHUNK_INFILE);
@@ -54,10 +54,6 @@ void	WebServer::_setupServer()
 		if ((this->_database.serverFd[i] = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 			this->_database.perrorExit("Socket Error");
 
-		// struct timeval tv;
-		// tv.tv_sec = 1;
-		// tv.tv_usec = 0;
-		// if (setsockopt(this->_database.serverFd[i], SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv)) == -1)
 		int	optval = 1;
 		if (setsockopt(this->_database.serverFd[i], SOL_SOCKET, SO_NOSIGPIPE, &optval, sizeof(optval)) == -1)
 			this->_database.perrorExit("Setsockopt Error");

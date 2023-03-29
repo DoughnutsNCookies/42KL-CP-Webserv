@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   HttpPutResponse.hpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
+/*   By: jhii <jhii@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 14:00:35 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/24 16:06:27 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/29 12:29:02 by jhii             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef HTTPPUTRESPONSE_HPP
 # define HTTPPUTRESPONSE_HPP
 
-# include "WebServer.hpp"
+# include "EuleeHand.hpp"
 
 class HttpPutResponse
 {
