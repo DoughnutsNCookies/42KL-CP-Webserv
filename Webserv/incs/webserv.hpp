@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 14:32:49 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/29 16:53:41 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/30 15:17:32 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,5 +56,6 @@
 # include <sys/socket.h>
 # include <sys/select.h>
 # include <netinet/in.h>
+# include <sys/resource.h>
 
 #endif

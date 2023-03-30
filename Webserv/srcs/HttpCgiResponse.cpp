@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:55:14 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/30 15:13:58 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/30 15:18:23 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,14 @@ void    HttpCgiResponse::handleCgi()
 				exit(EXIT_FAILURE);
 			}
 		}
+		rlimit	cpuLimit;
+		cpuLimit.rlim_cur = 10;
+		cpuLimit.rlim_max = 10;
+		if (setrlimit(RLIMIT_CPU, &cpuLimit) == -1)
+		{
+        	this->_database->perrorExit("setrlimit", 0);
+        	exit(EXIT_FAILURE);
+    	}
 		execve(args[0], args, this->_database->envp);
 		std::remove(inFileName.c_str());
 		std::remove(outFileName.c_str());
