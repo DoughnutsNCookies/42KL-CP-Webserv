@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:55:14 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/29 18:34:30 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/30 15:13:58 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,12 +60,23 @@ void    HttpCgiResponse::handleCgi()
 		close(inFd);
 		dup2(outFd, STDOUT_FILENO);
 		close(outFd);
-		char *args[3] = {(char *)this->_database->cgi[ext].c_str(), (char *)this->_database->methodPath[this->_database->socket].c_str(), NULL};
+		size_t	lastSlash = this->_database->cgi[ext].find_last_of("/");
+		char	*args[3] = {(char *)this->_database->cgi[ext].c_str(), (char *)this->_database->methodPath[this->_database->socket].c_str() + 1, NULL};
+		if (lastSlash != std::string::npos)
+		{
+			args[0] = (char *)this->_database->cgi[ext].c_str() + lastSlash + 1;
+			if (chdir(this->_database->cgi[ext].substr(0, this->_database->cgi[ext].find_last_of("/")).c_str()) < 0)
+			{
+				std::cerr << RED << "Chdir failed..." << RESET << std::endl;
+				this->_database->perrorExit("chdir", 0);
+				exit(EXIT_FAILURE);
+			}
+		}
 		execve(args[0], args, this->_database->envp);
 		std::remove(inFileName.c_str());
 		std::remove(outFileName.c_str());
 		std::cerr << RED << "Execve failed..." << RESET << std::endl;
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 	int status;
 	waitpid(-1, &status, 0);
