@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 21:19:35 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/30 15:19:15 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/30 20:29:55 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,8 @@ int    main(int ac, char **av, char **envp)
     std::cout << "Current working directory: " << cwd << std::endl;
     free(cwd);
 
-    while (1)
-        ;
+    // while (1)
+        // ;
 
 	delete[] buffer;
     return (0);

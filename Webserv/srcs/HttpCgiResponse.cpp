@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 10:55:14 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/30 15:18:23 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/30 20:33:43 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,16 +102,21 @@ void    HttpCgiResponse::handleCgi()
 		total += bytesRead;
 	}
 	close(outfd2);
-	size_t  startPos = output.find("\r\n\r\n") + std::strlen("\r\n\r\n");
-	std::string newOutput = output.substr(startPos);
-
-	this->_database->sendHttp(200, newOutput);
-	std::cout << GREEN << "CGI ran successfully!" << RESET << std::endl;
-	std::remove(inFileName.c_str());
-	std::remove(outFileName.c_str());
-	dup2(stdinFd, STDIN_FILENO);
-	close(stdinFd);
-	dup2(stdoutFd, STDOUT_FILENO);
-	close(stdoutFd);
+	size_t  startPos = output.find("\r\n\r\n");
+	if (startPos == std::string::npos)
+		this->_database->sendHttp(404);
+	else
+	{
+		startPos += std::strlen("\r\n\r\n");
+		std::string newOutput = output.substr(startPos);
+		this->_database->sendHttp(200, newOutput);
+		std::cout << GREEN << "CGI ran successfully!" << RESET << std::endl;
+		std::remove(inFileName.c_str());
+		std::remove(outFileName.c_str());
+		dup2(stdinFd, STDIN_FILENO);
+		close(stdinFd);
+		dup2(stdoutFd, STDOUT_FILENO);
+		close(stdoutFd);
+	}
 	count++;
 }
