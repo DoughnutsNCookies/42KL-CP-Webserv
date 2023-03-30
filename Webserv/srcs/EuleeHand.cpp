@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/30 21:11:09 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/30 21:37:48 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -567,7 +567,6 @@ int	EuleeHand::unchunkResponse()
 void	EuleeHand::convertLocation()
 {
 	this->useDefaultIndex[this->socket] = 0;
-	std::cout << "Server index: " << this->serverIndex[this->socket] << std::endl;
 	EuleePocket	myServer = this->server[this->serverIndex[this->socket]];
 	std::string	methodPathCopy = this->methodPath[this->socket].c_str();
 	size_t		longestPathSize = 0;
@@ -608,12 +607,7 @@ void	EuleeHand::convertLocation()
 		remainingPath = this->methodPath[this->socket].substr(this->locationPath[this->socket].length());
 		if (myServer[INDEX].empty() == false)
 			indexFile = myServer[INDEX][0];
-		std::string root;
-		if (myServer.location[this->locationPath[this->socket]][ROOT].empty())
-			root = myServer[ROOT][0];
-		else
-			root = myServer.location[this->locationPath[this->socket]][ROOT][0];
-		this->methodPath[this->socket] = "/" + root + this->locationPath[this->socket] + (this->locationPath[this->socket][this->locationPath[this->socket].length() - 1] == '/' ? "" : "/") + (this->method[this->socket] == "GET" ? indexFile : ""); 
+		this->methodPath[this->socket] = "/" + (myServer.location[this->locationPath[this->socket]][ROOT].empty() ? myServer[ROOT][0] : myServer.location[this->locationPath[this->socket]][ROOT][0]) + this->locationPath[this->socket] + (this->locationPath[this->socket][this->locationPath[this->socket].length() - 1] == '/' ? "" : "/") + (this->method[this->socket] == "GET" ? indexFile : ""); 
 		this->useDefaultIndex[this->socket] = 1;
 		this->useDirectoryListing[this->socket] = (this->server[this->serverIndex[this->socket]].location[this->locationPath[this->socket]][AUTO_INDEX].size() != 0);
 	}
