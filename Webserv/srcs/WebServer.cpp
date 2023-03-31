@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/31 14:38:46 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/31 15:16:55 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -299,7 +299,6 @@ void	WebServer::_serverLoop()
 	static int countIn = 0;
 	while (1)
 	{
-		// usleep(2000);
 		memcpy(&readFds, &this->_database.myReadFds, sizeof(this->_database.myReadFds));
 		memcpy(&writeFds, &this->_database.myWriteFds, sizeof(this->_database.myWriteFds));
 		int	selectVal = select(FD_SETSIZE, &readFds, &writeFds, NULL, &timeout);

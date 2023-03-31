@@ -6,14 +6,14 @@
 #    By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/28 17:38:48 by jhii              #+#    #+#              #
-#    Updated: 2023/03/31 14:34:54 by schuah           ###   ########.fr        #
+#    Updated: 2023/03/31 15:16:56 by schuah           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		=	webserv
 CXX			=	g++
 CXXFLAGS	=	-Wall -Wextra -Werror -Wshadow -std=c++98 -pedantic
-# CXXFLAGS	+=	-fsanitize=thread -g3
+CXXFLAGS	+=	-fsanitize=thread -g3
 INCLUDES	=	-Iincs
 RM			=	rm -rf
 MKDIR		=	mkdir -p
