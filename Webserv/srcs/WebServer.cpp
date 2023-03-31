@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/31 13:43:21 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/31 14:38:46 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,19 +121,18 @@ void	WebServer::_receiveRequest()
 		FD_CLR(this->_database.socket, &this->_database.myReadFds);
 		return ;
 	}
+	if (this->_database.parseHeader())
+	{
+		std::cout << std::endl;
+		FD_SET(this->_database.socket, &this->_database.myWriteFds);
+		FD_CLR(this->_database.socket, &this->_database.myReadFds);
+	}
 	while (recvVal > 0)
 	{
 		this->_database.buffer[this->_database.socket].append(readBuffer, recvVal);
 		std::cout << GREEN << "Receiving total: " << this->_database.buffer[this->_database.socket].size() << "\r" << RESET;
 		std::cout.flush();
 		std::memset(readBuffer, 0, WS_BUFFER_SIZE + 1);
-		if (this->_database.parseHeader())
-		{
-			std::cout << std::endl;
-			FD_SET(this->_database.socket, &this->_database.myWriteFds);
-			FD_CLR(this->_database.socket, &this->_database.myReadFds);
-			return ;
-		}
 		recvVal = recv(this->_database.socket, readBuffer, WS_BUFFER_SIZE, 0);
 		if (recvVal <= 0)
 			break ;
