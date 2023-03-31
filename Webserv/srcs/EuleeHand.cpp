@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/07 15:13:53 by jhii              #+#    #+#             */
-/*   Updated: 2023/03/30 21:37:48 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/31 14:06:32 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -600,7 +600,16 @@ void	EuleeHand::convertLocation()
 			}
 		}
 		else // Not Found
+		{
+			newPath = myServer[ROOT][0] + newPath;
+			if (this->checkPath(newPath, 1, 0) && newPath[newPath.length() - 1] != '/') // Found file, else found directory
+			{
+				this->methodPath[this->socket] = "/" + newPath;
+				std::cout << GREEN << "Location Path: " << this->locationPath[this->socket] << RESET << std::endl;
+				std::cout << GREEN << "New Path: " << this->methodPath[this->socket] << RESET << std::endl;
+			}
 			return ;
+		}
 	}
 	if (myServer.location[this->locationPath[this->socket]][INDEX].empty()) // No Trailing File -> Append back and find
 	{
