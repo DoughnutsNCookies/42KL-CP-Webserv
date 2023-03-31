@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 14:01:49 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/29 14:25:13 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/31 18:23:49 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,10 +65,7 @@ void	HttpPutResponse::handlePut()
 	{
 		std::cout << GREEN << "Put to: " << this->_database->methodPath[this->_database->socket].c_str() + 1 << RESET << std::endl;
 		std::string		toWrite = this->_database->buffer[this->_database->socket].substr(this->_database->buffer[this->_database->socket].find("\r\n\r\n") + std::strlen("\r\n\r\n"));
-		if (contentLengthSpecified)
-			originalPath << toWrite;
-		else
-			originalPath << toWrite;
+		originalPath << toWrite;
 		originalPath.close();
 	}
 	this->_database->sendHttp(200);
