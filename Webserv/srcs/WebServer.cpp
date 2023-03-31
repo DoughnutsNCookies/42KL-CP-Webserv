@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/31 13:40:45 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/31 13:43:21 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -265,7 +265,7 @@ void	WebServer::_doRequest()
 		}
 		else
 		{
-			std::cout << MAGENTA << "Default method called" << RESET << std::endl;
+			std::cout << MAGENTA << "Invalid method called" << RESET << std::endl;
 			this->_database.sendHttp(405);
 		}
 	}
