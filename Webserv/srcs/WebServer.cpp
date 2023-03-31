@@ -6,7 +6,7 @@
 /*   By: schuah <schuah@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 13:27:11 by schuah            #+#    #+#             */
-/*   Updated: 2023/03/29 20:05:17 by schuah           ###   ########.fr       */
+/*   Updated: 2023/03/31 13:40:45 by schuah           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,6 +127,13 @@ void	WebServer::_receiveRequest()
 		std::cout << GREEN << "Receiving total: " << this->_database.buffer[this->_database.socket].size() << "\r" << RESET;
 		std::cout.flush();
 		std::memset(readBuffer, 0, WS_BUFFER_SIZE + 1);
+		if (this->_database.parseHeader())
+		{
+			std::cout << std::endl;
+			FD_SET(this->_database.socket, &this->_database.myWriteFds);
+			FD_CLR(this->_database.socket, &this->_database.myReadFds);
+			return ;
+		}
 		recvVal = recv(this->_database.socket, readBuffer, WS_BUFFER_SIZE, 0);
 		if (recvVal <= 0)
 			break ;
@@ -145,24 +152,16 @@ void	WebServer::_sendResponse()
 	long	total = this->_database.bytes_sent[this->_database.socket];
 	long	sendVal = send(this->_database.socket, this->_database.response[this->_database.socket].c_str() + total, this->_database.response[this->_database.socket].size() - total, 0);
 	if (sendVal <= 0)
-	{
 		this->_database.perrorExit("Send Error", 0);
-		this->_database.bytes_sent[this->_database.socket] = 0;
-		this->_database.buffer[this->_database.socket].clear();
-		this->_database.response[this->_database.socket].clear();
-		this->_database.parsed.erase(this->_database.socket);
-		close(this->_database.socket);
-		FD_CLR(this->_database.socket, &this->_database.myWriteFds);
-		return ;
+	else
+	{
+		this->_database.bytes_sent[this->_database.socket] += sendVal;
+		std::cout << GREEN << "Sending total: " << this->_database.bytes_sent[this->_database.socket] << RESET << "\r";
+		std::cout.flush();
+		if ((size_t)this->_database.bytes_sent[this->_database.socket] != this->_database.response[this->_database.socket].size())
+			return ;
+		std::cout << std::endl;
 	}
-	this->_database.bytes_sent[this->_database.socket] += sendVal;
-	std::cout << GREEN << "Sending total: " << this->_database.bytes_sent[this->_database.socket] << RESET << "\r";
-	std::cout.flush();
-
-	if ((size_t)this->_database.bytes_sent[this->_database.socket] != this->_database.response[this->_database.socket].size())
-		return ;
-
-	std::cout << std::endl;
 	this->_database.bytes_sent.erase(this->_database.socket);
 	this->_database.buffer.erase(this->_database.socket);
 	this->_database.response.erase(this->_database.socket);
@@ -263,6 +262,11 @@ void	WebServer::_doRequest()
 			std::cout << MAGENTA << "Get method called" << RESET << std::endl;
 			HttpGetResponse	getResponse(&this->_database);
 			getResponse.handleGet();
+		}
+		else
+		{
+			std::cout << MAGENTA << "Default method called" << RESET << std::endl;
+			this->_database.sendHttp(405);
 		}
 	}
 	catch(const std::exception& e)
